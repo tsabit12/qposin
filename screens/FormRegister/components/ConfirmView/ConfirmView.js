@@ -5,7 +5,8 @@ import {
 	Modal, 
 	StyleSheet, 
 	TouchableOpacity,
-	Animated
+	Animated,
+	StatusBar
 } from 'react-native';
 import { Icon } from 'native-base';
 import rgba from 'hex-to-rgba';
@@ -155,6 +156,7 @@ const ConfirmView = props => {
         	animationType="fade"
 		>
 			<View style={styles.modalBackground}>
+				<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
 				<Animated.View style={[styles.content, {transform: [{translateY: bounceValue }] }]}>
 					<View style={styles.right}>
 						<TouchableOpacity onPress={handleClose}>

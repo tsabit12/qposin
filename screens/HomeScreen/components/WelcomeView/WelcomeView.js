@@ -10,7 +10,8 @@ import {
 	Animated,
 	Keyboard,
 	KeyboardAvoidingView,
-	ScrollView
+	ScrollView,
+	StatusBar
 } from 'react-native';
 import rgba from 'hex-to-rgba';
 import Hr from "react-native-hr-component";
@@ -104,21 +105,25 @@ const WelcomeScreen = props => {
 				>	
 					 <AnimatedLoader
 				        visible={state.loading}
-				        overlayColor="rgba(0,0,0,0.6)"
+				        overlayColor="rgba(0,0,0,0.5)"
 				        source={require("../../../../assets/images/loader/3098.json")}
 				        animationStyle={styles.lottie}
 				        speed={1}
 				    />
-				    { state.tracks.length > 0 && 
-				    	<TracksView 
-				    		data={state.tracks} 
-				    		noresi={state.noresi} 
-				    		onClose={() => setState(state => ({
-				    			...state,
-				    			tracks: [],
-				    			noresi: ''
-				    		}))}
-				    	/> }
+				    { state.loading && <StatusBar backgroundColor="rgba(0,0,0,0.5)"/> }
+				    { state.tracks.length > 0 &&
+				    	<React.Fragment> 	
+				    		<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
+					    	<TracksView 
+					    		data={state.tracks} 
+					    		noresi={state.noresi} 
+					    		onClose={() => setState(state => ({
+					    			...state,
+					    			tracks: [],
+					    			noresi: ''
+					    		}))}
+					    	/>
+				    	</React.Fragment> }
 					<KeyboardAvoidingView behavior='padding' enabled={false} style={{flex: 1}}>
 						<ScrollView showsVerticalScrollIndicator={false}>
 							<View style={{alignItems: 'center', marginTop: 20}}>

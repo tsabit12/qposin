@@ -5,7 +5,8 @@ import {
 	ImageBackground, 
 	StyleSheet, 
 	TouchableOpacity,
-	TextInput
+	TextInput,
+	StatusBar
 } from 'react-native';
 import {
 	widthPercentageToDP as wp, 
@@ -94,6 +95,7 @@ const PulihkanAkun = props => {
 		        animationStyle={styles.lottie}
 		        speed={1}
 		    />
+		    { state.loading &&  <StatusBar backgroundColor="rgba(0,0,0,0.6)"/> }
 		    { state.showVerifyCode && 
 		    	<VerificationView 
 		    		onClose={() => setState(state => ({

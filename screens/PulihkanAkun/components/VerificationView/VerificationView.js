@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { Modal, View, StyleSheet, Text, Animated, TouchableOpacity } from 'react-native';
+import { Modal, View, StyleSheet, Text, Animated, TouchableOpacity, StatusBar } from 'react-native';
 import {
 	widthPercentageToDP as wp, 
 	heightPercentageToDP as hp
@@ -58,6 +58,7 @@ const VerificationView = props => {
         	visible={true}
         	animationType="fade"
 		>
+			<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
 			<View style={styles.backgroundModal}>
 				<Animated.View style={[styles.modalContainer, {transform: [{translateY: bounceValue }] }]}>
 					<Text style={[styles.text, { textAlign: 'center', margin: 5}]}>
