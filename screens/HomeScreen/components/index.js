@@ -1,2 +1,2 @@
 export { default as SliderView } from './SliderView';
-export { default as PinView } from './PinView';
+export { default as WelcomeView } from './WelcomeView';

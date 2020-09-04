@@ -18,6 +18,7 @@ import Hr from "react-native-hr-component";
 import {
 	ConfirmView
 } from './components';
+import api from '../../api';
 
 
 const ErrorLabel = props => {
@@ -85,6 +86,7 @@ const FormRegister = props => {
 						...state,
 						modalVisible: false
 					}))}
+					callApi={(payload) => api.sendWhatsApp(payload)}
 				/> }
 			<View style={styles.form}>
 				<Text style={styles.label}>Nomor Ponsel</Text>
@@ -106,7 +108,7 @@ const FormRegister = props => {
 				{ errors.phone ? 
 					<ErrorLabel text={errors.phone} /> : 
 					<Text style={[styles.label, {marginTop: 7, color: rgba('#FFF', 0.6)}]}>
-						Contoh: 087712336667
+						Contoh: 08XXXXXXXXXX
 					</Text> }
 			</View>
 			<View style={{justifyContent: 'space-around', height: hp('20%')}}>
@@ -131,6 +133,7 @@ const FormRegister = props => {
 					<TouchableOpacity 
 						style={[styles.btn, {borderWidth: 0.6, borderColor: '#FFF'}]}
 						activeOpacity={0.6}
+						onPress={() => props.navigation.push('Restore')}
 					>
 						<Text style={styles.text}>Pulihkan akun</Text>
 					</TouchableOpacity>

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 // import MaskedView from '@react-native-community/masked-view';
 
 import {
-	PinView,
+	WelcomeView,
 	SliderView
 } from './components';
 
@@ -14,7 +14,8 @@ const HomeScreen = props => {
 		animatedDone: false,
 		animtedValue: new Animated.Value(0),
 		mount: false,
-		localUser: {}
+		localUser: {},
+		displayIntro: true
 	})
 
 	//we are using redux 
@@ -29,7 +30,8 @@ const HomeScreen = props => {
 				setState(state => ({
 					...state,
 					mount: true,
-					localUser: toObje
+					localUser: toObje,
+					displayIntro: false
 				}))
 			}else{
 				setState(state => ({
@@ -49,10 +51,10 @@ const HomeScreen = props => {
 	            delay: 400,
 	            useNativeDriver: true,
 	        }).start(() => {
-	          setState(state => ({
-	            ...state,
-	            animatedDone: true
-	          }))
+				setState(state => ({
+				...state,
+				animatedDone: true
+				}))
 	        })
 		}
 	}, [state.mount]);
@@ -74,7 +76,7 @@ const HomeScreen = props => {
         outputRange: [0, 0, 1],
         extrapolate: 'clamp'
       })
-    }
+    } 
 
 	return(
 		<View style={{flex: 1}}>
@@ -84,11 +86,18 @@ const HomeScreen = props => {
 	            source={require('../../assets/images/posindo.png')}
 	            style={[{ width: 500, height: 500}, imageScale ]}
 	        />  
-				{ Object.keys(state.localUser).length > 0 ? 
-					<PinView onDone={() => props.navigation.navigate('Welcome')} /> : 
+				{ !state.displayIntro ? 
+					<WelcomeView 
+						opacity={opacity} 
+						navigation={props.navigation}
+						user={state.localUser}
+					/> : 
 					<SliderView 
 						opacity={opacity} 
-						onDoneSlider={() => props.navigation.navigate('Welcome')}
+						onDoneSlider={() => setState(state => ({
+							...state,
+							displayIntro: false
+						}))}
 					/> }
 			</View>
 		</View>

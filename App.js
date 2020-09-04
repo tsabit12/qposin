@@ -8,11 +8,10 @@ import store from './redux/store';
 import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import { Root } from "native-base";
-
 import {
   HomeScreen,
-  WelcomeScreen,
-  FormRegister as FormRegisterScreen
+  FormRegister as FormRegisterScreen,
+  PulihkanAkun
 } from './screens';
 
 const Stack = createStackNavigator();
@@ -50,7 +49,7 @@ export default function App() {
 
     setAppReady(true);
   }
-
+  
   if (!appIsReady) {
     return null;
   }else{
@@ -65,8 +64,8 @@ export default function App() {
               }}
             >
               <Stack.Screen name="Home" component={HomeScreen} />
-              <Stack.Screen name="Welcome" component={WelcomeScreen} />
               <Stack.Screen name="FormRegister" component={FormRegisterScreen} />
+              <Stack.Screen name="Restore" component={PulihkanAkun} />
             </Stack.Navigator>
           </NavigationContainer>
           <StatusBar style="light" />

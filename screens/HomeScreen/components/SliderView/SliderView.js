@@ -3,6 +3,10 @@ import { StyleSheet, View, Text, Animated, ImageBackground, Image, Dimensions } 
 import AppIntroSlider from 'react-native-app-intro-slider';
 import PropTypes from 'prop-types';
 import Constants from 'expo-constants';
+import {
+	widthPercentageToDP as wp, 
+	heightPercentageToDP as hp
+} from 'react-native-responsive-screen';
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,8 +33,8 @@ const SliderView = props => {
 	      <Image 
 	      	source={require('../../../../assets/images/logo2.png')}
 	      	style={{
-	      		width: width / 2.7, 
-		      	height: height / 5,
+	      		width: wp('40%'), 
+				height: hp('20%'),
 	      		marginTop: 50
 	      	}}
 	      />

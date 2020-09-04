@@ -16,6 +16,12 @@ import {
 import PropTypes from 'prop-types';
 import CodeInput from 'react-native-confirmation-code-input';
 
+const convertPhone = (phone) => {
+	//skip first number (0)
+	const removeFirstNumber = phone.substring(1,15); 
+	return `62${removeFirstNumber}`;
+}
+
 const VerficationForm = props => {
 	const bounceValue = new Animated.Value(-100);
 	const confirmRef = useRef();
@@ -100,19 +106,47 @@ const ConfirmView = props => {
 	}
 
 	const handleSend = () => {
+		const convertedPhone = convertPhone(props.phone);
+
+		const payload = {
+			phone: convertedPhone,
+			body: 'QPOSIN: untuk pembuatan akun, masukkan kode verifikasi 7766'
+		};
+
 		setState(state => ({
 			...state,
 			loading: true
 		}))
+		
+		props.callApi(payload)
+			.then(res => {
+				console.log(res);
+				setState(state => ({
+					...state,
+					loading: false
+				}))
+			})
+			.catch(err => {
+				console.log(err.request);
+				setState(state => ({
+					...state,
+					loading: false
+				}))
+			})
 
-		setTimeout(function() {
-			setState(state => ({
-				...state,
-				loading: false,
-				success: true
-			}))
-		}, 2000);
-	}
+		// setState(state => ({
+		// 	...state,
+		// 	loading: true
+		// }))
+
+		// setTimeout(function() {
+		// 	setState(state => ({
+		// 		...state,
+		// 		loading: false,
+		// 		success: true
+		// 	}))
+		// }, 2000);
+	}	
 
 	return(
 		<Modal
@@ -194,5 +228,9 @@ const styles = StyleSheet.create({
 		marginTop: 12
 	}
 })
+
+ConfirmView.propTypes = {
+	callApi: PropTypes.func.isRequired
+}
 
 export default ConfirmView;
