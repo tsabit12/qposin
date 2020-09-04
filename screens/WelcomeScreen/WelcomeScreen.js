@@ -15,131 +15,199 @@ import {
 import rgba from 'hex-to-rgba';
 import Hr from "react-native-hr-component";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import { 
-	Text
-} from 'native-base';
-// import rgba from 'hex-to-rgba';
+import { Text } from 'native-base';
 import Constants from 'expo-constants';
+import {
+	BarcodeView,
+	TracksView
+} from './components';
+import api from '../../api';
+import AnimatedLoader from "react-native-animated-loader";
+import { Toast } from 'native-base';
 
 const { width, height } = Dimensions.get('window');
 
 const WelcomeScreen = props => {
-	const [isKeyboardVisible, setActiveKeyboard] = useState(false);
+	const [state, setState] = useState({
+		hasPermission: null,
+		activePage: 'welcome',
+		noresi: '',
+		loading: false,
+		tracks: []
+	})
+	
+	const { activePage } = state;
 
-	useEffect(() => {
-		const keyboardDidShowListener = Keyboard.addListener(
-	      'keyboardDidShow',
-	      () => {
-	        setActiveKeyboard(true);
-	      }
-	    );
+	const searchBarcode = (resiValue) => {
+		if (resiValue.length === 0) {
+			alert('Nomor resi belum diisi');
+		}else{
+			setState(state => ({
+				...state,
+				loading: true
+			}))
 
-	    const keyboardDidHideListener = Keyboard.addListener(
-	      'keyboardDidHide',
-	      () => {
-	        setActiveKeyboard(false);
-	      }
-	    );
+			api.lacakKiriman(resiValue)
+				.then(tracks => {
+					setState(state => ({
+						...state,
+						loading: false,
+						tracks
+					}))
+				})
+				.catch(err => {
+					setState(state => ({
+						...state,
+						loading: false
+					}))
 
-	    return () => {
-	      keyboardDidHideListener.remove();
-	      keyboardDidShowListener.remove();
-	    };
-	}, []);
+					Toast.show({
+		                text: "Kiriman tidak ditemukan",
+		                duration: 3000,
+		                textStyle: { color: "#FFF", textAlign: 'center' }
+		            })
+				})
+		}
+	}
 
+	const handleSearchBarcode = (barcode) => {
+		setState(state => ({
+			...state,
+			activePage: 'welcome'
+		}))
 
-	return(
-		<ImageBackground 
-			source={require('../../assets/images/background.png')} 
-			style={styles.root}
-		>	
-			<KeyboardAvoidingView behavior='padding' enabled={false} style={{flex: 1}}>
-				<ScrollView showsVerticalScrollIndicator={false}>
-					<View style={{alignItems: 'center'}}>
-						<Image 
-					      	source={require('../../assets/images/logo2.png')}
-					      	style={{
-					      		width: wp('40%'), 
-					      		height: hp('20%')
-					      	}}
-					      	resizeMode='contain'
-					    />
-				    </View>
-					<View 
-						style={{
-							alignItems: 'center', 
-							//backgroundColor: 'green',
-							height: hp('15%'),
-							flex: 1,
-							padding: 10,
-							justifyContent: 'center'
-						}}
-					>
-					    
-				    	<Text style={styles.text}>Halo, Selamat datang</Text>
-			    		<TouchableOpacity 
-			    			style={[styles.btnrounded, {backgroundColor: '#ffac30', marginTop: 10}]} 
-			    			activeOpacity={0.9}
-			    		>
-				            <Text style={styles.textBtn}>Registrasi sekarang</Text>
-				        </TouchableOpacity>
-				    </View>
-					    <View style={styles.container}>
-				        	<Text style={[styles.subText, {marginBottom: 10}]}>Cek kiriman kamu disini</Text>
-				        	<TextInput
-						      style={[styles.input, {marginBottom: 10}]}
-						      //onChangeText={text => onChangeText(text)}
-						      // value={value}
-						      placeholderTextColor={rgba('#FFF', 0.6)}
-						      placeholder='Masukan nomor resi'
-						      textAlign='center'
-						      returnKeyType='search'
-						      returnKeyLabel='search'
+		searchBarcode(barcode);
+	}
+
+	if (activePage === 'welcome') {
+		return(
+			<ImageBackground 
+				source={require('../../assets/images/background.png')} 
+				style={styles.root}
+			>	
+				 <AnimatedLoader
+			        visible={state.loading}
+			        overlayColor="rgba(0,0,0,0.6)"
+			        source={require("../../assets/images/loader/3098.json")}
+			        animationStyle={styles.lottie}
+			        speed={1}
+			    />
+			    { state.tracks.length > 0 && 
+			    	<TracksView 
+			    		data={state.tracks} 
+			    		noresi={state.noresi} 
+			    		onClose={() => setState(state => ({
+			    			...state,
+			    			tracks: [],
+			    			noresi: ''
+			    		}))}
+			    	/> }
+				<KeyboardAvoidingView behavior='padding' enabled={false} style={{flex: 1}}>
+					<ScrollView showsVerticalScrollIndicator={false}>
+						<View style={{alignItems: 'center', marginTop: 20}}>
+							<Image 
+						      	source={require('../../assets/images/logo2.png')}
+						      	style={{
+						      		width: wp('40%'), 
+						      		height: hp('20%')
+						      	}}
+						      	resizeMode='contain'
 						    />
-						    <Hr 
-						    	lineColor={rgba('#FFF', 0.7)} 
-						    	width={1} 
-						    	textPadding={10} 
-						    	text="atau" 
-						    	textStyles={styles.hr} 
-						    	hrPadding={10}
-						    />
-
-						    <TouchableOpacity 
-						    	style={[styles.btnrounded, {
-						    		marginTop: 10, 
-						    		borderColor: rgba('#FFF', 0.7), 
-						    		borderWidth: 1
-						    	}]} 
-						    	activeOpacity={0.6}
-						    >
-					            <Text style={styles.textBtn}>Scan barcode</Text>
+					    </View>
+						<View 
+							style={{
+								alignItems: 'center', 
+								height: hp('15%'),
+								flex: 1,
+								padding: 10,
+								justifyContent: 'center'
+							}}
+						>
+						    
+					    	<Text style={styles.text}>Halo, Selamat datang</Text>
+				    		<TouchableOpacity 
+				    			style={[styles.btnrounded, {backgroundColor: '#ffac30', marginTop: 10}]} 
+				    			activeOpacity={0.9}
+				    			onPress={() => props.navigation.navigate('FormRegister')}
+				    		>
+					            <Text style={styles.textBtn}>Registrasi sekarang</Text>
 					        </TouchableOpacity>
-				    	</View>
-				    	<View 
-				    		style={{
-				    			height: hp('20%'),
-				    			justifyContent: 'center',
-				    			width: wp('100%'),
-				    			alignItems: 'center',
-				    			flex: 1
-				    		}}
-				    	>
-							<Text 
-								style={{
-									textAlign: 'center', 
-									fontFamily: 'Nunito-Bold', 
-									color: rgba('#FFF', 0.8),
-									fontSize: 14
-								}}
-							>
-								Butuh Bantuan? <Text style={[styles.text, {fontSize: 14}]}>Hubungi Contact Center 161</Text>
-							</Text>
-						</View>
-				</ScrollView>
-			</KeyboardAvoidingView>
-		</ImageBackground>
-	);	
+					    </View>
+						    <View style={styles.container}>
+					        	<Text style={[styles.subText, {marginBottom: 10}]}>Cek kiriman kamu disini</Text>
+					        	<TextInput
+							      style={[styles.input, {marginBottom: 10}]}
+							      onChangeText={text => setState(state => ({
+							      	...state,
+							      	noresi: text
+							      }))}
+							      onSubmitEditing={() => searchBarcode(state.noresi)}
+							      value={state.noresi}
+							      placeholderTextColor={rgba('#FFF', 0.6)}
+							      placeholder='Masukan nomor resi'
+							      textAlign='center'
+							      returnKeyType='search'
+							      returnKeyLabel='search'
+							    />
+							    <Hr 
+							    	lineColor={rgba('#FFF', 0.7)} 
+							    	width={1} 
+							    	textPadding={10} 
+							    	text="atau" 
+							    	textStyles={styles.hr} 
+							    	hrPadding={10}
+							    />
+
+							    <TouchableOpacity 
+							    	style={[styles.btnrounded, {
+							    		marginTop: 10, 
+							    		borderColor: rgba('#FFF', 0.7), 
+							    		borderWidth: 1
+							    	}]} 
+							    	activeOpacity={0.6}
+							    	onPress={() => setState(state => ({
+							    		...state,
+							    		activePage: 'barcode'
+							    	}))}
+							    >
+						            <Text style={styles.textBtn}>Scan barcode</Text>
+						        </TouchableOpacity>
+					    	</View>
+					    	<View 
+					    		style={{
+					    			height: hp('20%'),
+					    			justifyContent: 'center',
+					    			width: wp('100%'),
+					    			alignItems: 'center',
+					    			flex: 1
+					    		}}
+					    	>
+								<Text 
+									style={{
+										textAlign: 'center', 
+										fontFamily: 'Nunito-Bold', 
+										color: rgba('#FFF', 0.8),
+										fontSize: 14
+									}}
+								>
+									Butuh Bantuan? <Text style={[styles.text, {fontSize: 14}]}>Hubungi Contact Center 161</Text>
+								</Text>
+							</View>
+					</ScrollView>
+				</KeyboardAvoidingView>
+			</ImageBackground>
+		)
+	}else{
+		return(
+			<BarcodeView 
+				onClose={() => setState(state => ({
+					...state,
+					activePage: 'welcome'
+				}))}
+				onSearch={handleSearchBarcode}
+			/>
+		)
+	}
 }
 
 const styles = StyleSheet.create({
@@ -171,8 +239,8 @@ const styles = StyleSheet.create({
 	btnrounded: {
 		padding: 10,
 		borderRadius: 25,
-		minWidth: width / 1.2,
-		height: height / 19,
+		width: wp('90%'),
+		height: hp('6%'),
 		justifyContent: 'center',
 		alignItems: 'center'
 	},
@@ -181,8 +249,8 @@ const styles = StyleSheet.create({
 		fontSize: 14
 	},
 	input: {
-		height: height / 19,
-		width: width / 1.2,
+		width: wp('90%'),
+		height: hp('6%'),
 		borderColor: '#FFF',
 		borderWidth: 0.3,
 		borderRadius: 25,
@@ -191,6 +259,10 @@ const styles = StyleSheet.create({
 	},
 	hr: {
 		color: rgba('#FFF', 0.7)
+	},
+	lottie: {
+	    width: 100,
+	    height: 100
 	}
 })
 

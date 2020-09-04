@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 import store from './redux/store';
 import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
+import { Root } from "native-base";
 
 import {
   HomeScreen,
@@ -54,21 +55,23 @@ export default function App() {
     return null;
   }else{
     return(
-      <Provider store={store}>
-        <NavigationContainer>
-          <Stack.Navigator 
-            initialRouteName="Home"
-            screenOptions={{
-              headerShown: false
-            }}
-          >
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Welcome" component={WelcomeScreen} />
-            <Stack.Screen name="FormRegister" component={FormRegisterScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
-        <StatusBar style="auto" />
-      </Provider>
+      <Root>
+        <Provider store={store}>
+          <NavigationContainer>
+            <Stack.Navigator 
+              initialRouteName="Home"
+              screenOptions={{
+                headerShown: false
+              }}
+            >
+              <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen name="Welcome" component={WelcomeScreen} />
+              <Stack.Screen name="FormRegister" component={FormRegisterScreen} />
+            </Stack.Navigator>
+          </NavigationContainer>
+          <StatusBar style="light" />
+        </Provider>
+      </Root>
     );
   }
 }
