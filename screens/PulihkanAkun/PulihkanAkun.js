@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
 	View, 
 	Text, 
@@ -6,18 +6,53 @@ import {
 	StyleSheet, 
 	TouchableOpacity,
 	TextInput,
-	StatusBar
+	StatusBar,
+	AsyncStorage
 } from 'react-native';
+import PropTypes from 'prop-types';
 import {
 	widthPercentageToDP as wp, 
 	heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
-import { Icon } from 'native-base';
+import { Icon, Toast } from 'native-base';
 import rgba from 'hex-to-rgba';
 import AnimatedLoader from "react-native-animated-loader";
 import {
-	VerificationView
+	VerificationView,
+	ChangePinView
 } from './components';
+import api from '../../api';
+import Constants from 'expo-constants';
+import { connect } from 'react-redux';
+import { setLocalUser } from '../../redux/actions/auth';
+
+const getCurdate = () => {
+	var now     = new Date(); 
+    var year    = now.getFullYear();
+    var month   = now.getMonth()+1; 
+    var day     = now.getDate();
+    var hour    = now.getHours();
+    var minute  = now.getMinutes();
+    var second  = now.getSeconds(); 
+    if(month.toString().length == 1) {
+         month = '0'+month;
+    }
+    if(day.toString().length == 1) {
+         day = '0'+day;
+    }   
+    if(hour.toString().length == 1) {
+         hour = '0'+hour;
+    }
+    if(minute.toString().length == 1) {
+         minute = '0'+minute;
+    }
+    if(second.toString().length == 1) {
+         second = '0'+second;
+    }   
+
+    var dateTime = year+''+month+''+day; //+' '+hour+':'+minute+':'+second;   
+    return dateTime;
+}
 
 const PulihkanAkun = props => {
 	const useridRef = useRef();
@@ -32,8 +67,36 @@ const PulihkanAkun = props => {
 		},
 		errors: {},
 		loading: false,
-		showVerifyCode: false
+		showVerifyCode: false,
+		verifyCode: null,
+		isChangePin: {
+			open: false,
+			newPin: ''
+		}
 	})
+
+	const { isChangePin } = state;
+
+	useEffect(() => {
+		(async () => {
+			const value = await AsyncStorage.getItem("HISTORI_REQUST_PEMULIHAN");
+			if (value !== null) {
+				const toObj = JSON.parse(value);
+				if (toObj.curdate === getCurdate()) { //1 request expired in 1 day, so remove if date in storage is not now
+					setState(state => ({
+						...state,
+						data: {
+							userid: toObj.userid,
+							phone: toObj.nohp,
+							email: toObj.email
+						},
+						verifyCode: toObj.verifyCode,
+						showVerifyCode: true
+					}))
+				}
+			}
+		})();
+	}, []);
 
 	const { data, errors, loading, showVerifyCode } = state;
 
@@ -62,14 +125,144 @@ const PulihkanAkun = props => {
 				loading: true
 			}))
 
-			setTimeout(function() {
+			const param1 = `${data.userid}|-|${data.phone}|${data.email}|${Constants.deviceId}|2`;
+			
+			api.bantuan(param1, data.userid)
+				.then(res => {
+					//handle if verify code is empty 
+					const { response_data2 } = res;
+
+					const payload = {
+						...state.data,
+						curdate: getCurdate(),
+						verifyCode: response_data2
+					};
+
+					const savedCodeVerify = saveRequestValueToStorage(payload);
+					
+					if (savedCodeVerify) {
+						setState(state => ({
+							...state,
+							loading: false,
+							verifyCode: response_data2,
+							showVerifyCode: true
+						}))
+					}else{
+						setState(state => ({
+							...state,
+							loading: false
+						}))
+
+						Toast.show({
+			                text: 'Request gagal 400',
+			                textStyle: { textAlign: 'center' },
+			                duration: 4000
+			            })
+					}
+				})
+				.catch(err => {
+					setState(state => ({
+						...state,
+						loading: false
+					}))
+
+					if (err.global) {
+						Toast.show({
+			                text: err.global,
+			                textStyle: { textAlign: 'center' },
+			                duration: 4000
+			            })
+					}else{
+						Toast.show({
+			                text: 'Tidak dapat memproses permintaan anda, silahkan coba beberapa saat lagi',
+			                textStyle: { textAlign: 'center' },
+			                duration: 4000
+			            })
+					}
+				});
+		}
+	}
+
+	const handleConfirmCode = (code) => {
+		setState(state => ({
+			...state,
+			showVerifyCode: false,
+			loading: true
+		}))
+		const param1 = `${data.userid}|-|${data.phone}|${data.email}|${Constants.deviceId}|${code}|2`;
+		
+		api.verifikasiBantuan(param1, data.userid)
+			.then(res => {
+				//console.log(res);
+				const { response_data2, response_data1 } = res;
+				const parsing 	 = response_data2.split('|');
+
+				const payloadQobUser = {
+					userid: parsing[0],
+					username: parsing[1],
+					pinMd5: parsing[2],
+					nama: parsing[3],
+					nohp: parsing[4],
+					email: parsing[5]
+				};
+
+				const savePayloadQobUser = saveQobUser(payloadQobUser);
+
+				if (savePayloadQobUser) {
+					AsyncStorage.removeItem('HISTORI_REQUST_PEMULIHAN');
+					props.setLocalUser(savePayloadQobUser); //handle login without close app
+					//get number from string
+					var numb 	= response_data1.match(/\d/g);
+					numb 	 	= numb.join("");
+
+					setState(state => ({
+						...state,
+						loading: false,
+						data: {
+							userid: '',
+							phone: '',
+							email: ''
+						},
+						isChangePin: {
+							open: true,
+							newPin: numb
+						}
+					}));
+				}else{
+					setState(state => ({
+						...state,
+						loading: false,
+						showVerifyCode: true
+					}));
+
+					Toast.show({
+		                text: 'Request gagal 400',
+		                textStyle: { textAlign: 'center' },
+		                duration: 4000
+		            })
+				}
+			})
+			.catch(err => {
+				console.log(err);
 				setState(state => ({
 					...state,
 					loading: false,
 					showVerifyCode: true
-				}))
-			}, 3000);
-		}
+				}));
+				if (err.global) {
+					Toast.show({
+		                text: err.global,
+		                textStyle: { textAlign: 'center' },
+		                duration: 4000
+		            })
+				}else{
+					Toast.show({
+		                text: 'Tidak dapat memproses permintaan anda, silahkan coba beberapa saat lagi',
+		                textStyle: { textAlign: 'center' },
+		                duration: 4000
+		            })
+				}
+			})
 	}
 
 	const validate = (field) => {
@@ -80,6 +273,36 @@ const PulihkanAkun = props => {
 		if (!field.email) errors.email = 'Alamat email belum diisi';
 
 		return errors;
+	}
+
+	const saveRequestValueToStorage = async (payload) => {
+		try {
+			await AsyncStorage.setItem('HISTORI_REQUST_PEMULIHAN', JSON.stringify(payload));
+			return true;
+		}catch(err){
+			return false
+		}
+	}
+
+	const saveQobUser = async (payload) => {
+		try{
+			await AsyncStorage.setItem('qobUserPrivasi', JSON.stringify(payload));
+			return true;
+		}catch(err){
+			return false;
+		}
+	}
+
+	const navigateToHome = () => {
+		setState(state => ({
+			...state,
+			isChangePin: {
+				open: false,
+				newPin: ''
+			}
+		}))
+
+		props.navigation.replace('Home');
 	}
 
 
@@ -98,17 +321,15 @@ const PulihkanAkun = props => {
 		    { state.loading &&  <StatusBar backgroundColor="rgba(0,0,0,0.6)"/> }
 		    { state.showVerifyCode && 
 		    	<VerificationView 
-		    		onClose={() => setState(state => ({
-		    			...state,
-		    			showVerifyCode: false,
-		    			data: {
-		    				userid: '',
-							phone: '',
-							email: ''
-		    			}
-		    		}))}
+		    		onVerifyCode={handleConfirmCode}
 		    		phone={data.phone}
+		    		verifyCode={state.verifyCode}
 		    	/> }
+		    { isChangePin.open && 
+		    	<ChangePinView 
+		    		pin={isChangePin.newPin} 
+		    		goDoneConfirm={navigateToHome}
+		    	/>}
 			<View style={styles.header}>
 				<TouchableOpacity 
 					style={styles.btn} 
@@ -231,4 +452,8 @@ const styles = StyleSheet.create({
 	}
 })
 
-export default PulihkanAkun;
+PulihkanAkun.propTypes = {
+	setLocalUser: PropTypes.func.isRequired
+}
+
+export default connect(null, { setLocalUser })(PulihkanAkun);

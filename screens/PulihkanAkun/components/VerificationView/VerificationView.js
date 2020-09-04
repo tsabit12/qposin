@@ -7,6 +7,7 @@ import {
 import rgba from 'hex-to-rgba';
 import CodeInput from 'react-native-confirmation-code-input';
 import PropTypes from 'prop-types';
+import { Toast } from 'native-base';
 
 const VerificationView = props => {
 	const confirmRef = useRef();
@@ -48,8 +49,17 @@ const VerificationView = props => {
 	}
 
 	const onSubmitCode = (code) => {
-		alert(code);
-		props.onClose();
+		if (code !== props.verifyCode) {
+			Toast.show({
+				text: "Kode verifikasi tidak valid",
+				position: "top",
+				textStyle: {textAlign: 'center'},
+				duration: 4000
+			})
+			confirmRef.current.clear();
+		}else{
+			props.onVerifyCode(code);
+		}
 	}
 
 	return(
@@ -133,8 +143,9 @@ const styles = StyleSheet.create({
 })
 
 VerificationView.propTypes = {
-	onClose: PropTypes.func.isRequired,
-	phone: PropTypes.string.isRequired
+	onVerifyCode: PropTypes.func.isRequired,
+	phone: PropTypes.string.isRequired,
+	verifyCode: PropTypes.string.isRequired
 }
 
 export default VerificationView;

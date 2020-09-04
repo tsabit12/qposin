@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { encode } from 'base-64';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
@@ -17,6 +18,8 @@ import {
 const Stack = createStackNavigator();
 
 export default function App() {
+  if (!global.btoa) { global.btoa = encode; }
+  
   const [appIsReady, setAppReady] = useState(false);
 
   useEffect(() => {

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, AsyncStorage, Animated, StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
-// import MaskedView from '@react-native-community/masked-view';
+import { setLocalUser } from '../../redux/actions/auth';
+import PropsTypes from 'prop-types';
 
 import {
 	WelcomeView,
@@ -14,7 +15,6 @@ const HomeScreen = props => {
 		animatedDone: false,
 		animtedValue: new Animated.Value(0),
 		mount: false,
-		localUser: {},
 		displayIntro: true
 	})
 
@@ -27,10 +27,11 @@ const HomeScreen = props => {
 			const value = await AsyncStorage.getItem("qobUserPrivasi");
 			if (value !== null) { //detect user was register
 				const toObje  = JSON.parse(value);
+				setLocalUser(toObje); //store to redux
+				
 				setState(state => ({
 					...state,
 					mount: true,
-					localUser: toObje,
 					displayIntro: false
 				}))
 			}else{
@@ -90,7 +91,7 @@ const HomeScreen = props => {
 					<WelcomeView 
 						opacity={opacity} 
 						navigation={props.navigation}
-						user={state.localUser}
+						user={props.auth.localUser}
 					/> : 
 					<SliderView 
 						opacity={opacity} 
@@ -112,10 +113,15 @@ const styles = StyleSheet.create({
 	}
 })
 
+HomeScreen.propTypes = {
+	auth: PropsTypes.object.isRequired,
+	setLocalUser: PropsTypes.func.isRequired
+}
+
 function mapStateToProps(state) {
 	return{
-		isLoggedIn: state.auth.logged
+		auth: state.auth
 	}
 }
 
-export default connect(mapStateToProps, null)(HomeScreen);
+export default connect(mapStateToProps, { setLocalUser })(HomeScreen);
