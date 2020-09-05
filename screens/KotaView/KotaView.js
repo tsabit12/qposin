@@ -25,6 +25,8 @@ import {
 import { connect } from 'react-redux';
 import { setOrder } from '../../redux/actions/order';
 
+import { CommonActions } from '@react-navigation/native';
+
 const dynamicSort = (property) => {
 	var sortOrder = 1;
     if(property[0] === "-") {
@@ -63,6 +65,21 @@ const KotaView = props => {
 				}))
 			});
 	}, []);
+
+	useEffect(() => {
+		if (state.allKota.length > 0) {
+			
+			const time = setTimeout(function() {
+				const kota = state.allKota.filter(val => val.kota.toLowerCase().indexOf(state.kotaValue.toLowerCase()) > -1);
+				setState(state => ({
+					...state,
+					kota
+				}))
+			}, 70);
+
+			return () => clearTimeout(time);
+		}
+	}, [state.kotaValue, state.allKota])
 
 	const list 		= [];
 	let grouping 	= ''; 
@@ -117,7 +134,23 @@ const KotaView = props => {
 
 		props.setOrder(payload);
 
-		props.navigation.replace('Home');
+		props.navigation.dispatch(
+		  CommonActions.reset({
+		    index: 0,
+		    routes: [
+		      {
+		        name: 'Home'
+		      },
+		    ],
+		  })
+		);
+	}
+
+	const handelChangeText = (value) => {
+		setState({
+			...state,
+			kotaValue: value
+		})
 	}
 
 	return(
@@ -155,6 +188,7 @@ const KotaView = props => {
 								placeholder={params.type === 'sender' ? 'Cari kota kamu disini' : 'Cari kota penerima disini'}
 								style={styles.input}
 								value={state.kotaValue}
+								onChangeText={(text) => handelChangeText(text)}
 							/>
 						</View>
 						<TouchableOpacity style={styles.iconSearch}>
