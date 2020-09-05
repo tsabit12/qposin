@@ -57,5 +57,26 @@ export default {
 			};
 			return Promise.reject(errors);
 		}
-	})
+	}),
+	login: (payload, userid) => axios.post(url, {
+		messtype: '216',
+		param1: payload,
+		hashing: hashing('216', payload)
+	}, configYuyus)
+		.then(res => res.data)
+		.catch(err => {
+			if (err.response) {
+				const errors = {
+					global: 'Terdapat kesalahan, mohon coba beberapa saat lagi',
+					status: err.response.status
+				}
+				return Promise.reject(errors);
+			}else{
+				const errors = {
+					global: 'Network error',
+					status: 500
+				}
+				return Promise.reject(errors);
+			}
+		}),
 }

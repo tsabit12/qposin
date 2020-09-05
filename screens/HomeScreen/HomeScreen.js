@@ -27,7 +27,8 @@ const HomeScreen = props => {
 			const value = await AsyncStorage.getItem("qobUserPrivasi");
 			if (value !== null) { //detect user was register
 				const toObje  = JSON.parse(value);
-				setLocalUser(toObje); //store to redux
+				// console.log(toObje); 
+				props.setLocalUser(toObje); //store to redux
 				
 				setState(state => ({
 					...state,

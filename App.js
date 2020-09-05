@@ -2,20 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { encode } from 'base-64';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import { Root } from "native-base";
-import {
-  HomeScreen,
-  FormRegister as FormRegisterScreen,
-  PulihkanAkun
-} from './screens';
-
-const Stack = createStackNavigator();
+import Routes from './Routes';
 
 export default function App() {
   if (!global.btoa) { global.btoa = encode; }
@@ -52,25 +44,14 @@ export default function App() {
 
     setAppReady(true);
   }
-  
+
   if (!appIsReady) {
     return null;
   }else{
     return(
       <Root>
         <Provider store={store}>
-          <NavigationContainer>
-            <Stack.Navigator 
-              initialRouteName="Home"
-              screenOptions={{
-                headerShown: false
-              }}
-            >
-              <Stack.Screen name="Home" component={HomeScreen} />
-              <Stack.Screen name="FormRegister" component={FormRegisterScreen} />
-              <Stack.Screen name="Restore" component={PulihkanAkun} />
-            </Stack.Navigator>
-          </NavigationContainer>
+          <Routes />
           <StatusBar style="light" />
         </Provider>
       </Root>

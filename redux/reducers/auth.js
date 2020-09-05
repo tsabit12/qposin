@@ -1,6 +1,7 @@
 const initialState = {
 	logged: false,
-	localUser: {}
+	localUser: {},
+	session: {}
 }
 
 export default function auth(state=initialState, action={}){
@@ -9,6 +10,12 @@ export default function auth(state=initialState, action={}){
 			return{
 				...state,
 				localUser: action.user
+			}
+		case 'USER_LOGGED_IN':
+			return{
+				...state,
+				session: action.session,
+				logged: true
 			}
 		default: 
 			return state;
