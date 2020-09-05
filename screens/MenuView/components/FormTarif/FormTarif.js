@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, Text as TextDefault, TouchableOpacity } from 'react-native';
 import { ListItem, Text, Left, Body, Right, Switch, List, Thumbnail } from 'native-base';
 import { Entypo, FontAwesome, Feather } from '@expo/vector-icons'; 
@@ -8,18 +8,88 @@ import {
 	heightPercentageToDP as hp
 } from 'react-native-responsive-screen'; 
 import PropTypes from 'prop-types';
+import {
+	PilihJenis 
+} from './components';
 
 const FormTarif = props => {
 	const { values } = props;
+	const [state, setState] = useState({
+		data: {
+			panjang: '',
+			lebar: '',
+			tinggi: '',
+			berat: '1000',
+			jenis: '1'
+		},
+		loading: false,
+		showJenis: false
+	})
 
+	const { data, showJenis } = state;
+  
 	const handlePressItem = (type) => {
 		props.navigate('Kota', {
 			type
 		});
 	}
 
+	const handleChange = (value, name) => {
+		setState(state => ({
+			...state,
+			data: {
+				...state.data,
+				[name]: value
+			}
+		}))
+	}
+
+	const onSubmit = () => {
+		if (!values.kotaA) {
+			alert('Kota pengirim belum diisi');
+		}else if(!values.kotaB){
+			alert('Kota penerima belum diisi');
+		}else{
+			const panjangVal = data.panjang ? data.panjang : '0';
+			const lebarVal = data.lebar ? data.lebar : '0';
+			const tinggiVal = data.tinggi ? data.tinggi : '0';
+			const param1 = `#1#${data.jenis}#${values.kodeposA}#${values.kodeposB}#${data.berat}#${panjangVal}#${lebarVal}#${tinggiVal}#0#0`;
+			props.onSubmit(param1);
+		}
+	}
+
+	const handlePressBerat = () => {
+		alert('oke');
+	}
+
+	const handlePressJenis = () => {
+		setState(state => ({
+			...state,
+			showJenis: true
+		}))
+	}
+
+	const handleChoosedJenis = (value) => {
+		setState(state => ({
+			...state,
+			data: {
+				...state.data,
+				jenis: value
+			},
+			showJenis: false
+		}))
+	}
+
 	return(
 		<View>
+			{ showJenis && 
+				<PilihJenis  
+					handleClose={() => setState(state => ({
+						...state,
+						showJenis: false
+					}))}
+					onChoosed={handleChoosedJenis}
+				/> }
 			<List>
 	            <ListItem avatar onPress={() => handlePressItem('sender')}>
 	              <Left>
@@ -49,26 +119,29 @@ const FormTarif = props => {
 	                <Ionicons name="ios-arrow-forward" size={24} color="black" />
 	              </Right>
 	            </ListItem>
-	            <ListItem avatar>
+
+
+	            <ListItem avatar onPress={handlePressJenis}>
 	              <Left>
 	                <Feather name="box" size={23} color="black" />
 	              </Left>
 	              <Body>
-	                <Text>Isi kiriman</Text>
-	                <Text note>Pakaian</Text>
+	                <Text>Jenis Kiriman</Text>
+	                <Text note>{data.jenis === '1' ? 'Paket' : 'Surat'}</Text>
 	              </Body>
 	              <Right style={{justifyContent: 'center'}}>
 	                <Ionicons name="ios-arrow-forward" size={24} color="black" />
 	              </Right>
 	            </ListItem>
 
-	            <ListItem avatar>
+
+	            <ListItem avatar onPress={handlePressBerat}>
 	              <Left>
 	                <FontAwesome name="balance-scale" size={20} color="black" />
 	              </Left>
 	              <Body>
 	                <Text>Berat</Text>
-	                <Text note>1 kg</Text>
+	                <Text note>{data.berat} gram</Text>
 	              </Body>
 	              <Right style={{justifyContent: 'center'}}>
 	                <Ionicons name="ios-arrow-forward" size={24} color="black" />
@@ -82,6 +155,8 @@ const FormTarif = props => {
 			            		style={styles.input}
 			            		placeholder='cm'
 			            		textAlign='center'
+			            		value={data.panjang}
+			            		onChangeText={(text) => handleChange(text, 'panjang')}
 			            	/>
 		            	</View>
 		            	<View style={styles.field}>
@@ -90,6 +165,8 @@ const FormTarif = props => {
 			            		style={styles.input}
 			            		placeholder='cm'
 			            		textAlign='center'
+			            		value={data.lebar}
+			            		onChangeText={(text) => handleChange(text, 'lebar')}
 			            	/>
 		            	</View>
 		            	<View style={styles.field}>
@@ -98,10 +175,12 @@ const FormTarif = props => {
 			            		style={styles.input}
 			            		placeholder='cm'
 			            		textAlign='center'
+			            		value={data.tinggi}
+			            		onChangeText={(text) => handleChange(text, 'tinggi')}
 			            	/>
 		            	</View>
 		            </View>
-		            <TouchableOpacity style={styles.button} activeOpacity={0.7}>
+		            <TouchableOpacity style={styles.button} activeOpacity={0.7} onPress={onSubmit}>
 		            	<TextDefault style={[styles.text, {color: '#FFF'}]}>Cek Tarif</TextDefault>
 		            </TouchableOpacity>
 	            </View>
@@ -149,7 +228,8 @@ const styles = StyleSheet.create({
 
 FormTarif.propTypes = {
 	navigate: PropTypes.func.isRequired,
-	values: PropTypes.object.isRequired
+	values: PropTypes.object.isRequired,
+	onSubmit: PropTypes.func.isRequired
 }
 
 export default FormTarif;

@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, Image, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ImageBackground, Image, ScrollView, StatusBar } from 'react-native';
 import { connect } from 'react-redux';
 import {
 	widthPercentageToDP as wp, 
@@ -7,12 +7,14 @@ import {
 } from 'react-native-responsive-screen';
 import rgba from 'hex-to-rgba';
 import Constants from 'expo-constants';
-import { Icon } from 'native-base';
+import { Icon, Toast } from 'native-base';
 import {
 	SliderImage,
 	FormTarif
 } from './components';
 import PropTypes from 'prop-types';
+import AnimatedLoader from "react-native-animated-loader";
+import api from '../../api';
 
 const capitalize = (string) => {
 	if (string) {
@@ -23,13 +25,67 @@ const capitalize = (string) => {
 }
 
 const MenuView = props => {
+	const [state, setState] = useState({
+		loading: false
+	})
+
 	const { user, order } = props;
+
+	const handleCekTarif = (param) => {
+		setState(state => ({
+			...state,
+			loading: true
+		}))
+
+		api.getTarif(param)
+			.then(res => {
+				setState(state => ({
+					...state,
+					loading: false
+				}))
+				const response = res.split('#');
+				setTimeout(function() {
+					props.navigation.navigate('Tarif', {
+						data: response
+					})
+				}, 10);
+			})
+			.catch(err => {
+				setState(state => ({
+					...state,
+					loading: false
+				}))
+
+				if (err.global) {	
+					Toast.show({
+		                text: err.global,
+		                textStyle: { textAlign: 'center' },
+		                duration: 3000
+		            })
+				}else{
+					Toast.show({
+		                text: 'Network Error',
+		                textStyle: { textAlign: 'center' },
+		                duration: 3000
+		            })
+				}
+			})
+	}
 	
 	return(
 		<ImageBackground 
 			source={require('../../assets/images/background.png')} 
 			style={{flex: 1}}
 		>	
+			<AnimatedLoader
+		        visible={state.loading}
+		        overlayColor="rgba(0,0,0,0.6)"
+		        source={require("../../assets/images/loader/3098.json")}
+		        animationStyle={styles.lottie}
+		        speed={1}
+		    />
+		    { state.loading &&  <StatusBar backgroundColor="rgba(0,0,0,0.6)"/> }
+
 			<View style={styles.header}>
 				<Text style={styles.title}>QPOSin AJA</Text>
 				<View style={{flexDirection: 'row'}}>
@@ -50,6 +106,7 @@ const MenuView = props => {
 				<FormTarif 
 					navigate={props.navigation.navigate}
 					values={order}
+					onSubmit={handleCekTarif}
 				/>
 
 				<View style={styles.hr} />
@@ -133,6 +190,10 @@ const styles = StyleSheet.create({
 		marginTop: 10,
 		marginBottom: 5,
 		elevation: 2
+	},
+	lottie: {
+	    width: 100,
+	    height: 100
 	}
 })
 

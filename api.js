@@ -82,5 +82,25 @@ export default {
 	getKota: () => axios.get('https://order.posindonesia.co.id/api/refkota.json').then(res => res.data),
 	getKecamatan: (kota) => axios.post(`${url1}/qposinaja/getPostalCode`, {
 		kota
-	}).then(res => res.data.result)
+	}).then(res => res.data.result),
+	getTarif: (param1) => axios.post(url, {
+		messtype: '703',
+		param1,
+		param2: '',
+		param3: '',
+		param4: '',
+		param5: '',
+		hashing: hashing('703', param1)
+	}, configYuyus)
+	.then(res => {
+		const { rc_mess } = res.data;
+		if (rc_mess === '00') {
+			return res.data.response_data1.substring(2);
+		}else{
+			const errors = {
+				global: 'Tarif tidak ditemukan'
+			};
+			return Promise.reject(errors);
+		}
+	})
 }
