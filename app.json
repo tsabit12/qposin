@@ -23,7 +23,8 @@
     },
     "android": {
       "package": "com.appawesome.cob",
-      "versionCode": 1
+      "versionCode": 1,
+      "useNextNotificationsApi": true
     },
     "web": {
       "favicon": "./assets/favicon.png"

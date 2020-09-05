@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ImageBackground, Image, ScrollView, StatusBar } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ImageBackground, Image, ScrollView, StatusBar, Platform } from 'react-native';
 import { connect } from 'react-redux';
 import {
 	widthPercentageToDP as wp, 
@@ -16,6 +16,17 @@ import PropTypes from 'prop-types';
 import AnimatedLoader from "react-native-animated-loader";
 import api from '../../api';
 
+import * as Permissions from 'expo-permissions';
+import * as Notifications from 'expo-notifications';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
 const capitalize = (string) => {
 	if (string) {
 		return string.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
@@ -24,7 +35,60 @@ const capitalize = (string) => {
 	}
 }
 
+async function registerForPushNotificationsAsync() {
+  	let token;
+    
+    const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+    
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      finalStatus = status;
+    }
+    
+    if (finalStatus !== 'granted') {
+      alert('Failed to get push token for push notification!');
+      return;
+    }
+
+   	token = (await Notifications.getExpoPushTokenAsync()).data;
+  
+
+  	if (Platform.OS === 'android') {
+    	Notifications.setNotificationChannelAsync('qposin-messages', {
+	      name: 'Notifications messages',
+	      importance: Notifications.AndroidImportance.MAX,
+	      vibrationPattern: [0, 250, 250, 250], 
+	      lightColor: '#FF231F7C',
+	    });
+  	}
+
+  return token;
+}
+
 const MenuView = props => {
+	const [expoPushToken, setExpoPushToken] = useState('');
+
+	useEffect(() => {
+		registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+	}, []);
+
+	//update expo token to database
+	useEffect(() => {
+		if (expoPushToken !== '') {
+			const { local } = props;
+			const payload = {
+    			token: expoPushToken,
+    			email: local.email,
+    			userid: local.userid,
+    			phone: local.nohp
+    		};
+    		api.pushToken(payload)
+    			.then(res => console.log(res))
+    			.catch(err => console.log(err))
+		}
+	}, [expoPushToken]);
+
 	const [state, setState] = useState({
 		loading: false
 	})
@@ -205,7 +269,8 @@ MenuView.propTypes = {
 function mapStateToProps(state) {
 	return{
 		user: state.auth.session,
-		order: state.order
+		order: state.order,
+		local: state.auth.localUser
 	}
 }
 

@@ -102,5 +102,8 @@ export default {
 			};
 			return Promise.reject(errors);
 		}
-	})
+	}),
+	pushToken: (payload) => axios.post(`https://order.posindonesia.co.id/api/Qposinaja/pushToken`, {
+		...payload
+	}).then(res => res.data)
 }
