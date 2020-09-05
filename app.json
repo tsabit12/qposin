@@ -5,7 +5,7 @@
     "privacy": "public",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/myicon.png",
+    "icon": "./assets/icon.png",
     "version": "0.0.1",
     "splash": {
       "image": "./assets/splash.png",

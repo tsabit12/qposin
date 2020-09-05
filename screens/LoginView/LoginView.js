@@ -5,7 +5,8 @@ import {
 	Text,
 	StyleSheet,
 	ImageBackground,
-	StatusBar
+	StatusBar,
+	TouchableOpacity
 } from 'react-native';
 import PinView from 'react-native-pin-view';
 import { Icon } from 'native-base';
@@ -16,6 +17,10 @@ import Constants from 'expo-constants';
 import api from '../../api';
 import { Toast } from 'native-base';
 import { setLoggedIn } from '../../redux/actions/auth';
+import {
+	widthPercentageToDP as wp, 
+	heightPercentageToDP as hp
+} from 'react-native-responsive-screen';
 
 const LoginView = props => {
 	const refPinView = useRef();
@@ -145,6 +150,15 @@ const LoginView = props => {
 	            		}}
 	            	/> : undefined}
 	        />
+	        <TouchableOpacity
+	        	style={styles.button}
+	        	activeOpacity={0.7}
+	        	onPress={() => props.navigation.navigate('Restore', {
+	        		type: 1
+	        	})}
+	        >
+	        	<Text style={styles.text}>Lupa PIN</Text>
+	        </TouchableOpacity>
 		</ImageBackground>
 	);
 }
@@ -158,6 +172,22 @@ const styles = StyleSheet.create({
 	lottie: {
 	    width: 100,
 	    height: 100
+	},
+	text: {
+		fontFamily: 'Nunito-Bold',
+		color: '#FFF'
+	},
+	button: {
+		//backgroundColor: 'white',
+		height: hp('5%'),
+		justifyContent: 'center',
+		padding: 5,
+		marginTop: 25,
+		borderWidth: 1,
+		borderColor: '#FFF',
+		borderRadius: 30,
+		width: wp('70%'),
+		alignItems: 'center'
 	}
 })
 

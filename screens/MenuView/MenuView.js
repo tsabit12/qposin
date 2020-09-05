@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, Image, ScrollView } from 'react-native';
 import { connect } from 'react-redux';
 import {
 	widthPercentageToDP as wp, 
@@ -8,6 +8,10 @@ import {
 import rgba from 'hex-to-rgba';
 import Constants from 'expo-constants';
 import { Icon } from 'native-base';
+import {
+	SliderImage,
+	FormTarif
+} from './components';
 
 const capitalize = (string) => {
 	if (string) {
@@ -19,7 +23,6 @@ const capitalize = (string) => {
 
 const MenuView = props => {
 	const { user } = props;
-	console.log(Constants.StatusBarHeight);
 	return(
 		<ImageBackground 
 			source={require('../../assets/images/background.png')} 
@@ -34,9 +37,39 @@ const MenuView = props => {
 					<Icon name='md-person' style={{marginLeft: 8, color: '#FFF', fontSize: 24}} />
 				</View>
 			</View>
+			<ScrollView
+				showsVerticalScrollIndicator={false}
+			>
 			<View style={styles.content}>
+				<View style={styles.slider}>
+					<SliderImage />
+				</View>
 				
+				<FormTarif />
+
+				<View style={styles.hr} />
+				
+				<View style={{justifyContent: 'center', alignItems: 'center'}}>
+					<View style={styles.menu}>
+						<View style={styles.icon} />
+						<View style={styles.icon}>
+							<Image source={require('../../assets/images/icon/lacak.png')} />
+						</View>
+						<View style={styles.icon}>
+							<Image source={require('../../assets/images/icon/history.png')} />
+						</View>
+					</View>
+					<View style={styles.menu}>
+						<View style={styles.icon}>
+							<Image source={require('../../assets/images/icon/token.png')} />
+						</View>
+						<View style={styles.icon}>
+							<Image source={require('../../assets/images/icon/call.png')} />
+						</View>
+					</View>
+				</View>
 			</View>
+			</ScrollView>
 		</ImageBackground>
 	);
 }
@@ -53,7 +86,7 @@ const styles = StyleSheet.create({
 	},
 	content: {
 		flex: 1,
-		backgroundColor: 'white'
+		backgroundColor: 'white',
 	},
 	title: {
 		fontFamily: 'Nunito-Bold',
@@ -63,6 +96,38 @@ const styles = StyleSheet.create({
 	text: {
 		fontFamily: 'Nunito-Bold',
 		color: '#FFF',
+	},
+	slider: {
+		// backgroundColor: 'green',
+		height: hp('30%')
+	},
+	icon: {
+		height: hp('10%'),
+		width: wp('20%'),
+		backgroundColor: 'white',
+		borderRadius: 18,
+		elevation: 3,
+		margin: 20,
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	menu: {
+		height: hp('15%'),
+		width: wp('100%'), 
+		padding: 20,
+		//backgroundColor: 'red',
+		flexDirection: 'row',
+		alignItems: 'center'
+		//justifyContent: 'space-between'
+		//backgroundColor: 'red',
+	},
+	hr: {
+		width: wp('100%'),
+		height: hp('0.1%'),
+		backgroundColor: rgba('#FFF', 1),
+		marginTop: 10,
+		marginBottom: 5,
+		elevation: 2
 	}
 })
 

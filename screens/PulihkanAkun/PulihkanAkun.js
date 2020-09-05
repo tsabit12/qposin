@@ -72,7 +72,8 @@ const PulihkanAkun = props => {
 		isChangePin: {
 			open: false,
 			newPin: ''
-		}
+		},
+		type: '2'
 	})
 
 	const { isChangePin } = state;
@@ -97,6 +98,15 @@ const PulihkanAkun = props => {
 			}
 		})();
 	}, []);
+
+	useEffect(() => {
+		if (props.route.params) {
+			setState(state => ({
+				...state,
+				type: '1'
+			}))
+		}
+	}, [props.route])
 
 	const { data, errors, loading, showVerifyCode } = state;
 
@@ -125,7 +135,7 @@ const PulihkanAkun = props => {
 				loading: true
 			}))
 
-			const param1 = `${data.userid}|-|${data.phone}|${data.email}|${Constants.deviceId}|2`;
+			const param1 = `${data.userid}|-|${data.phone}|${data.email}|${Constants.deviceId}|${state.type}`;
 			
 			api.bantuan(param1, data.userid)
 				.then(res => {
@@ -189,7 +199,7 @@ const PulihkanAkun = props => {
 			showVerifyCode: false,
 			loading: true
 		}))
-		const param1 = `${data.userid}|-|${data.phone}|${data.email}|${Constants.deviceId}|${code}|2`;
+		const param1 = `${data.userid}|-|${data.phone}|${data.email}|${Constants.deviceId}|${code}|${state.type}`;
 		
 		api.verifikasiBantuan(param1, data.userid)
 			.then(res => {
@@ -337,7 +347,9 @@ const PulihkanAkun = props => {
 				>
 					<Icon name='ios-arrow-back' style={{color: '#FFF', fontSize: 25, marginTop: 20}} />
 				</TouchableOpacity>
-				<Text style={[styles.text, {marginTop: 20, fontSize: 17}]}>Pemulihan akun</Text>
+				<Text style={[styles.text, {marginTop: 20, fontSize: 17}]}>
+					{state.type === '2' ? 'Pemulihan akun' : 'Lupa PIN'}
+				</Text>
 			</View>
 			<View style={styles.container}>
 				<View style={styles.field}>
@@ -398,7 +410,9 @@ const PulihkanAkun = props => {
 					activeOpacity={0.6}
 					onPress={onSubmit}
 				>
-					<Text style={styles.text}>Pulihkan</Text>
+					<Text style={styles.text}>
+						{ state.type === '2' ? 'Pulihkan' : 'Submit' }
+					</Text>
 				</TouchableOpacity>
 			</View>
 		</ImageBackground>

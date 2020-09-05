@@ -26,6 +26,7 @@ const Routes = props => {
 		        >
 		        	{ isLoggedin ? <React.Fragment>
 		        		<Stack.Screen name="Home" component={MenuView} />
+		        		<Stack.Screen name="Restore" component={PulihkanAkun} />
 		        	</React.Fragment> : <React.Fragment>
 						<Stack.Screen name="Home" component={HomeScreen} />
 						<Stack.Screen name="FormRegister" component={FormRegisterScreen} />
