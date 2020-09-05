@@ -7,30 +7,43 @@ import {
 	widthPercentageToDP as wp, 
 	heightPercentageToDP as hp
 } from 'react-native-responsive-screen'; 
+import PropTypes from 'prop-types';
 
 const FormTarif = props => {
+	const { values } = props;
+
+	const handlePressItem = (type) => {
+		props.navigate('Kota', {
+			type
+		});
+	}
+
 	return(
 		<View>
 			<List>
-	            <ListItem avatar onPress={() => alert('presed')} activeOpacity={0.6}>
+	            <ListItem avatar onPress={() => handlePressItem('sender')}>
 	              <Left>
 	                <Entypo name="location-pin" size={24} color="black" />
 	              </Left>
 	              <Body>
 	                <Text>Dari</Text>
-	                <Text note>Jakarta</Text>
+	                <Text note numberOfLines={1}>
+	                	{ values.kotaA ? `${values.kotaA}, ${values.kecamatanA}, ${values.kodeposA}` : '-' }
+	                </Text>
 	              </Body>
 	              <Right style={{justifyContent: 'center'}}>
 	                <Ionicons name="ios-arrow-forward" size={24} color="black" />
 	              </Right>
 	            </ListItem>
-	            <ListItem avatar>
+	            <ListItem avatar onPress={() => handlePressItem('receiver')}>
 	              <Left>
 	                <Entypo name="location-pin" size={24} color="black" />
 	              </Left>
 	              <Body>
 	                <Text>Ke</Text>
-	                <Text note>Mando</Text>
+	                <Text note numberOfLines={1}>
+	                	{ values.kotaB ? `${values.kotaB}, ${values.kecamatanB}, ${values.kodeposB}` : '-' }
+	                </Text>
 	              </Body>
 	              <Right style={{justifyContent: 'center'}}>
 	                <Ionicons name="ios-arrow-forward" size={24} color="black" />
@@ -133,5 +146,10 @@ const styles = StyleSheet.create({
 		marginTop: 10
 	}
 })
+
+FormTarif.propTypes = {
+	navigate: PropTypes.func.isRequired,
+	values: PropTypes.object.isRequired
+}
 
 export default FormTarif;

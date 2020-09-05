@@ -12,6 +12,7 @@ import {
 	SliderImage,
 	FormTarif
 } from './components';
+import PropTypes from 'prop-types';
 
 const capitalize = (string) => {
 	if (string) {
@@ -22,7 +23,8 @@ const capitalize = (string) => {
 }
 
 const MenuView = props => {
-	const { user } = props;
+	const { user, order } = props;
+	
 	return(
 		<ImageBackground 
 			source={require('../../assets/images/background.png')} 
@@ -45,7 +47,10 @@ const MenuView = props => {
 					<SliderImage />
 				</View>
 				
-				<FormTarif />
+				<FormTarif 
+					navigate={props.navigation.navigate}
+					values={order}
+				/>
 
 				<View style={styles.hr} />
 				
@@ -131,9 +136,15 @@ const styles = StyleSheet.create({
 	}
 })
 
+MenuView.propTypes = {
+	user: PropTypes.object.isRequired,
+	order: PropTypes.object.isRequired
+}
+
 function mapStateToProps(state) {
 	return{
-		user: state.auth.session
+		user: state.auth.session,
+		order: state.order
 	}
 }
 

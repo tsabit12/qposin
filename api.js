@@ -79,4 +79,8 @@ export default {
 				return Promise.reject(errors);
 			}
 		}),
+	getKota: () => axios.get('https://order.posindonesia.co.id/api/refkota.json').then(res => res.data),
+	getKecamatan: (kota) => axios.post(`${url1}/qposinaja/getPostalCode`, {
+		kota
+	}).then(res => res.data.result)
 }

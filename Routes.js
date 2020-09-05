@@ -7,7 +7,8 @@ import {
   FormRegister as FormRegisterScreen,
   PulihkanAkun,
   LoginView,
-  MenuView
+  MenuView,
+  KotaView
 } from './screens';
 
 
@@ -27,6 +28,7 @@ const Routes = props => {
 		        	{ isLoggedin ? <React.Fragment>
 		        		<Stack.Screen name="Home" component={MenuView} />
 		        		<Stack.Screen name="Restore" component={PulihkanAkun} />
+		        		<Stack.Screen name="Kota" component={KotaView} />
 		        	</React.Fragment> : <React.Fragment>
 						<Stack.Screen name="Home" component={HomeScreen} />
 						<Stack.Screen name="FormRegister" component={FormRegisterScreen} />
