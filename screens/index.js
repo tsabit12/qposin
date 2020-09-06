@@ -5,3 +5,4 @@ export { default as LoginView } from './LoginView';
 export { default as MenuView } from './MenuView';
 export { default as KotaView } from './KotaView';
 export { default as ListTarif } from './ListTarif';
+export { default as ProfileView } from './ProfileView';

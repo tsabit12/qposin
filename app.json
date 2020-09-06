@@ -26,6 +26,12 @@
       "versionCode": 1,
       "useNextNotificationsApi": true
     },
+    "notification":{
+      "icon": "./assets/notification.png",
+      "color": "#f68527",
+      "androidMode": "default",
+      "iosDisplayInForeground": true
+    },
     "web": {
       "favicon": "./assets/favicon.png"
     }

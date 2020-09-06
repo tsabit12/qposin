@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ImageBackground, Image, ScrollView, StatusBar, Platform } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, Image, ScrollView, StatusBar, Platform, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
 import {
 	widthPercentageToDP as wp, 
@@ -152,12 +152,15 @@ const MenuView = props => {
 
 			<View style={styles.header}>
 				<Text style={styles.title}>QPOSin AJA</Text>
-				<View style={{flexDirection: 'row'}}>
+				<TouchableOpacity 
+					style={{flexDirection: 'row'}} activeOpacity={0.7}
+					onPress={() => props.navigation.navigate('Profile')}
+				>
 					<Text style={[styles.text, {fontSize: 17}]}>
 						Halo {capitalize(user.nama.replace(/ .*/,''))}
 					</Text>
 					<Icon name='md-person' style={{marginLeft: 8, color: '#FFF', fontSize: 24}} />
-				</View>
+				</TouchableOpacity>
 			</View>
 			<ScrollView
 				showsVerticalScrollIndicator={false}
@@ -178,20 +181,20 @@ const MenuView = props => {
 				<View style={{justifyContent: 'center', alignItems: 'center'}}>
 					<View style={styles.menu}>
 						<View style={styles.icon} />
-						<View style={styles.icon}>
+						<TouchableOpacity style={styles.icon}>
 							<Image source={require('../../assets/images/icon/lacak.png')} />
-						</View>
-						<View style={styles.icon}>
+						</TouchableOpacity>
+						<TouchableOpacity style={styles.icon}>
 							<Image source={require('../../assets/images/icon/history.png')} />
-						</View>
+						</TouchableOpacity>
 					</View>
 					<View style={styles.menu}>
-						<View style={styles.icon}>
+						<TouchableOpacity style={styles.icon}>
 							<Image source={require('../../assets/images/icon/token.png')} />
-						</View>
-						<View style={styles.icon}>
+						</TouchableOpacity>
+						<TouchableOpacity style={styles.icon}>
 							<Image source={require('../../assets/images/icon/call.png')} />
-						</View>
+						</TouchableOpacity>
 					</View>
 				</View>
 			</View>

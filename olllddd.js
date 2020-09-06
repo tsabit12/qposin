@@ -1,122 +1,101 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, AsyncStorage, Animated, StyleSheet } from 'react-native';
-import { connect } from 'react-redux';
-import MaskedView from '@react-native-community/masked-view';
+import Constants from 'expo-constants';
+import * as Notifications from 'expo-notifications';
+import * as Permissions from 'expo-permissions';
+import React, { useState, useEffect, useRef } from 'react';
+import { Text, View, Button, Platform } from 'react-native';
 
-import {
-  PinView,
-  SliderView
-} from './components';
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
-const HomeScreen = props => {
+export default function App() {
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
 
-  const [state, setState] = useState({
-    animatedDone: false,
-    animtedValue: new Animated.Value(0),
-    mount: false,
-    localUser: {}
-  })
-
-  //we are using redux 
-  //it will be confused to get data from storage in all component
-  //of this app
-  //so i'll move data from storage to redux here
   useEffect(() => {
-    (async () => {
-      const value = await AsyncStorage.getItem("qobUserPrivasi");
-      if (value !== null) { //detect user was register
-        const toObje  = JSON.parse(value);
-        setState(state => ({
-          ...state,
-          mount: true,
-          localUser: toObje
-        }))
-      }else{
-        setState(state => ({
-          ...state,
-          mount: true
-        }))
-      }
-    })()
+    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification);
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener);
+      Notifications.removeNotificationSubscription(responseListener);
+    };
   }, []);
 
-  //start animated
-  useEffect(() => {
-    if (state.mount) {
-      Animated.timing(state.animtedValue, {
-              toValue: 150,
-              duration: 1000,
-              delay: 400,
-              useNativeDriver: true,
-          }).start(() => {
-            setState(state => ({
-              ...state,
-              animatedDone: true
-            }))
-          })
-    }
-  }, [state.mount]);
-
-  const imageScale = {
-      transform: [
-        {
-          scale: state.animtedValue.interpolate({
-            inputRange: [0, 15, 100],
-            outputRange: [0.1, 0.06, 16]
-          })
-        }
-      ]
-    }
-
-    const opacity = {
-      opacity: state.animtedValue.interpolate({
-        inputRange: [0, 25, 50],
-        outputRange: [0, 0, 1],
-        extrapolate: 'clamp'
-      })
-    }
-
-  return(
-    <View style={{flex: 1}}>
-      <View style={[StyleSheet.absoluteFill, {backgroundColor: '#ff8e1c'}]} />
-      <MaskedView
-        style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}}
-        maskElement={
-              <View
-                style={styles.centered}
-              >
-                <Animated.Image 
-            source={require('../../assets/images/posindo.png')}
-            //resizeMode='contain'
-            style={[{ width: 500, height: 500}, imageScale ]}
-          />  
-              </View>
-            }
-      >
-        <View style={[StyleSheet.absoluteFill, {backgroundColor: 'white'}]} />
-        { Object.keys(state.localUser).length > 0 ? 
-          <PinView onDone={() => props.navigation.navigate('Registrasi')} /> : 
-          <SliderView 
-            opacity={opacity} 
-            onDoneSlider={() => props.navigation.navigate('Registrasi')}
-          /> }
-      </MaskedView>
+  return (
+    <View
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'space-around',
+      }}>
+      <Text>Your expo push token: {expoPushToken}</Text>
+      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Title: {notification && notification.request.content.title} </Text>
+        <Text>Body: {notification && notification.request.content.body}</Text>
+        <Text>Data: {notification && JSON.stringify(notification.request.content.data)}</Text>
+      </View>
+      <Button
+        title="Press to schedule a notification"
+        onPress={async () => {
+          await sendPushNotification();
+        }}
+      />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  centered: {
-    justifyContent: 'center',
-    flex: 1,
-    alignItems: 'center'
-  }
-})
-
-function mapStateToProps(state) {
-  return{
-    isLoggedIn: state.auth.logged
-  }
+async function sendPushNotification(expoPushToken) {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "You've got mail! 📬",
+      body: 'Here is the notification body',
+      data: { data: 'goes here' },
+    },
+    trigger: { seconds: 2 },
+  });
 }
 
-export default connect(mapStateToProps, null)(HomeScreen);
+async function registerForPushNotificationsAsync() {
+  let token;
+  if (Constants.isDevice) {
+    const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      alert('Failed to get push token for push notification!');
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log(token);
+  } else {
+    alert('Must use physical device for Push Notifications');
+  }
+
+  if (Platform.OS === 'android') {
+    Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
+  }
+
+  return token;
+}
