@@ -105,5 +105,16 @@ export default {
 	}),
 	pushToken: (payload) => axios.post(`https://order.posindonesia.co.id/api/Qposinaja/pushToken`, {
 		...payload
-	}).then(res => res.data)
+	}).then(res => res.data),
+	updatePin: (param1) => axios.post(url, {
+		messtype: '208',
+		param1,
+		hashing: hashing('208', param1)
+	}, configYuyus).then(res => {
+		if (res.data.rc_mess === '00') {
+			return res.data;
+		}else{
+			return Promise.reject(res.data);
+		}
+	})
 }

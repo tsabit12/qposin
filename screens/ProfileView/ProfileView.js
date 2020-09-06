@@ -152,7 +152,10 @@ const ProfileView = props => {
 							{ /* <Icon name='ios-arrow-forward' style={{color: 'black', fontSize: 25}} /> */}
 						</View>
 
-						<View style={styles.list}>
+						<TouchableOpacity 
+							style={styles.list}
+							onPress={() => props.navigation.navigate('Ubahpin')}
+						>
 							<View style={styles.listLeft}>
 								<View style={styles.icon}>
 									<Icon name='ios-lock' style={{color: '#919191', fontSize: 30}} />
@@ -165,8 +168,7 @@ const ProfileView = props => {
 								</View>
 							</View>
 							<Icon name='ios-arrow-forward' style={{color: 'black', fontSize: 25}} />
-						</View>
-						
+						</TouchableOpacity>
 					</View>
 				</View>
 			</ScrollView>

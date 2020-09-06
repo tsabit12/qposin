@@ -17,6 +17,11 @@ export default function auth(state=initialState, action={}){
 				session: action.session,
 				logged: true
 			}
+		case 'UPDATE_PIN':
+			return{
+				...state,
+				localUser: action.localUser
+			}
 		default: 
 			return state;
 	}

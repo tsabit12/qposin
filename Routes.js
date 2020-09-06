@@ -10,7 +10,8 @@ import {
   MenuView,
   KotaView,
   ListTarif as ListTarifView,
-  ProfileView
+  ProfileView,
+  UbahPinView
 } from './screens';
 
 
@@ -33,6 +34,7 @@ const Routes = props => {
 		        		<Stack.Screen name="Kota" component={KotaView} />
 		        		<Stack.Screen name="Tarif" component={ListTarifView} />
 		        		<Stack.Screen name="Profile" component={ProfileView} />
+		        		<Stack.Screen name="Ubahpin" component={UbahPinView} />
 		        	</React.Fragment> : <React.Fragment>
 						<Stack.Screen name="Home" component={HomeScreen} />
 						<Stack.Screen name="FormRegister" component={FormRegisterScreen} />
