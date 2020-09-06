@@ -15,6 +15,14 @@ import {
 import { Icon, Thumbnail, Text as TextNote } from 'native-base';
 import { connect } from 'react-redux';
 
+const numberWithCommas = (number) => {
+	if (isNaN(number)) {
+		return number; 
+	}else{
+		return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+	}
+}
+
 const capitalize = (string) => {
 	if (string) {
 		return string.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
@@ -23,13 +31,11 @@ const capitalize = (string) => {
 	}
 }
 
-const numberWithCommas = (number) => {
-	return number.toString().replace(/\B(?=(\d{4})+(?!\d))/g, "-");
-}
-
 
 const ProfileView = props => {
 	const { user, userid } = props;
+
+	// console.log(user);
 
 	return(
 		<ImageBackground 
@@ -67,7 +73,9 @@ const ProfileView = props => {
 							activeOpacity={0.7}
 							disabled={user.norek !== '-' ? true : false}
 						>
-							<Text style={styles.text}>Hubungkan dengan Akun Giro</Text>
+							<Text style={styles.text}>
+								{ user.norek === '-' ? 'Hubungkan dengan Akun Giro' : `Rp ${numberWithCommas(user.saldo)}` }
+							</Text>
 						</TouchableOpacity>
 					</View>
 					<View style={styles.info}>

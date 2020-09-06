@@ -13,7 +13,9 @@ import {
   ProfileView,
   UbahPinView,
   CompleteRegistrasiView,
-  CreatePinView
+  CreatePinView,
+  OrderView,
+  DataPenerima as DataPenerimaView
 } from './screens';
 
 
@@ -37,6 +39,8 @@ const Routes = props => {
 		        		<Stack.Screen name="Tarif" component={ListTarifView} />
 		        		<Stack.Screen name="Profile" component={ProfileView} />
 		        		<Stack.Screen name="Ubahpin" component={UbahPinView} />
+		        		<Stack.Screen name="Order" component={OrderView} />
+		        		<Stack.Screen name="DataPenerima" component={DataPenerimaView} />
 		        	</React.Fragment> : <React.Fragment>
 						<Stack.Screen name="Home" component={HomeScreen} />
 						<Stack.Screen name="FormRegister" component={FormRegisterScreen} />

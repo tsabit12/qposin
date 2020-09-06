@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ImageBackground, Image, ScrollView, StatusBar, Platform, TouchableOpacity } from 'react-native';
+import { 
+	View, 
+	Text, 
+	StyleSheet, 
+	ImageBackground, 
+	Image, 
+	ScrollView, 
+	StatusBar, 
+	Platform, 
+	TouchableOpacity 
+} from 'react-native';
 import { connect } from 'react-redux';
 import {
 	widthPercentageToDP as wp, 
@@ -15,6 +25,7 @@ import {
 import PropTypes from 'prop-types';
 import AnimatedLoader from "react-native-animated-loader";
 import api from '../../api';
+import { resetOrder } from '../../redux/actions/order';
 
 import * as Permissions from 'expo-permissions';
 import * as Notifications from 'expo-notifications';
@@ -135,6 +146,14 @@ const MenuView = props => {
 				}
 			})
 	}
+
+	const handlePressOrder = () => {
+		props.navigation.navigate('Order');
+
+		setTimeout(function() {
+			props.resetOrder();
+		}, 100);
+	}
 	
 	return(
 		<ImageBackground 
@@ -151,15 +170,23 @@ const MenuView = props => {
 		    { state.loading &&  <StatusBar backgroundColor="rgba(0,0,0,0.6)"/> }
 
 			<View style={styles.header}>
-				<Text style={styles.title}>QPOSin AJA</Text>
+				<Image 
+					source={require('../../assets/images/icon/qposin.png')}
+					style={styles.qposin}
+					resizeMode='contain'
+				/>
 				<TouchableOpacity 
 					style={{flexDirection: 'row'}} activeOpacity={0.7}
 					onPress={() => props.navigation.navigate('Profile')}
 				>
-					<Text style={[styles.text, {fontSize: 17}]}>
-						Halo {capitalize(user.nama.replace(/ .*/,''))}
-					</Text>
-					<Icon name='md-person' style={{marginLeft: 8, color: '#FFF', fontSize: 24}} />
+					<Icon 
+						name='md-person' 
+						style={{
+							color: '#FFF', 
+							fontSize: 30,
+							marginRight: 5
+						}} 
+					/>
 				</TouchableOpacity>
 			</View>
 			<ScrollView
@@ -183,10 +210,12 @@ const MenuView = props => {
 						<TouchableOpacity 
 							style={styles.icon}
 							activeOpacity={0.8}
+							onPress={() => handlePressOrder()}
 						>
 							<Image 
 								style={styles.image}
 								source={require('../../assets/images/icon/qob.png')} 
+								resizeMode='contain'
 							/>
 						</TouchableOpacity>
 
@@ -197,38 +226,46 @@ const MenuView = props => {
 							<Image 
 								style={styles.image}
 								source={require('../../assets/images/icon/lacak.png')} 
+								resizeMode='contain'
 							/>
 						</TouchableOpacity>
+
 						<TouchableOpacity 
 							style={styles.icon}
 							activeOpacity={0.8}
 						>
 							<Image 
-								source={require('../../assets/images/icon/history.png')} 
 								style={styles.image}
+								source={require('../../assets/images/icon/history.png')} 
+								resizeMode='contain'
 							/>
 						</TouchableOpacity>
 					</View>
+
 					<View style={styles.menu}>
 						<TouchableOpacity 
 							style={styles.icon}
 							activeOpacity={0.8}
 						>
 							<Image 
-								source={require('../../assets/images/icon/token.png')} 
 								style={styles.image}
+								source={require('../../assets/images/icon/token.png')} 
+								resizeMode='contain'
 							/>
 						</TouchableOpacity>
+
 						<TouchableOpacity 
 							style={styles.icon}
 							activeOpacity={0.8}
 						>
 							<Image 
-								source={require('../../assets/images/icon/call.png')} 
 								style={styles.image}
+								source={require('../../assets/images/icon/call.png')} 
+								resizeMode='contain'
 							/>
 						</TouchableOpacity>
 					</View>
+					
 				</View>
 			</View>
 			</ScrollView>
@@ -264,17 +301,19 @@ const styles = StyleSheet.create({
 		height: hp('30%')
 	},
 	icon: {
-		height: hp('10%'),
-		width: wp('20%'),
-		backgroundColor: 'white',
-		borderRadius: 18,
-		elevation: 3,
+		height: hp('10.6%'),
+		width: wp('19%'),
+		borderRadius: 20,
+		// elevation: 3,
 		margin: 20,
 		justifyContent: 'center',
-		alignItems: 'center'
+		alignItems: 'center',
+		// borderWidth: 0.2,
+		backgroundColor: 'red',
+		elevation: 1
 	},
 	menu: {
-		height: hp('15%'),
+		height: hp('16%'),
 		width: wp('100%'), 
 		padding: 20,
 		//backgroundColor: 'red',
@@ -296,8 +335,12 @@ const styles = StyleSheet.create({
 	    height: 100
 	},
 	image: {
-		width: wp('12%'),
-		height: hp('8%')
+		// width: wp('30%'),
+		height: hp('10%')
+	},
+	qposin: {
+		width: wp('38%'),
+		height: hp('30%')
 	}
 })
 
@@ -314,4 +357,4 @@ function mapStateToProps(state) {
 	}
 }
 
-export default connect(mapStateToProps, null)(MenuView);
+export default connect(mapStateToProps, { resetOrder })(MenuView);

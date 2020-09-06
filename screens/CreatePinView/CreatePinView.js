@@ -20,6 +20,8 @@ import { Toast } from 'native-base';
 import { connect } from 'react-redux';
 import { updatePin } from '../../redux/actions/auth';
 import { CommonActions } from '@react-navigation/native';
+import AnimatedLoader from "react-native-animated-loader";
+import api from '../../api';
 
 const CreatePinView = props => {
 	const [pin, setPin] = useState('');
@@ -71,6 +73,12 @@ const CreatePinView = props => {
 					};
 					handleSuccesUpdate(newLocaluser);
 				})
+		}else{
+			Toast.show({
+	            text: 'Gagal mengambil data',
+	            textStyle: { textAlign: 'center' },
+	            duration: 3000
+	        })
 		}
 	}
 
@@ -111,6 +119,13 @@ const CreatePinView = props => {
 			source={require('../../assets/images/background.png')} 
 			style={styles.root}
 		>	
+			<AnimatedLoader
+		        visible={loading}
+		        overlayColor="rgba(0,0,0,0.6)"
+		        source={require("../../assets/images/loader/3098.json")}
+		        animationStyle={styles.lottie}
+		        speed={1}
+		    />
 			<View style={styles.content}>
 				<Image 
 					source={require('../../assets/images/icon/security.png')}
@@ -199,6 +214,10 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		//backgroundColor: 'green',
 		height: hp('15%')
+	},
+	lottie: {
+	    width: 100,
+	    height: 100
 	}
 })
 

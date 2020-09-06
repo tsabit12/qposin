@@ -9,3 +9,5 @@ export { default as ProfileView } from './ProfileView';
 export { default as UbahPinView } from './UbahPinView';
 export { default as CompleteRegistrasiView } from './CompleteRegistrasi';
 export { default as CreatePinView } from './CreatePinView';
+export { default as OrderView } from './OrderView';
+export { default as DataPenerima } from './DataPenerima';

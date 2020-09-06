@@ -119,6 +119,7 @@ const KotaView = props => {
 		}))
 	}
 
+
 	const handleChooseKec = (choosedKec) => {
 		const payload = {};
 
@@ -134,16 +135,27 @@ const KotaView = props => {
 
 		props.setOrder(payload);
 
-		props.navigation.dispatch(
-		  CommonActions.reset({
-		    index: 0,
-		    routes: [
-		      {
-		        name: 'Home'
-		      },
-		    ],
-		  })
-		);
+		if (params.fromRoute === 'order') {
+			props.navigation.dispatch(state => {
+			  const routes = state.routes.filter(r => r.name !== 'Kota');
+			  return CommonActions.reset({
+			    ...state,
+			    routes,
+			    index: routes.length - 1,
+			  });
+			});
+		}else{
+			props.navigation.dispatch(
+			  CommonActions.reset({
+			    index: 0,
+			    routes: [
+			      {
+			        name: 'Home'
+			      },
+			    ],
+			  })
+			);
+		}
 	}
 
 	const handelChangeText = (value) => {
