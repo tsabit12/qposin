@@ -27,6 +27,7 @@ const VerficationForm = props => {
 	const bounceValue = new Animated.Value(-100);
 	const confirmRef = useRef();
 	const [code, setCode] = useState('');
+	const [timer, setTimer] = useState(60);
 
 	useEffect(() => {
 		Animated.spring(bounceValue, {
@@ -38,11 +39,30 @@ const VerficationForm = props => {
 	    }).start();
 	}, []);
 
-	// const handleChangeCode = (val) => {
-	// 	if (code.length === 4) {
-	// 		setCode()
-	// 	}
-	// }
+	useEffect(() => {
+       if (timer <= 0) return;
+
+        const intervalId = setInterval(() => {
+        	setTimer(timer - 1);
+	    }, 1000);
+
+	    return () => clearInterval(intervalId);
+
+	}, [timer]);
+
+	const handleChangeCode = (val) => {
+		if (Number(val) !== Number(props.code)) {
+			alert(`Invalid kode verifikasi`);
+			confirmRef.current.clear();
+		}else{
+			props.onDone(props.phone);
+		}
+	}
+
+	const handleResend = () => {
+		setTimer(60);
+		props.onResendCode();
+	}
 
 	return(
 		<Animated.View style={[styles.main, {transform: [{translateX: bounceValue}] }]}>
@@ -64,15 +84,18 @@ const VerficationForm = props => {
 		      inactiveColor='#6e6c6b'
 		      activeColor='#db1a04'
 		    />
-		    <TouchableOpacity 
-				style={[styles.btn, {backgroundColor: code.length !== 4 ? rgba('#db1a04', 0.3) : '#db1a04'}]} 
-				activeOpacity={0.6}
-				disabled={code.length !== 4 ? true : false}
-			>
-				<Text style={[styles.text, {color: '#FFF'}]}>
-					Verifikasi
-				</Text>
-			</TouchableOpacity>
+		    { timer === 0 ? 
+		    	<TouchableOpacity 
+					style={[styles.btn]} 
+					activeOpacity={0.6}
+					onPress={handleResend}
+				>
+					<Text style={[styles.text, {color: '#FFF'}]}>
+						Kirim ulang kode verifikasi
+					</Text>
+				</TouchableOpacity> : <Text style={[styles.text, {color: rgba('#949494', 0.7), marginTop: 10}]}>
+					Mohon tunggu dalam {timer} detik untuk kirim ulang
+				</Text> }
 		</Animated.View>
 	);
 }
@@ -81,7 +104,9 @@ const ConfirmView = props => {
 	const bounceValue = new Animated.Value(200);
 	const [state, setState] = useState({
 		loading: false,
-		success: false
+		success: false,
+		code: Math.floor(1000 + Math.random() * 9000),
+		activePage: 1
 	})
 
 	useEffect(() => {
@@ -93,25 +118,25 @@ const ConfirmView = props => {
 	    }).start();
 	}, [])
 
-	const handleClose = () => {
-		Animated.spring(bounceValue, {
-	      toValue: 200,
-	      useNativeDriver: true,
-	      tension: 2,
-	      friction: 8
-	    }).start();
+	// const handleClose = () => {
+	// 	Animated.spring(bounceValue, {
+	//       toValue: 200,
+	//       useNativeDriver: true,
+	//       tension: 2,
+	//       friction: 8
+	//     }).start();
 
-	    setTimeout(function() {
-	    	props.onClose();
-	    }, 500);
-	}
+	//     setTimeout(function() {
+	//     	props.onClose();
+	//     }, 500);
+	// }
 
 	const handleSend = () => {
 		const convertedPhone = convertPhone(props.phone);
 
 		const payload = {
 			phone: convertedPhone,
-			body: 'QPOSIN: untuk pembuatan akun, masukkan kode verifikasi 7766'
+			body: `QPOSIN: untuk pembuatan akun, masukkan kode verifikasi ${state.code}`
 		};
 
 		setState(state => ({
@@ -119,35 +144,37 @@ const ConfirmView = props => {
 			loading: true
 		}))
 		
-		props.callApi(payload)
-			.then(res => {
-				console.log(res);
-				setState(state => ({
-					...state,
-					loading: false
-				}))
+		props.getLinkWa()
+			.then(link => {
+				props.sendWa(payload, link)
+					.then(res => {
+						console.log(res);
+						setState(state => ({
+							...state,
+							loading: false,
+							success: true
+						}))
+					})
+					.catch(err => {
+						// console.log(err);
+						setState(state => ({
+							...state,
+							loading: false,
+							success: true
+						}))
+					})
 			})
 			.catch(err => {
-				console.log(err.request);
+				// console.log(err);
 				setState(state => ({
 					...state,
-					loading: false
+					loading: false,
+					success: true
 				}))
 			})
-
-		// setState(state => ({
-		// 	...state,
-		// 	loading: true
-		// }))
-
-		// setTimeout(function() {
-		// 	setState(state => ({
-		// 		...state,
-		// 		loading: false,
-		// 		success: true
-		// 	}))
-		// }, 2000);
 	}	
+
+	//console.log(state.code);
 
 	return(
 		<Modal
@@ -159,12 +186,17 @@ const ConfirmView = props => {
 				<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
 				<Animated.View style={[styles.content, {transform: [{translateY: bounceValue }] }]}>
 					<View style={styles.right}>
-						<TouchableOpacity onPress={handleClose}>
-							<Icon name='close' style={{color: state.success ? rgba('#b6bab7', 0.6) : '#7a7d7b'}}/>
+						<TouchableOpacity onPress={props.onClose}>
+							<Icon name='close' style={{color: '#7a7d7b'}}/>
 						</TouchableOpacity>
 					</View>
 					{ state.success ? 
-						<VerficationForm phone={props.phone} /> : 
+						<VerficationForm 
+							phone={props.phone} 
+							code={state.code}
+							onResendCode={handleSend}
+							onDone={(phone) => props.onDone(phone)}
+						/> : 
 						<Animated.View style={styles.main}>
 							<Text style={[styles.text, {fontSize: 17, marginBottom: 10}]}>Verifikasi</Text>
 							<Text style={styles.text}>Kode verifikasi akan dikirim melalui WhatsApp ke {props.phone}</Text>
@@ -187,7 +219,8 @@ const ConfirmView = props => {
 
 ConfirmView.propTypes = {
 	phone: PropTypes.string.isRequired,
-	onClose: PropTypes.func.isRequired
+	onClose: PropTypes.func.isRequired,
+	onDone: PropTypes.func.isRequired
 }
 
 const styles = StyleSheet.create({
@@ -232,7 +265,8 @@ const styles = StyleSheet.create({
 })
 
 ConfirmView.propTypes = {
-	callApi: PropTypes.func.isRequired
+	sendWa: PropTypes.func.isRequired,
+	getLinkWa: PropTypes.func.isRequired
 }
 
 export default ConfirmView;

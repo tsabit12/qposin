@@ -80,6 +80,10 @@ const ProfileView = props => {
 								<View style={styles.icon}>
 									<Image 
 										source={require('../../assets/images/icon/pebisol.png')}
+										style={{
+											height: hp('4%'),
+											width: wp('6%')
+										}}
 									/>
 								</View>
 								<View style={{marginLeft: 8}}>

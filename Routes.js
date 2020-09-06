@@ -11,7 +11,9 @@ import {
   KotaView,
   ListTarif as ListTarifView,
   ProfileView,
-  UbahPinView
+  UbahPinView,
+  CompleteRegistrasiView,
+  CreatePinView
 } from './screens';
 
 
@@ -40,6 +42,8 @@ const Routes = props => {
 						<Stack.Screen name="FormRegister" component={FormRegisterScreen} />
 						<Stack.Screen name="Restore" component={PulihkanAkun} />
 						<Stack.Screen name="Login" component={LoginView} />
+						<Stack.Screen name="CompleteRegistrasi" component={CompleteRegistrasiView} />
+						<Stack.Screen name="CreatePin" component={CreatePinView} />
 		        	</React.Fragment> }
 		        </Stack.Navigator>
 		    </NavigationContainer>

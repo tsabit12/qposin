@@ -1,6 +1,7 @@
 import axios from 'axios';
 import hashing from './utils/hashing';
 const url 	= 'https://qcomm.posindonesia.co.id:10444/a767e8eec95442bda80c4e35e0660dbb'; //live
+// const url 	= 'https://qcomm.posindonesia.co.id:10555/a767e8eec95442bda80c4e35e0660dbb'; //dev
 const url1 	= 'https://order.posindonesia.co.id/api';
 
 
@@ -26,7 +27,7 @@ export default {
 	lacakKiriman: (barcode) => axios.post(`${url1}/lacak`, {
 		barcode
 	}).then(res => res.data.result),
-	sendWhatsApp: (payload) => axios.post('https://profilagen.posindonesia.co.id/chatbot/KirimWhatsapp', {
+	sendWhatsApp: (payload, urlWa) => axios.post(urlWa, {
 		...payload
 	}, config).then(res => res.data),
 	bantuan: (param1, userid) => axios.post(url, {
@@ -115,6 +116,21 @@ export default {
 			return res.data;
 		}else{
 			return Promise.reject(res.data);
+		}
+	}),
+	getLinkWa: () => axios.post(`${url1}/qposinaja/getLinkWa`).then(res => res.data.result.link),
+	registrasi: (payload) => axios.post(url, {
+		messtype: '215',
+		...payload,
+		hashing: hashing('215', payload.param1)
+	}, configYuyus).then(res => {
+		if (res.data.rc_mess === '00') {
+			return res.data;
+		}else{
+			const errors = {
+				global: res.data.desk_mess
+			};
+			return Promise.reject(errors);
 		}
 	})
 }

@@ -66,12 +66,25 @@ const FormRegister = props => {
 				modalVisible: true
 			}))
 		}
+		// handleDone('087736389581');
 	}
 
 	const validate = (phone) => {
 		const errors = {};
 		if (!phone) errors.phone = 'Nomor ponsel belum diisi';
 		return errors;
+	}
+
+	const handleDone = (phone) => {
+		setState(state => ({
+			phone: '',
+			errors: {},
+			modalVisible: false
+		}));
+
+		props.navigation.navigate('CompleteRegistrasi', {
+			phone: phone
+		})
 	}
 
 	return(
@@ -86,7 +99,9 @@ const FormRegister = props => {
 						...state,
 						modalVisible: false
 					}))}
-					callApi={(payload) => api.sendWhatsApp(payload)}
+					sendWa={(payload, url) => api.sendWhatsApp(payload, url)}
+					getLinkWa={() => api.getLinkWa()}
+					onDone={handleDone}
 				/> }
 			<View style={styles.form}>
 				<Text style={styles.label}>Nomor Ponsel</Text>

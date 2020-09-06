@@ -180,20 +180,53 @@ const MenuView = props => {
 				
 				<View style={{justifyContent: 'center', alignItems: 'center'}}>
 					<View style={styles.menu}>
-						<View style={styles.icon} />
-						<TouchableOpacity style={styles.icon}>
-							<Image source={require('../../assets/images/icon/lacak.png')} />
+						<TouchableOpacity 
+							style={styles.icon}
+							activeOpacity={0.8}
+						>
+							<Image 
+								style={styles.image}
+								source={require('../../assets/images/icon/qob.png')} 
+							/>
 						</TouchableOpacity>
-						<TouchableOpacity style={styles.icon}>
-							<Image source={require('../../assets/images/icon/history.png')} />
+
+						<TouchableOpacity 
+							style={styles.icon}
+							activeOpacity={0.8}
+						>
+							<Image 
+								style={styles.image}
+								source={require('../../assets/images/icon/lacak.png')} 
+							/>
+						</TouchableOpacity>
+						<TouchableOpacity 
+							style={styles.icon}
+							activeOpacity={0.8}
+						>
+							<Image 
+								source={require('../../assets/images/icon/history.png')} 
+								style={styles.image}
+							/>
 						</TouchableOpacity>
 					</View>
 					<View style={styles.menu}>
-						<TouchableOpacity style={styles.icon}>
-							<Image source={require('../../assets/images/icon/token.png')} />
+						<TouchableOpacity 
+							style={styles.icon}
+							activeOpacity={0.8}
+						>
+							<Image 
+								source={require('../../assets/images/icon/token.png')} 
+								style={styles.image}
+							/>
 						</TouchableOpacity>
-						<TouchableOpacity style={styles.icon}>
-							<Image source={require('../../assets/images/icon/call.png')} />
+						<TouchableOpacity 
+							style={styles.icon}
+							activeOpacity={0.8}
+						>
+							<Image 
+								source={require('../../assets/images/icon/call.png')} 
+								style={styles.image}
+							/>
 						</TouchableOpacity>
 					</View>
 				</View>
@@ -261,6 +294,10 @@ const styles = StyleSheet.create({
 	lottie: {
 	    width: 100,
 	    height: 100
+	},
+	image: {
+		width: wp('12%'),
+		height: hp('8%')
 	}
 })
 
