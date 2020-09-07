@@ -8,7 +8,8 @@ import {
 	ScrollView, 
 	StatusBar, 
 	Platform, 
-	TouchableOpacity 
+	TouchableOpacity,
+	Animated
 } from 'react-native';
 import { connect } from 'react-redux';
 import {
@@ -17,7 +18,7 @@ import {
 } from 'react-native-responsive-screen';
 import rgba from 'hex-to-rgba';
 import Constants from 'expo-constants';
-import { Icon, Toast } from 'native-base';
+import { Icon, Toast, List, ListItem, Left, Right } from 'native-base';
 import {
 	SliderImage,
 	FormTarif
@@ -29,6 +30,8 @@ import { resetOrder } from '../../redux/actions/order';
 
 import * as Permissions from 'expo-permissions';
 import * as Notifications from 'expo-notifications';
+import * as Linking from 'expo-linking';
+import { Ionicons } from '@expo/vector-icons';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -78,7 +81,17 @@ async function registerForPushNotificationsAsync() {
 }
 
 const MenuView = props => {
+	const scrollRef = React.useRef();
+
 	const [expoPushToken, setExpoPushToken] = useState('');
+
+	const [state, setState] = useState({
+		loading: false,
+		positionTarif: new Animated.Value(0),
+		tarifVisible: false
+	})
+
+	const { user, order } = props;
 
 	useEffect(() => {
 		registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
@@ -100,11 +113,29 @@ const MenuView = props => {
 		}
 	}, [expoPushToken]);
 
-	const [state, setState] = useState({
-		loading: false
-	})
+	useEffect(() => {
+		if (state.tarifVisible) {
+			Animated.timing(state.positionTarif, {
+				toValue: 100,                   // Animate the value
+      			duration: 500,
+      			useNativeDriver: true
+			}).start();
+		}
+	}, [state.tarifVisible])
 
-	const { user, order } = props;
+	useEffect(() => {
+		if (order.kecamatanA) {
+			setState(state => ({
+				...state,
+				tarifVisible: true
+			}))
+		}else if(order.kecamatanB){
+			setState(state => ({
+				...state,
+				tarifVisible: true
+			}))
+		}
+	}, [order]);
 
 	const handleCekTarif = (param) => {
 		setState(state => ({
@@ -189,86 +220,165 @@ const MenuView = props => {
 					/>
 				</TouchableOpacity>
 			</View>
-			<ScrollView
-				showsVerticalScrollIndicator={false}
-			>
 			<View style={styles.content}>
-				<View style={styles.slider}>
-					<SliderImage />
-				</View>
-				
-				<FormTarif 
-					navigate={props.navigation.navigate}
-					values={order}
-					onSubmit={handleCekTarif}
-				/>
-
-				<View style={styles.hr} />
-				
-				<View style={{justifyContent: 'center', alignItems: 'center'}}>
-					<View style={styles.menu}>
-						<TouchableOpacity 
-							style={styles.icon}
-							activeOpacity={0.8}
-							onPress={() => handlePressOrder()}
-						>
-							<Image 
-								style={styles.image}
-								source={require('../../assets/images/icon/qob.png')} 
-								resizeMode='contain'
-							/>
-						</TouchableOpacity>
-
-						<TouchableOpacity 
-							style={styles.icon}
-							activeOpacity={0.8}
-						>
-							<Image 
-								style={styles.image}
-								source={require('../../assets/images/icon/lacak.png')} 
-								resizeMode='contain'
-							/>
-						</TouchableOpacity>
-
-						<TouchableOpacity 
-							style={styles.icon}
-							activeOpacity={0.8}
-						>
-							<Image 
-								style={styles.image}
-								source={require('../../assets/images/icon/history.png')} 
-								resizeMode='contain'
-							/>
-						</TouchableOpacity>
+				<ScrollView
+					showsVerticalScrollIndicator={false}
+					ref={scrollRef}
+					//onContentSizeChange={() => scrollRef.current.scrollToEnd({animated: true})}
+				>
+					<View style={styles.slider}>
+						<SliderImage />
 					</View>
+					<View style={[styles.hr, { marginTop: 0}]} />
 
-					<View style={styles.menu}>
-						<TouchableOpacity 
-							style={styles.icon}
-							activeOpacity={0.8}
-						>
-							<Image 
-								style={styles.image}
-								source={require('../../assets/images/icon/token.png')} 
-								resizeMode='contain'
-							/>
-						</TouchableOpacity>
-
-						<TouchableOpacity 
-							style={styles.icon}
-							activeOpacity={0.8}
-						>
-							<Image 
-								style={styles.image}
-								source={require('../../assets/images/icon/call.png')} 
-								resizeMode='contain'
-							/>
-						</TouchableOpacity>
-					</View>
+					<TouchableOpacity 
+						style={{
+							height: hp('5.2%'),
+							alignItems: 'center',
+							flexDirection: 'row',
+							justifyContent: 'space-between',
+							width: wp('95%'),
+							paddingTop: 5
+						}}
+						activeOpacity={0.7}
+						onPress={() => setState(state => ({
+							...state,
+							tarifVisible: !state.tarifVisible
+						}))}
+					>
+						<Text style={styles.subTitle}>Mau Kirim Kemana?</Text>
+						{ state.tarifVisible ? 
+							<Ionicons name="ios-arrow-down" size={24} color="black" /> : 
+							<Ionicons name="ios-arrow-forward" size={24} color="black" />}
+					</TouchableOpacity>
 					
-				</View>
+
+					{ state.tarifVisible && <FormTarif 
+						animatedValue={state.positionTarif}
+						navigate={props.navigation.navigate}
+						values={order}
+						onSubmit={handleCekTarif}
+					/> }
+
+					<View style={styles.hr} />
+					
+					<Text style={styles.subTitle}>Layanan yang Kamu Butuhkan</Text>
+					<View style={{alignItems: 'center', flex: 1}}>
+						<View style={{marginTop: 5}}>
+							<View style={[styles.menu]}>
+								<TouchableOpacity 
+									style={[styles.icon]}
+									activeOpacity={1}
+								>
+									<View style={[styles.image, styles.elevationImage]}>
+										<Image 
+											style={styles.image}
+											source={require('../../assets/images/icon/qcom.png')} 
+											resizeMode='contain'
+										/>
+									</View>
+									<Text style={styles.textLabel}>Kiriman E-commerce</Text>
+								</TouchableOpacity>
+
+								<TouchableOpacity 
+									style={styles.icon}
+									activeOpacity={1}
+									onPress={() => props.navigation.navigate('CityCourier')}
+								>
+									<View style={[styles.image, styles.elevationImage]}>
+										<Image 
+											style={styles.image}
+											source={require('../../assets/images/icon/q9plus.png')} 
+											resizeMode='contain'
+										/>
+									</View>
+									<Text style={styles.textLabel}>City Courier</Text>
+								</TouchableOpacity>
+
+								<TouchableOpacity 
+									style={styles.icon}
+									activeOpacity={1}
+									onPress={() => handlePressOrder()}
+								>
+									<View style={[styles.image, styles.elevationImage]}>
+										<Image 
+											style={styles.image}
+											source={require('../../assets/images/icon/qob.png')} 
+											resizeMode='contain'
+										/>
+									</View>
+									<Text style={styles.textLabel}>Online Booking</Text>
+								</TouchableOpacity>
+							</View>
+						</View>
+
+						<View style={styles.menu}>
+
+							<TouchableOpacity 
+								style={styles.icon}
+								activeOpacity={1}
+							>
+								<View style={[styles.image, styles.elevationImage]}>
+									<Image 
+										style={styles.image}
+										source={require('../../assets/images/icon/lacak.png')} 
+										resizeMode='contain'
+									/>
+								</View>
+								<Text style={styles.textLabel}>Lacak Kiriman</Text>
+							</TouchableOpacity>
+
+							<TouchableOpacity 
+									style={styles.icon}
+									activeOpacity={1}
+									onPress={() => props.navigation.navigate('CityCourier')}
+								>
+								<View style={[styles.image, styles.elevationImage]}>
+									<Image 
+										style={styles.image}
+										source={require('../../assets/images/icon/history.png')} 
+										resizeMode='contain'
+									/>
+								</View>
+								<Text style={styles.textLabel}>History Order</Text>
+							</TouchableOpacity>
+
+							<TouchableOpacity 
+								style={styles.icon}
+								activeOpacity={1}
+							>
+								<View style={[styles.image, styles.elevationImage]}>
+									<Image 
+										style={styles.image}
+										source={require('../../assets/images/icon/token.png')} 
+										resizeMode='contain'
+									/>
+								</View>
+								<Text style={styles.textLabel}>Generate Password Web</Text>
+							</TouchableOpacity>
+							
+						</View>
+
+						<View style={[styles.menu]}>
+							<TouchableOpacity 
+								style={styles.icon}
+								activeOpacity={1}
+								onPress={() => Linking.openURL('tel:' + '161')}
+							>
+								<View style={[styles.image, styles.elevationImage]}>
+									<Image 
+										style={styles.image}
+										source={require('../../assets/images/icon/call.png')} 
+										resizeMode='contain'
+									/>
+								</View>
+								<Text style={styles.textLabel}>Halo POS</Text>
+							</TouchableOpacity>
+
+						</View>
+					</View>
+				</ScrollView>
 			</View>
-			</ScrollView>
 		</ImageBackground>
 	);
 }
@@ -301,34 +411,30 @@ const styles = StyleSheet.create({
 		height: hp('30%')
 	},
 	icon: {
-		height: hp('10.6%'),
-		width: wp('19%'),
+		height: hp('12%'),
+		width: wp('28%'),
 		borderRadius: 20,
-		// elevation: 3,
-		margin: 20,
-		justifyContent: 'center',
+		margin: 5,
+		//justifyContent: 'center',
 		alignItems: 'center',
 		// borderWidth: 0.2,
-		backgroundColor: 'red',
-		elevation: 1
+		//backgroundColor: 'green',
+		// elevation: 1,
 	},
 	menu: {
 		height: hp('16%'),
-		width: wp('100%'), 
-		padding: 20,
-		//backgroundColor: 'red',
+		width: wp('90%'), 
 		flexDirection: 'row',
-		alignItems: 'center'
-		//justifyContent: 'space-between'
+		alignItems: 'center',
+		// justifyContent: 'center',
 		//backgroundColor: 'red',
 	},
 	hr: {
 		width: wp('100%'),
-		height: hp('0.1%'),
-		backgroundColor: rgba('#FFF', 1),
+		height: hp('0.7%'),
+		backgroundColor: rgba('#c4c4c4', 0.4),
 		marginTop: 10,
-		marginBottom: 5,
-		elevation: 2
+		//elevation: 2
 	},
 	lottie: {
 	    width: 100,
@@ -336,11 +442,28 @@ const styles = StyleSheet.create({
 	},
 	image: {
 		// width: wp('30%'),
-		height: hp('10%')
+		height: hp('8%'),
+		width: wp('20%')
 	},
 	qposin: {
 		width: wp('38%'),
 		height: hp('30%')
+	},
+	textLabel: {
+		textAlign: 'center',
+		marginTop: 5,
+		fontSize: 12,
+		//fontFamily: 'Nunito-Bold'
+	},
+	subTitle: {
+		fontFamily: 'Nunito-Bold',
+		marginLeft: 6,
+		color: rgba('#3d3c3c', 0.7)
+	},
+	elevationImage: {
+		elevation: 2, 
+		borderRadius: 12, 
+		backgroundColor: 'white'
 	}
 })
 

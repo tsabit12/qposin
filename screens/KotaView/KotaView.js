@@ -39,6 +39,8 @@ const dynamicSort = (property) => {
     }
 }
 
+import dataKota from '../../refkota.json';
+
 const KotaView = props => {
 	const { params } = props.route;
 	const [state, setState] = useState({
@@ -51,19 +53,16 @@ const KotaView = props => {
 
 	const { kota, loading, active } = state;
 
-
 	useEffect(() => {
-		api.getKota()
-			.then(res => {
-				res.sort(dynamicSort("kota"));
-
-				setState(state => ({
-					...state,
-					kota: res,
-					allKota: res,
-					loading: false
-				}))
-			});
+		setTimeout(function() {
+			dataKota.sort(dynamicSort("kota"));
+			setState(state => ({
+				...state,
+				kota: dataKota,
+				allKota: dataKota,
+				loading: false
+			}))
+		}, 10);
 	}, []);
 
 	useEffect(() => {

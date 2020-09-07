@@ -32,6 +32,11 @@ const capitalize = (string) => {
 }
 
 
+const numberPhone = (number) => {
+	return number.toString().replace(/\B(?=(\d{4})+(?!\d))/g, "-");
+}
+
+
 const ProfileView = props => {
 	const { user, userid } = props;
 
@@ -53,7 +58,7 @@ const ProfileView = props => {
 					Informasi Akun
 				</Text>
 			</View>
-			<ScrollView>
+			<ScrollView style={{backgroundColor: '#FFF'}}>
 				<View style={{flex: 1, backgroundColor: '#f5f7f6'}}>
 					<View style={styles.highlight}>
 						<View style={styles.thumbnail}>
@@ -127,7 +132,7 @@ const ProfileView = props => {
 								<View style={{marginLeft: 8}}>
 									<Text style={styles.textLabel}>Nomor Handphone</Text>
 									<TextNote note>
-										{numberWithCommas(user.nohp)}
+										{numberPhone(user.nohp)}
 									</TextNote>
 								</View>
 							</View>

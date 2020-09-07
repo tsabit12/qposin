@@ -15,14 +15,15 @@ import {
   CompleteRegistrasiView,
   CreatePinView,
   OrderView,
-  DataPenerima as DataPenerimaView
+  DataPenerima as DataPenerimaView,
+  CityCourier as CityCourierView
 } from './screens';
 
 
 const Stack = createStackNavigator();
 
 const Routes = props => {
-	const { isLoggedin } = props;
+	const { isLoggedin } = props; 
 	return(
 		<React.Fragment>
 			<NavigationContainer>
@@ -41,6 +42,7 @@ const Routes = props => {
 		        		<Stack.Screen name="Ubahpin" component={UbahPinView} />
 		        		<Stack.Screen name="Order" component={OrderView} />
 		        		<Stack.Screen name="DataPenerima" component={DataPenerimaView} />
+		        		<Stack.Screen name="CityCourier" component={CityCourierView} />
 		        	</React.Fragment> : <React.Fragment>
 						<Stack.Screen name="Home" component={HomeScreen} />
 						<Stack.Screen name="FormRegister" component={FormRegisterScreen} />

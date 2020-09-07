@@ -3,10 +3,9 @@
     "name": "awesome",
     "slug": "awesome",
     "privacy": "public",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/posindo.png",
-    "version": "0.0.1",
     "splash": {
       "image": "./assets/splash.jpg",
       "resizeMode": "cover",
@@ -26,7 +25,7 @@
       "versionCode": 1,
       "useNextNotificationsApi": true
     },
-    "notification":{
+    "notification": {
       "icon": "./assets/notification.png",
       "color": "#f68527",
       "androidMode": "default",
@@ -34,6 +33,7 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "description": ""
   }
 }

@@ -12,3 +12,9 @@ export const updatePin = (localUser) => dispatch => dispatch({
 	type: 'UPDATE_PIN',
 	localUser
 })
+
+export const calculateSaldo = (nominal, calculateType) => dispatch => dispatch({
+	type: 'CALCULATE_SALDO',
+	calculateType,
+	nominal
+})

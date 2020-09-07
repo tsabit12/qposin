@@ -95,15 +95,14 @@ const styles = StyleSheet.create({
 		marginTop: 5
 	},
 	cardLeft: {
-		//backgroundColor: 'white',
 		//elevation: 1,
-		width: wp('76%'),
+		width: wp('82%'),
 		height: hp('10%'),
 		//borderRadius: 20,
 		justifyContent: 'space-around'
 	},
 	cardRight: {
-		width: wp('18%'),
+		width: wp('14%'),
 		justifyContent: 'center',
 		alignItems: 'center'
 	},

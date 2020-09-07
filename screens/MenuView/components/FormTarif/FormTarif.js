@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, Text as TextDefault, TouchableOpacity } from 'react-native';
+import { 
+	View, 
+	TextInput, 
+	StyleSheet, 
+	Text as TextDefault, 
+	TouchableOpacity,
+	Animated
+} from 'react-native';
 import { ListItem, Text, Left, Body, Right, Switch, List, Thumbnail } from 'native-base';
 import { Entypo, FontAwesome, Feather } from '@expo/vector-icons'; 
 import { Ionicons } from '@expo/vector-icons';
@@ -80,8 +87,15 @@ const FormTarif = props => {
 		}))
 	}
 
+	const ViewScaleValue = props.animatedValue.interpolate({
+	  inputRange: [0, 25, 50, 100],
+	  outputRange: [0, .5, 0.75, 1]
+	});
+
 	return(
-		<View>
+		<Animated.View 
+			style={{transform: [{  scaleX: ViewScaleValue }]}}
+		>
 			{ showJenis && 
 				<PilihJenis  
 					handleClose={() => setState(state => ({
@@ -185,7 +199,7 @@ const FormTarif = props => {
 		            </TouchableOpacity>
 	            </View>
           	</List>
-		</View>
+		</Animated.View>
 	);
 }
 

@@ -162,13 +162,27 @@ const OrderView = props => {
 			api.getTarif(param1)
 				.then(res => {
 					const convertedTarif = handleConvertTarif(res);
-					setState(state => ({
-						...state,
-						loading: false,
-						listTarif: convertedTarif
-					}))	
+					if (convertedTarif.length > 0) {
+						setState(state => ({
+							...state,
+							loading: false,
+							listTarif: convertedTarif
+						}))	
+					}else{
+						Toast.show({
+			                text: 'Tarif tidak ditemukan',
+			                textStyle: { textAlign: 'center' },
+			                duration: 4000
+			            })
+
+			            setState(state => ({
+							...state,
+							loading: false,
+						}))	
+					}
 				})
 				.catch(err => {
+					console.log(err);
 					setState(state => ({
 						...state,
 						loading: false
