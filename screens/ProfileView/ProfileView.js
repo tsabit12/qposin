@@ -106,7 +106,7 @@ const ProfileView = props => {
 									</Text>
 								</View>
 							</View>
-							<Icon name='ios-arrow-forward' style={{color: 'black', fontSize: 25}} />
+							
 						</View>
 
 						<View style={styles.list}>

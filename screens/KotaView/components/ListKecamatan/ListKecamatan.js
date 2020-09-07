@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import PropTypes from 'prop-types';
 import { ListItem, List, Right, Icon, Left } from 'native-base';
+import AnimatedLoader from "react-native-animated-loader";
 
 const ListKecamatan = props => {
 	const [listKec, setKec] = useState([]);
+	const [loading, setLoading] = useState(true);
 	
 	useEffect(() => {
 		if (props.kota) {
 			props.callApi(props.kota)
 				.then(res => {
 					 setKec(res);
+					 setLoading(false)
 				})
 		}
 	}, [props.kota])
@@ -18,6 +21,14 @@ const ListKecamatan = props => {
 
 	return(
 		<View>
+			<AnimatedLoader
+		        visible={loading}
+		        overlayColor="rgba(0,0,0,0.6)"
+		        source={require("../../../../assets/images/loader/3098.json")}
+		        animationStyle={styles.lottie}
+		        speed={1}
+		    />
+		    { loading &&  <StatusBar backgroundColor="rgba(0,0,0,0.6)"/> }
 			<Text style={styles.title}>
 				PILIH KECAMATAN
 			</Text>
@@ -44,6 +55,10 @@ const styles = StyleSheet.create({
 	},
 	list: {
 		marginTop: 10
+	},
+	lottie: {
+	    width: 100,
+	    height: 100
 	}
 })
 

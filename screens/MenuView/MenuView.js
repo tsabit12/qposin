@@ -21,7 +21,9 @@ import Constants from 'expo-constants';
 import { Icon, Toast, List, ListItem, Left, Right } from 'native-base';
 import {
 	SliderImage,
-	FormTarif
+	FormTarif,
+	ModalToken,
+	ModalLacak
 } from './components';
 import PropTypes from 'prop-types';
 import AnimatedLoader from "react-native-animated-loader";
@@ -84,11 +86,14 @@ const MenuView = props => {
 	const scrollRef = React.useRef();
 
 	const [expoPushToken, setExpoPushToken] = useState('');
+	const [showLacak, setLacak] = useState(false);
 
 	const [state, setState] = useState({
 		loading: false,
 		positionTarif: new Animated.Value(0),
-		tarifVisible: false
+		tarifVisible: false,
+		showToken: false,
+		tokenValue: ''
 	})
 
 	const { user, order } = props;
@@ -178,12 +183,61 @@ const MenuView = props => {
 			})
 	}
 
-	const handlePressOrder = () => {
-		props.navigation.navigate('Order');
+	const handlePressOrder = (type) => {
+		props.navigation.navigate('Order', {
+			type
+		});
 
 		setTimeout(function() {
 			props.resetOrder();
 		}, 100);
+	}
+
+	const onGenerateToken = () => {
+		setState(state => ({
+			...state,
+			loading: true
+		}))
+
+		const { userid, email } = props.local;
+		api.generateToken(userid)
+			.then(res => {
+				const payload = {
+					email: email,
+					pin: res.response_data1
+				};
+				api.syncronizeUserPwd(payload)
+					.then(res2 => {
+						setState(state => ({
+							...state,
+							loading: false,
+							showToken: true,
+							tokenValue: res.response_data1
+						}))
+					})
+					.catch(err => {
+						setError('Tidak dapat memproses permintaan anda, mohon coba beberapa saat lagi (500)');
+					})
+			})
+			.catch(err => {
+				if (err.global) {
+					setError(err.global)
+				}else{
+					setError('Tidak dapat memproses permintaan anda, mohon coba beberapa saat lagi');
+				}
+			})
+	}
+
+	const setError = (msg) => {
+		setState(state => ({
+			...state,
+			loading: false
+		}));
+		Toast.show({
+            text: 'Tidak dapat memproses permintaan anda, mohon coba beberapa saat lagi',
+            textStyle: { textAlign: 'center' },
+            duration: 3000
+        })
 	}
 	
 	return(
@@ -199,6 +253,17 @@ const MenuView = props => {
 		        speed={1}
 		    />
 		    { state.loading &&  <StatusBar backgroundColor="rgba(0,0,0,0.6)"/> }
+
+		    { state.showToken && 
+		    	<ModalToken 
+		    		onClose={() => setState(state => ({
+		    			...state,
+		    			showToken: false
+		    		}))} 
+		    		value={state.tokenValue} 
+		    	/> }
+
+		    { showLacak && <ModalLacak onClose={() => setLacak(false)} /> }
 
 			<View style={styles.header}>
 				<Image 
@@ -266,19 +331,6 @@ const MenuView = props => {
 					<View style={{alignItems: 'center', flex: 1}}>
 						<View style={{marginTop: 5}}>
 							<View style={[styles.menu]}>
-								<TouchableOpacity 
-									style={[styles.icon]}
-									activeOpacity={1}
-								>
-									<View style={[styles.image, styles.elevationImage]}>
-										<Image 
-											style={styles.image}
-											source={require('../../assets/images/icon/qcom.png')} 
-											resizeMode='contain'
-										/>
-									</View>
-									<Text style={styles.textLabel}>Kiriman E-commerce</Text>
-								</TouchableOpacity>
 
 								<TouchableOpacity 
 									style={styles.icon}
@@ -292,13 +344,28 @@ const MenuView = props => {
 											resizeMode='contain'
 										/>
 									</View>
-									<Text style={styles.textLabel}>City Courier</Text>
+									<Text style={styles.textLabel}>City {'\n'}Courier</Text>
+								</TouchableOpacity>
+
+								<TouchableOpacity 
+									style={[styles.icon]}
+									activeOpacity={1}
+									onPress={() => handlePressOrder(1)}
+								>
+									<View style={[styles.image, styles.elevationImage]}>
+										<Image 
+											style={styles.image}
+											source={require('../../assets/images/icon/qcom.png')} 
+											resizeMode='contain'
+										/>
+									</View>
+									<Text style={styles.textLabel}>Kiriman E-Commerce</Text>
 								</TouchableOpacity>
 
 								<TouchableOpacity 
 									style={styles.icon}
 									activeOpacity={1}
-									onPress={() => handlePressOrder()}
+									onPress={() => handlePressOrder(2)}
 								>
 									<View style={[styles.image, styles.elevationImage]}>
 										<Image 
@@ -307,7 +374,7 @@ const MenuView = props => {
 											resizeMode='contain'
 										/>
 									</View>
-									<Text style={styles.textLabel}>Online Booking</Text>
+									<Text style={styles.textLabel}>Online {'\n'}Booking</Text>
 								</TouchableOpacity>
 							</View>
 						</View>
@@ -317,6 +384,7 @@ const MenuView = props => {
 							<TouchableOpacity 
 								style={styles.icon}
 								activeOpacity={1}
+								onPress={() => setLacak(true)}
 							>
 								<View style={[styles.image, styles.elevationImage]}>
 									<Image 
@@ -325,7 +393,7 @@ const MenuView = props => {
 										resizeMode='contain'
 									/>
 								</View>
-								<Text style={styles.textLabel}>Lacak Kiriman</Text>
+								<Text style={styles.textLabel}>Lacak {'\n'}Kiriman</Text>
 							</TouchableOpacity>
 
 							<TouchableOpacity 
@@ -340,12 +408,13 @@ const MenuView = props => {
 										resizeMode='contain'
 									/>
 								</View>
-								<Text style={styles.textLabel}>History Order</Text>
+								<Text style={styles.textLabel}>History {'\n'}Kiriman</Text>
 							</TouchableOpacity>
 
 							<TouchableOpacity 
 								style={styles.icon}
 								activeOpacity={1}
+								onPress={onGenerateToken}
 							>
 								<View style={[styles.image, styles.elevationImage]}>
 									<Image 

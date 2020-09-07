@@ -3,9 +3,10 @@ import {
 	Modal, 
 	View, 
 	Text, 
+	TextInput, 
 	StyleSheet, 
 	StatusBar, 
-	TouchableOpacity,
+	TouchableOpacity, 
 	Animated 
 } from 'react-native';
 import {
@@ -13,9 +14,12 @@ import {
 	heightPercentageToDP as hp
 } from 'react-native-responsive-screen'; 
 import PropTypes from 'prop-types';
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 
-const PilihJenis = props => {
+const EntriBetay = props => {
 	const bounceValue = new Animated.Value(200);
+	const refInput = React.useRef();
+	const [value, setValue] = React.useState('');
 
 	useEffect(() => {
 		Animated.spring(bounceValue, {
@@ -25,6 +29,24 @@ const PilihJenis = props => {
 	      friction: 8
 	    }).start();
 	}, []);
+
+	const handleSubmit = () => {
+		if (!value) {
+			alert('Berat belum diisi')
+		}else{
+			
+			Animated.spring(bounceValue, {
+		      toValue: 100,
+		      useNativeDriver: true,
+		      tension: 2,
+		      friction: 8
+		    }).start();
+
+		    setTimeout(function() {
+		    	props.onChoosed(value);
+		    }, 10);
+		}
+	}
 
 	return(
 		<Modal
@@ -36,21 +58,22 @@ const PilihJenis = props => {
 			<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
 			<View style={styles.backgroundModal}>
 				<Animated.View style={[styles.modalContainer, {transform: [{translateY: bounceValue }] }]}>
-					<Text style={styles.text}>Pilih jenis kiriman</Text>
-					<View style={styles.group}>
+					<Text style={styles.text}>Berat (gram)</Text>
+					<View style={styles.inputGroup}>
+						<TextInput 
+							style={styles.input}
+							ref={refInput}
+							placeholder='Masukkan berat'
+							returnKeyType='send'
+							keyboardType='numeric'
+							onChangeText={(text) => setValue(text)}
+							value={value}
+						/>
 						<TouchableOpacity 
-							style={[styles.btn, {borderTopLeftRadius: 30, borderBottomLeftRadius: 30}]} 
-							activeOpacity={0.7}
-							onPress={() => props.onChoosed('1')}
+							style={styles.btn}
+							onPress={handleSubmit}
 						>
-							<Text style={[styles.text, {color: '#FFF'}]}>PAKET</Text>
-						</TouchableOpacity>
-						<TouchableOpacity 
-							style={[styles.btn, {borderTopRightRadius: 30, borderBottomRightRadius: 30}]} 
-							activeOpacity={0.7}
-							onPress={() => props.onChoosed('2')}
-						>
-							<Text style={[styles.text, {color: '#FFF'}]}>SURAT</Text>
+							<MaterialCommunityIcons name="send" size={24} color="black" />
 						</TouchableOpacity>
 					</View>
 				</Animated.View>
@@ -73,32 +96,41 @@ const styles = StyleSheet.create({
 		padding: 10,
 		borderTopLeftRadius: 15,
 		borderTopRightRadius: 15,
-		height: hp('14%')
+		height: hp('13%')
 	},
 	text: {
 		fontFamily: 'Nunito-Bold',
-		textAlign: 'center'
+	},
+	inputGroup: {
+		flexDirection: 'row',
+		// justifyContent: 'center',
+		alignItems: 'center',
+		borderRadius: 30,
+		marginTop: 5,
+		borderWidth: 0.3,
+		borderColor: '#737272'
 	},
 	btn: {
-		backgroundColor: '#cc1e06',
 		alignItems: 'center',
 		justifyContent: 'center',
 		height: hp('6%'),
 		flex: 1,
-		borderWidth: 0.3,
-		borderColor: '#FFF'
+		borderTopRightRadius: 30,
+		borderBottomRightRadius: 30
 	},
-	group: {
-		flexDirection: 'row',
-		marginTop: 10,
-		alignItems: 'center',
-		justifyContent: 'center'
+	input: {
+		height: hp('6%'),
+		// backgroundColor: 'red',
+		width: wp('85%'),
+		paddingLeft: 10,
+		borderTopLeftRadius: 30,
+		borderBottomLeftRadius: 30,
 	}
 })
 
-PilihJenis.propTypes = {
+EntriBetay.propTypes = {
 	handleClose: PropTypes.func.isRequired,
 	onChoosed: PropTypes.func.isRequired
 }
 
-export default PilihJenis;
+export default EntriBetay;

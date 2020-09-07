@@ -5,7 +5,8 @@ import {
 	StyleSheet, 
 	Text as TextDefault, 
 	TouchableOpacity,
-	Animated
+	Animated,
+	Modal
 } from 'react-native';
 import { ListItem, Text, Left, Body, Right, Switch, List, Thumbnail } from 'native-base';
 import { Entypo, FontAwesome, Feather } from '@expo/vector-icons'; 
@@ -16,7 +17,8 @@ import {
 } from 'react-native-responsive-screen'; 
 import PropTypes from 'prop-types';
 import {
-	PilihJenis 
+	PilihJenis,
+	EntriBerat
 } from './components';
 
 const FormTarif = props => {
@@ -26,14 +28,15 @@ const FormTarif = props => {
 			panjang: '',
 			lebar: '',
 			tinggi: '',
-			berat: '1000',
+			berat: '100',
 			jenis: '1'
 		},
 		loading: false,
-		showJenis: false
+		showJenis: false,
+		showBerat: false
 	})
 
-	const { data, showJenis } = state;
+	const { data, showJenis, showBerat } = state;
   
 	const handlePressItem = (type) => {
 		props.navigate('Kota', {
@@ -66,7 +69,10 @@ const FormTarif = props => {
 	}
 
 	const handlePressBerat = () => {
-		alert('oke');
+		setState(state => ({
+			...state,
+			showBerat: true
+		}))
 	}
 
 	const handlePressJenis = () => {
@@ -94,7 +100,7 @@ const FormTarif = props => {
 
 	return(
 		<Animated.View 
-			style={{transform: [{  scaleX: ViewScaleValue }]}}
+			style={{transform: [{  scaleY: ViewScaleValue }]}}
 		>
 			{ showJenis && 
 				<PilihJenis  
@@ -103,6 +109,22 @@ const FormTarif = props => {
 						showJenis: false
 					}))}
 					onChoosed={handleChoosedJenis}
+				/> }
+
+			{ showBerat && 
+				<EntriBerat 
+					handleClose={() => setState(state => ({
+						...state,
+						showBerat: false
+					}))}
+					onChoosed={(value) => setState(state => ({
+						...state,
+						data: {
+							...state.data,
+							berat: value
+						},
+						showBerat: false
+					}))}
 				/> }
 			<List>
 	            <ListItem avatar onPress={() => handlePressItem('sender')}>

@@ -1,13 +1,14 @@
 {
   "expo": {
-    "name": "awesome",
-    "slug": "awesome",
+    "name": "QPOSin AJA",
+    "slug": "qob",
     "privacy": "public",
     "version": "0.0.1",
+    "sdkVersion": "38.0.0",
     "orientation": "portrait",
-    "icon": "./assets/posindo.png",
+    "icon": "./assets/logo.png",
     "splash": {
-      "image": "./assets/splash.jpg",
+      "image": "./assets/splash.png",
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
@@ -21,10 +22,16 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.appawesome.cob",
-      "versionCode": 1,
-      "useNextNotificationsApi": true
+      "package": "com.posindonesia.cob",
+      "versionCode": 10,
+      "useNextNotificationsApi": true,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyC7IVXqAk-qjFjBAICJUFN5XisAv5g3X7I"
+        }
+      }
     },
+    "githubUrl": "https://github.com/tsabit12/Qob2/",
     "notification": {
       "icon": "./assets/notification.png",
       "color": "#f68527",
@@ -34,6 +41,9 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "description": ""
+    "description": "",
+    "facebookAppId": "2274373556191901",
+    "facebookDisplayName": "qposin",
+    "facebookAutoLogAppEventsEnabled": true
   }
 }

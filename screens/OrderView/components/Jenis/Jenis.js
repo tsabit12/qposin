@@ -9,7 +9,7 @@ import {
 	TextInput
 } from 'react-native';
 import { ListItem, Body, Left, Right, Text } from 'native-base';
-import { Feather, Ionicons } from '@expo/vector-icons'; 
+import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
 import PropTypes from 'prop-types';
 import {
 	widthPercentageToDP as wp, 
@@ -120,31 +120,33 @@ const Jenis = props => {
 					<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
 					<View style={styles.backgroundModal}>
 						<Animated.View style={[styles.modalContainer, {transform: [{translateY: bounceValue }] }]}>
-							{ active === 1 && <React.Fragment>
+							{ active === 1 ? <Text style={{fontFamily: 'Nunito-Bold', textAlign: 'center'}}>
+									Pilih jenis kiriman
+								</Text> : <Text style={styles.label}>
+									Jenis kiriman = {state.jenis === '1' ? 'Paket' : 'Surat'}
+								</Text> }
+
+							{ active === 1 && <View style={styles.group}>
 								<TouchableOpacity 
-									style={styles.btn} 
+									style={[styles.btn, {borderTopLeftRadius: 30, borderBottomLeftRadius: 30}]} 
 									activeOpacity={0.7}
 									onPress={() => handleChoosed('1')}
 								>
 									<Text style={[styles.text, {color: '#FFF'}]}>PAKET</Text>
 								</TouchableOpacity>
 								<TouchableOpacity 
-									style={styles.btn} 
+									style={[styles.btn, {borderTopRightRadius: 30, borderBottomRightRadius: 30}]} 
 									activeOpacity={0.7}
 									onPress={() => handleChoosed('2')}
 								>
 									<Text style={[styles.text, {color: '#FFF'}]}>SURAT</Text>
 								</TouchableOpacity>
-							</React.Fragment> }
+							</View> }
 
-							{ active === 2 && <React.Fragment>
-								<Text style={styles.label}>
-									Jenis kiriman = {state.jenis === '1' ? 'Paket' : 'Surat'}
-								</Text>
+							{ active === 2 && <View style={styles.inputGroup}>
 								<TextInput 
 									style={styles.input}
 									placeholder='Masukkan isi kiriman'
-									textAlign='center'
 									value={state.isikiriman}
 									onChangeText={(value) => setState(state => ({
 										...state,
@@ -152,13 +154,12 @@ const Jenis = props => {
 									}))}
 								/>
 								<TouchableOpacity 
-									style={styles.btn} 
-									activeOpacity={0.7}
 									onPress={handleSave}
+									style={styles.btnGroup}
 								>
-									<Text style={[styles.text, {color: '#FFF'}]}>Simpan</Text>
+									<MaterialCommunityIcons name="send" size={24} color="black" />
 								</TouchableOpacity>
-							</React.Fragment> }
+							</View> }
 						</Animated.View>
 					</View>
 				</Modal> }
@@ -187,7 +188,7 @@ const styles = StyleSheet.create({
 		padding: 10,
 		borderTopLeftRadius: 15,
 		borderTopRightRadius: 15,
-		height: hp('20%')
+		height: hp('14%')
 	},
 	text: {
 		fontFamily: 'Nunito-Bold',
@@ -197,18 +198,44 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		height: hp('6%'),
-		borderRadius: 30,
-		marginTop: 10
+		flex: 1,
+		borderWidth: 0.3,
+		borderColor: '#FFF'
 	},
 	input: {
 		height: hp('6%'),
-		//backgroundColor: 'red',
+		// backgroundColor: 'red',
+		width: wp('85%'),
+		paddingLeft: 10,
+		borderTopLeftRadius: 30,
+		borderBottomLeftRadius: 30,
+	},
+	inputGroup: {
+		flexDirection: 'row',
+		// justifyContent: 'center',
+		alignItems: 'center',
 		borderRadius: 30,
-		borderWidth: 0.3
+		marginTop: 5,
+		borderWidth: 0.3,
+		borderColor: '#737272'
 	},
 	label: {
 		color: '#a3a3a3',
 		marginBottom: 4
+	},
+	group: {
+		flexDirection: 'row',
+		marginTop: 10,
+		alignItems: 'center',
+		justifyContent: 'center'
+	},
+	btnGroup: {
+		alignItems: 'center',
+		justifyContent: 'center',
+		height: hp('6%'),
+		flex: 1,
+		borderTopRightRadius: 30,
+		borderBottomRightRadius: 30
 	}
 })
 

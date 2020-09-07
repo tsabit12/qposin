@@ -29,7 +29,7 @@ import {
 import AnimatedLoader from "react-native-animated-loader";
 import api from '../../api';
 
-const handleConvertTarif = (res) => {
+const handleConvertTarif = (res, type) => {
 	const response = res.split('#');
 	const toWhatIwant = [];
 	response.forEach(x => {
@@ -45,9 +45,16 @@ const handleConvertTarif = (res) => {
 		}
 	});
 
-	const filterVal = ['210','240','EC2','EC1','1Q9','2Q9','447','401','417'];
-	const filters 	= toWhatIwant.filter(x => filterVal.includes(x.id));
-	return filters;
+	//let filterVal 	= [];
+	if (type === 2) {
+		const filterVal = ['210','240','EC2','EC1','1Q9','2Q9','447','401','417'];
+		const filters 	= toWhatIwant.filter(x => filterVal.includes(x.id));
+		return filters;
+	}else{
+		const filterVal = ['EC2'];
+		const filters 	= toWhatIwant.filter(x => filterVal.includes(x.id));
+		return filters;
+	}
 }
 
 const OrderView = props => {
@@ -69,6 +76,9 @@ const OrderView = props => {
 	})
 
 	const { data, errors } = state;
+
+	const { params } = props.route;
+	console.log(params);
 
 	const handlePress = (type) => {
 		props.navigation.navigate('Kota', {
@@ -161,7 +171,7 @@ const OrderView = props => {
 
 			api.getTarif(param1)
 				.then(res => {
-					const convertedTarif = handleConvertTarif(res);
+					const convertedTarif = handleConvertTarif(res, params.type);
 					if (convertedTarif.length > 0) {
 						setState(state => ({
 							...state,
@@ -283,7 +293,7 @@ const OrderView = props => {
 						<Icon name='ios-arrow-back' style={{color: '#FFF', fontSize: 25, marginTop: 20}} />
 					</TouchableOpacity>
 					<Text style={[styles.text, {marginTop: 20, fontSize: 17, color: '#FFF'}]}>
-						Kirim paket
+						{ params.type === 1 ? 'Kiriman E-Commerce' : 'Online Booking' }
 					</Text>
 				</View>
 				{ state.disabled && <TouchableOpacity 

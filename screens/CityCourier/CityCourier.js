@@ -410,7 +410,7 @@ const CityCourier = props => {
 
 		const payload = {
 			param1: props.user.userid,
-			param2: `40000|${sender.kota.toUpperCase()}|${data.berat.replace(/\D/g, '')}|${sender.latitude}|${sender.longitude}|${Number(jarak / 1000).toFixed(1)}`
+			param2: `${props.detail.nopend}|${sender.kota.toUpperCase()}|${data.berat.replace(/\D/g, '')}|${sender.latitude}|${sender.longitude}|${Number(jarak / 1000).toFixed(1)}`
 		}
 
 		// console.log(payload);

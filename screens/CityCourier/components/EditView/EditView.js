@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import Constants from 'expo-constants';
 import { Text, Item, Input, Button, List, ListItem, Thumbnail, Left, Body, Right, Icon } from 'native-base';
 import { FontAwesome } from '@expo/vector-icons';
-import { ApiOrder } from '../../../../api';
+import  api from '../../../../api';
 
 const device = Dimensions.get('window').width;
 
@@ -68,7 +68,7 @@ const EditView = props => {
 			places: [] //reset
 		}))
 
-		ApiOrder.google.findLatlongbyAddres(value)
+		api.google.findLatlongbyAddres(value)
 			.then(places => {
 				setState(state => ({
 					...state,

@@ -99,6 +99,7 @@ const Berat = props => {
 					<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
 					<View style={styles.backgroundModal}>
 						<Animated.View style={[styles.modalContainer, {transform: [{translateY: bounceValue }] }]}>
+							<Text style={[styles.text, {textAlign: 'center', marginBottom: 2}]}>Berat kiriman (gram)</Text>
 							<TextInput 
 								style={styles.input}
 								placeholder='Masukkan berat'
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
 		padding: 10,
 		borderTopLeftRadius: 15,
 		borderTopRightRadius: 15,
-		height: hp('16%')
+		height: hp('20%')
 	},
 	text: {
 		fontFamily: 'Nunito-Bold',

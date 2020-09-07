@@ -271,7 +271,7 @@ const SelesaiOrder = props => {
 					        	</View>
 
 					        	{ history.status ? <View style={styles.cardHistory}>
-					        		<Text style={styles.cardTitleText}>Riwayat Order</Text>
+					        		<Text style={styles.cardTitleText}>History Order</Text>
 					        		<View style={{padding: 7}}>
 						        		{history.data.map((row, index) => (
 						        			<View key={index} style={{flexDirection: 'row'}}>
@@ -292,7 +292,7 @@ const SelesaiOrder = props => {
 					        			style={styles.link}
 					        			onPress={onPressHistory}
 					        		>
-					        			{ state.loading ? 'Sedang memuat...' : 'Tampilkan riwayat order'}
+					        			{ state.loading ? 'Sedang memuat...' : 'Tampilkan history order'}
 					        		</Text>
 					        	</View> }
 							</Content> }
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
 		marginTop: 7
 	},
 	cardTitleText: {
-		backgroundColor: '#56afbf', 
+		backgroundColor: '#cc1e06', 
 		textAlign: 'center', 
 		borderTopLeftRadius: 6, 
 		borderTopRightRadius: 6,

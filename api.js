@@ -305,5 +305,29 @@ export default {
 		}else{
 			return Promise.reject(res.data);
 		}
-	})
+	}),
+	generateToken: (userid) => axios.post(url, {
+		messtype: '213',
+		param1: userid,
+		hashing: hashing('213', userid)
+	}, configYuyus).then(res => {
+		if (res.data.rc_mess === '00') {
+			return Promise.resolve(res.data);
+		}else{
+			const errors = {
+				global: res.data.desk_mess
+			}
+			return Promise.reject(errors);
+		}
+	}),
+	syncronizeUserPwd: (payload) => axios.post(`${url1}/Qposinaja/sync`, {
+		...payload
+	}).then(res => {
+		const { result } = res.data;
+		if (result.respcode === '00' || result.respcode === '21') {
+			return result;
+		}else{
+			return Promise.reject(result);
+		}
+	}),
 }

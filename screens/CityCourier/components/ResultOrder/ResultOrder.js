@@ -1,7 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, Animated, Modal, Dimensions, Alert, StatusBar } from 'react-native';
+import { View, StyleSheet, Animated, Modal, Dimensions, Alert, StatusBar,TouchableOpacity } from 'react-native';
 import { Button, Text, Picker, Spinner } from 'native-base';
 import PropTypes from 'prop-types';
+import {
+	widthPercentageToDP as wp, 
+	heightPercentageToDP as hp
+} from 'react-native-responsive-screen';
 
 const { height } = Dimensions.get('window');
 
@@ -121,6 +125,7 @@ const ResultOrder = props => {
 			animationType="fade"
             transparent={true}
 		>
+			<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
 			<View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)'}}>
 				<Animated.View style={[styles.root, {transform: [{translateY: positionInput }] }]}>
 					{state.loading ? <LoadingView /> : <React.Fragment>
@@ -168,14 +173,17 @@ const ResultOrder = props => {
 							{ props.error.tarif ? <Button style={styles.btn} danger onPress={props.closeModal}>
 								<Text>Tutup</Text>
 							</Button> :  <React.Fragment>
-								<Button style={styles.btn} danger onPress={props.closeModal}>
-									<Text>BATAL</Text>
-								</Button>
-								<Button style={styles.btn} onPress={handleSubmit}>
-									<Text>
-										{state.sendLoading ? 'Loading...' : `ORDER ${numberWithCommas(props.tarif)}`}	
+								<TouchableOpacity style={styles.button} danger onPress={props.closeModal}>
+									<Text style={styles.text}>Batal</Text>
+								</TouchableOpacity>
+								<TouchableOpacity 
+									style={[styles.button, {backgroundColor: '#ffac30'}]}
+									onPress={handleSubmit}
+								>
+									<Text style={styles.text}>
+										{state.sendLoading ? 'Loading...' : `Order ${numberWithCommas(props.tarif)}`}	
 									</Text>
-								</Button>
+								</TouchableOpacity>
 							</React.Fragment> }
 						</React.Fragment>}
 
@@ -238,6 +246,19 @@ const styles = StyleSheet.create({
 		justifyContent: 'center', 
 		height: height / 10,
 		alignItems: 'center'
+	},
+	button: {
+		backgroundColor: '#cc1e06',
+		borderRadius: 30,
+		height: hp('6%'),
+		justifyContent: 'center',
+		alignItems: 'center',
+		flex: 1,
+		margin: 5
+	},
+	text: {
+		fontFamily: 'Nunito-Bold',
+		color: '#FFF'
 	}
 })
 

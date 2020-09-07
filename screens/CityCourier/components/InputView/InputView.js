@@ -1,9 +1,13 @@
 import React from 'react';
-import { View, StyleSheet, Animated, Alert } from 'react-native';
+import { View, StyleSheet, Animated, Alert, TouchableOpacity } from 'react-native';
 import PropTypes from 'prop-types';
 import { Input, Item, Icon, Button, List, ListItem, Right, Body, Text, Thumbnail, Left, Label, Toast } from 'native-base';
 import { FontAwesome, Foundation } from '@expo/vector-icons'; 
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
+import {
+	widthPercentageToDP as wp, 
+	heightPercentageToDP as hp
+} from 'react-native-responsive-screen';
 
 const numberWithCommas = (number) => {
 	return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -218,17 +222,16 @@ const KeloaKiriman = props => {
 		            { errors.tinggi && <ErrorWithAnimated label={errors.tinggi} /> }
 	            </View>
             </View>
-            <View style={{flexDirection: 'row'}}>
-	            <Button 
-	            	block 
-	            	style={{marginTop: 5, flex: 1, borderRadius: 0}} 
+            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+            	<TouchableOpacity 
+	            	style={styles.button}
 	            	onPress={handleSubmit}
 	            	disabled={state.disabled}
 	            >
 	            	<Text style={styles.btnText}>
-	            	 	{ props.jarak === 0 ? 'MEMUAT JARAK...' : `CEK TARIF (${Number(props.jarak / 1000).toFixed(1)} km)` }
+	            	 	{ props.jarak === 0 ? 'Memuat jarak...' : `Cek Tarif (${Number(props.jarak / 1000).toFixed(1)} km)` }
 	            	</Text>
-	            </Button>
+	            </TouchableOpacity>
             </View>
 		</View>
 	);
@@ -439,16 +442,17 @@ const InputView = props => {
 	            </Item>
 	            { errors.name && <ErrorWithAnimated label={errors.nohp} /> }
 
-	            <Button 
-	            	block 
-	            	style={{marginTop: 5}} 
-	            	onPress={handleSubmit}
-	            	disabled={state.loading}
-	            >
-	            	<Text style={styles.btnText}>
-	            	 	{props.markerType === 'sender' ? 'SIMPAN DATA PENGIRIM' : 'SIMPAN DATA PENERIMA'}
-	            	</Text>
-	            </Button>
+	            <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 5}}>
+		            <TouchableOpacity 
+		            	style={styles.button}
+		            	onPress={handleSubmit}
+		            	disabled={state.loading}
+		            >
+		            	<Text style={styles.btnText}>
+		            	 	{props.markerType === 'sender' ? 'Simpan Data Pengirim' : 'Simpan Data Penerima'}
+		            	</Text>
+		            </TouchableOpacity>
+	            </View>
 			</React.Fragment> : 
 				<KeloaKiriman 
 					onSubmit={props.onSubmitKiriman} 
@@ -472,7 +476,8 @@ InputView.propTypes = {
 const styles = StyleSheet.create({
 	btnText: {
 		color: '#FFFF',
-		zIndex: 1
+		zIndex: 1,
+		fontFamily: 'Nunito-Bold'
 	},
 	errorLabel: {
 		fontSize: 13,
@@ -500,6 +505,14 @@ const styles = StyleSheet.create({
 		margin: 2, 
 		marginBottom: 7,
 		marginTop: 5
+	},
+	button: {
+		backgroundColor: '#cc1e06',
+		borderRadius: 30,
+		height: hp('6%'),
+		justifyContent: 'center',
+		alignItems: 'center',
+		width: wp('90%')
 	}
 })
 

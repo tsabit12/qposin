@@ -18,7 +18,6 @@ import Constants from 'expo-constants';
 import { Icon, List, ListItem } from 'native-base';
 import { Entypo, Ionicons } from '@expo/vector-icons'; 
 import api from '../../api';
-import AnimatedLoader from "react-native-animated-loader";
 import {
 	ListKecamatan
 } from './components';
@@ -26,6 +25,14 @@ import { connect } from 'react-redux';
 import { setOrder } from '../../redux/actions/order';
 
 import { CommonActions } from '@react-navigation/native';
+
+const capitalize = (string) => {
+	if (string) {
+		return string.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
+	}else{
+		return '-';
+	}
+}
 
 const dynamicSort = (property) => {
 	var sortOrder = 1;
@@ -46,12 +53,11 @@ const KotaView = props => {
 	const [state, setState] = useState({
 		kota: [],
 		allKota: [],
-		loading: true,
 		active: 1,
 		kotaValue: ''
 	})
 
-	const { kota, loading, active } = state;
+	const { kota, active } = state;
 
 	useEffect(() => {
 		setTimeout(function() {
@@ -59,8 +65,7 @@ const KotaView = props => {
 			setState(state => ({
 				...state,
 				kota: dataKota,
-				allKota: dataKota,
-				loading: false
+				allKota: dataKota
 			}))
 		}, 10);
 	}, []);
@@ -95,14 +100,14 @@ const KotaView = props => {
 			              <Text>{firstWord}</Text>
 			            </ListItem>                    
 			            <ListItem onPress={() => handlePress(item.kota)}>
-			              <Text>{item.kota}</Text>
+			              <Text>{capitalize(item.kota)}</Text>
 			            </ListItem>
 			        </React.Fragment>
 				);
 			}else{
 				list.push(
 					<ListItem onPress={() => handlePress(item.kota)} key={key}>
-		              <Text>{item.kota}</Text>
+		              <Text>{capitalize(item.kota)}</Text>
 		            </ListItem>
 				)
 			}
@@ -112,7 +117,6 @@ const KotaView = props => {
 	const handlePress = (value) => {
 		setState(state => ({
 			...state,
-			//loading: true,
 			active: 2,
 			kotaValue: value
 		}))
@@ -124,12 +128,12 @@ const KotaView = props => {
 
 		if (params.type === 'sender') {
 			payload.kodeposA = choosedKec.kodepos;
-			payload.kecamatanA = choosedKec.KEC;
-			payload.kotaA = state.kotaValue;
+			payload.kecamatanA = capitalize(choosedKec.KEC);
+			payload.kotaA = capitalize(state.kotaValue);
 		}else{
 			payload.kodeposB = choosedKec.kodepos;
-			payload.kecamatanB = choosedKec.KEC;
-			payload.kotaB = state.kotaValue;
+			payload.kecamatanB = capitalize(choosedKec.KEC);
+			payload.kotaB = capitalize(state.kotaValue);
 		}
 
 		props.setOrder(payload);
@@ -169,14 +173,6 @@ const KotaView = props => {
 			source={require('../../assets/images/background.png')} 
 			style={{flex: 1}}
 		>	
-			<AnimatedLoader
-		        visible={loading}
-		        overlayColor="rgba(0,0,0,0.6)"
-		        source={require("../../assets/images/loader/3098.json")}
-		        animationStyle={styles.lottie}
-		        speed={1}
-		    />
-		    { loading &&  <StatusBar backgroundColor="rgba(0,0,0,0.6)"/> }
 			<View style={styles.header}>
 				<TouchableOpacity 
 					style={styles.btn} 
