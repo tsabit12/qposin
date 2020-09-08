@@ -135,7 +135,8 @@ const PulihkanAkun = props => {
 				loading: true
 			}))
 
-			const param1 = `${data.userid}|-|${data.phone}|${data.email}|${Constants.deviceId}|${state.type}`;
+			// const param1 = `${data.userid}|-|${data.phone}|${data.email}|${Constants.deviceId}|${state.type}`;
+			const param1 = `${data.userid}|-|${data.phone}|${data.email}|${Constants.deviceId}|2`;
 			
 			api.bantuan(param1, data.userid)
 				.then(res => {
@@ -199,7 +200,7 @@ const PulihkanAkun = props => {
 			showVerifyCode: false,
 			loading: true
 		}))
-		const param1 = `${data.userid}|-|${data.phone}|${data.email}|${Constants.deviceId}|${code}|${state.type}`;
+		const param1 = `${data.userid}|-|${data.phone}|${data.email}|${Constants.deviceId}|${code}|2`;
 		
 		api.verifikasiBantuan(param1, data.userid)
 			.then(res => {

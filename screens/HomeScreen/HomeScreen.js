@@ -3,6 +3,7 @@ import { View, Text, AsyncStorage, Animated, StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
 import { setLocalUser } from '../../redux/actions/auth';
 import PropsTypes from 'prop-types';
+import Constants from 'expo-constants';
 
 import {
 	WelcomeView,
@@ -27,6 +28,8 @@ const HomeScreen = props => {
 			const value = await AsyncStorage.getItem("qobUserPrivasi");
 			if (value !== null) { //detect user was register
 				const toObje  = JSON.parse(value);
+				console.log(toObje);
+				console.log(Constants.deviceId);
 				// console.log(toObje); 
 				props.setLocalUser(toObje); //store to redux
 				

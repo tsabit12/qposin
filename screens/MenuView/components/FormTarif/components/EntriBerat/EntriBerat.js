@@ -28,6 +28,10 @@ const EntriBetay = props => {
 	      tension: 2,
 	      friction: 8
 	    }).start();
+
+	    setTimeout(function() {
+	    	refInput.current.focus();
+	    }, 10);
 	}, []);
 
 	const handleSubmit = () => {

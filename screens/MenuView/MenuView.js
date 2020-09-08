@@ -86,7 +86,13 @@ const MenuView = props => {
 	const scrollRef = React.useRef();
 
 	const [expoPushToken, setExpoPushToken] = useState('');
-	const [showLacak, setLacak] = useState(false);
+	const [stateLacak, setLacak] = useState({
+		visible: false,
+		lacakList: [],
+		nomor: ''
+	})
+	// const [showLacak, setLacak] = useState(false);
+	// const [lacakList, setLacakList ] = useState([]);
 
 	const [state, setState] = useState({
 		loading: false,
@@ -141,6 +147,23 @@ const MenuView = props => {
 			}))
 		}
 	}, [order]);
+
+	//handle redirect lacak
+	useEffect(() => {
+		if (!props.route.params) {
+			console.log('kosong');
+		}else{
+			const { lacakList, nomor } = props.route.params;
+			setLacak(lacak => ({
+				...lacak,
+				lacakList,
+				nomor,
+				visible: true
+			}))
+			// setLacakList(lacakList);
+			// setLacak(true);
+		}
+	}, [props.route.params])
 
 	const handleCekTarif = (param) => {
 		setState(state => ({
@@ -263,7 +286,18 @@ const MenuView = props => {
 		    		value={state.tokenValue} 
 		    	/> }
 
-		    { showLacak && <ModalLacak onClose={() => setLacak(false)} /> }
+		    { stateLacak.visible && 
+		    	<ModalLacak 
+		    		onClose={() => setLacak(lacak => ({
+		    			...lacak,
+		    			visible: false,
+		    			lacakList: [],
+		    			nomor: ''
+		    		}))} 
+		    		navigateBarcode={() => props.navigation.navigate('ScanBarcode')}
+		    		list={stateLacak.lacakList}
+		    		nomor={stateLacak.nomor}
+		    	/> }
 
 			<View style={styles.header}>
 				<Image 
@@ -384,7 +418,10 @@ const MenuView = props => {
 							<TouchableOpacity 
 								style={styles.icon}
 								activeOpacity={1}
-								onPress={() => setLacak(true)}
+								onPress={() => setLacak(lacak => ({
+									...lacak,
+									visible: true
+								}))}
 							>
 								<View style={[styles.image, styles.elevationImage]}>
 									<Image 

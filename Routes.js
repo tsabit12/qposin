@@ -16,7 +16,8 @@ import {
   CreatePinView,
   OrderView,
   DataPenerima as DataPenerimaView,
-  CityCourier as CityCourierView
+  CityCourier as CityCourierView,
+  ScanBarcode as ScanBarcodeView
 } from './screens';
 
 
@@ -43,6 +44,7 @@ const Routes = props => {
 		        		<Stack.Screen name="Order" component={OrderView} />
 		        		<Stack.Screen name="DataPenerima" component={DataPenerimaView} />
 		        		<Stack.Screen name="CityCourier" component={CityCourierView} />
+		        		<Stack.Screen name="ScanBarcode" component={ScanBarcodeView} />
 		        	</React.Fragment> : <React.Fragment>
 						<Stack.Screen name="Home" component={HomeScreen} />
 						<Stack.Screen name="FormRegister" component={FormRegisterScreen} />

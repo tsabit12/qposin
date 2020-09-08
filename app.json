@@ -23,11 +23,11 @@
     },
     "android": {
       "package": "com.posindonesia.cob",
-      "versionCode": 10,
+      "versionCode": 11,
       "useNextNotificationsApi": true,
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyC7IVXqAk-qjFjBAICJUFN5XisAv5g3X7I"
+          "apiKey": "AIzaSyA7czY728UVajvsFfYCGLq67OPIjVpqFPc"
         }
       }
     },
