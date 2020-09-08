@@ -315,7 +315,7 @@ const OrderView = props => {
 				</TouchableOpacity> }
 			</View>
 			<View style={{flex: 1, backgroundColor: '#f5f7f6'}}>
-				<ScrollView>
+				<ScrollView keyboardShouldPersistTaps={'handled'}>
 					<React.Fragment>
 						<List>
 							<Pengirim 
@@ -353,7 +353,7 @@ const OrderView = props => {
 								error={!!errors.berat}
 								disabled={state.disabled}
 							/>
-							<Cod 
+							{ props.session.norek !== '-' && <Cod 
 								value={data.isCod}
 								onSimpan={(val) => setState(state => ({
 									...state,
@@ -363,7 +363,7 @@ const OrderView = props => {
 									}
 								}))}
 								disabled={state.disabled}
-							/>
+							/> }
 							<Nilai 
 								value={data.nilai}
 								onPress={(value) => setState(state => ({
@@ -511,7 +511,8 @@ OrderView.propTypes = {
 
 function mapStateToProps(state) {
 	return{
-		order: state.order
+		order: state.order,
+		session: state.auth.session
 	}
 }
 

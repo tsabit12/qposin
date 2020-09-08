@@ -330,4 +330,33 @@ export default {
 			return Promise.reject(result);
 		}
 	}),
+	connectToGiro: (rek, userid) => axios.post(url, {
+		messtype: '217',
+		param1: rek,
+		param2: userid,
+		hashing: hashing('217', rek)
+	}, configYuyus).then(res => {
+		if (res.data.rc_mess === '00') {
+			return res.data;
+		}else{
+			const errors = {
+				global: res.data.desk_mess
+			};
+			return Promise.reject(errors);
+		}
+	}),
+	validateGiro: (param1) => axios.post(url, {
+		messtype: '218',
+		param1,
+		hashing: hashing('218', param1)
+	}, configYuyus).then(res => {
+		if (res.data.rc_mess === '00') {
+			return res.data;
+		}else{
+			const errors = {
+				global: res.data.desk_mess
+			};
+			return Promise.reject(errors);
+		}
+	}),
 }

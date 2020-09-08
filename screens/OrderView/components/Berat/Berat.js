@@ -9,7 +9,7 @@ import {
 	TouchableOpacity
 } from 'react-native';
 import { ListItem, Body, Left, Right, Text } from 'native-base';
-import { FontAwesome, Ionicons } from '@expo/vector-icons'; 
+import { FontAwesome, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
 import PropTypes from 'prop-types';
 import {
 	widthPercentageToDP as wp, 
@@ -21,6 +21,7 @@ const numberWithCommas = (number) => {
 }
 
 const Berat = props => {
+	const refInput = React.useRef();
 	const [state, setState] = React.useState({
 		modalVisible: false,
 		bounceValue: new Animated.Value(200),
@@ -37,6 +38,10 @@ const Berat = props => {
 		      tension: 2,
 		      friction: 8
 		    }).start();
+
+			setTimeout(function() {
+				refInput.current.focus();
+			}, 10);
 		}
 	}, [state.modalVisible]);
 
@@ -99,22 +104,24 @@ const Berat = props => {
 					<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
 					<View style={styles.backgroundModal}>
 						<Animated.View style={[styles.modalContainer, {transform: [{translateY: bounceValue }] }]}>
-							<Text style={[styles.text, {textAlign: 'center', marginBottom: 2}]}>Berat kiriman (gram)</Text>
+							<Text style={[styles.text, {marginBottom: 2}]}>Berat kiriman (gram)</Text>
+							<View style={styles.inputGroup}>
 							<TextInput 
 								style={styles.input}
 								placeholder='Masukkan berat'
-								textAlign='center'
 								value={state.berat}
+								ref={refInput}
 								onChangeText={(value) => handleChangeBerat(value)}
 								keyboardType='number-pad'
+								onSubmitEditing={handleSimpan}
 							/>
 							<TouchableOpacity 
 								style={styles.btn} 
-								activeOpacity={0.7}
 								onPress={handleSimpan}
 							>
-								<Text style={[styles.text, {color: '#FFF'}]}>Simpan</Text>
+								<MaterialCommunityIcons name="send" size={24} color="black" />
 							</TouchableOpacity>
+							</View>
 						</Animated.View>
 					</View>
 				</Modal> }
@@ -142,24 +149,34 @@ const styles = StyleSheet.create({
 		padding: 10,
 		borderTopLeftRadius: 15,
 		borderTopRightRadius: 15,
-		height: hp('20%')
+		height: hp('13%')
 	},
 	text: {
 		fontFamily: 'Nunito-Bold',
 	},
 	input: {
 		height: hp('6%'),
-		//backgroundColor: 'red',
-		borderRadius: 30,
-		borderWidth: 0.3
+		width: wp('85%'),
+		paddingLeft: 10,
+		borderTopLeftRadius: 30,
+		borderBottomLeftRadius: 30,
 	},
 	btn: {
-		backgroundColor: '#cc1e06',
 		alignItems: 'center',
 		justifyContent: 'center',
 		height: hp('6%'),
+		flex: 1,
+		borderTopRightRadius: 30,
+		borderBottomRightRadius: 30
+	},
+	inputGroup: {
+		flexDirection: 'row',
+		// justifyContent: 'center',
+		alignItems: 'center',
 		borderRadius: 30,
-		marginTop: 10
+		marginTop: 5,
+		borderWidth: 0.3,
+		borderColor: '#737272'
 	},
 })
 

@@ -152,6 +152,7 @@ const Jenis = props => {
 										...state,
 										isikiriman: value
 									}))}
+									onSubmitEditing={handleSave}
 								/>
 								<TouchableOpacity 
 									onPress={handleSave}

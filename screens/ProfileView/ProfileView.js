@@ -41,6 +41,7 @@ const ProfileView = props => {
 	const { user, userid } = props;
 
 	// console.log(user);
+	console.log('welcome');
 
 	return(
 		<ImageBackground 
@@ -77,6 +78,7 @@ const ProfileView = props => {
 							style={styles.button}
 							activeOpacity={0.7}
 							disabled={user.norek !== '-' ? true : false}
+							onPress={() => props.navigation.navigate('ConnectGiro')}
 						>
 							<Text style={styles.text}>
 								{ user.norek === '-' ? 'Hubungkan dengan Akun Giro' : `Rp ${numberWithCommas(user.saldo)}` }

@@ -18,3 +18,9 @@ export const calculateSaldo = (nominal, calculateType) => dispatch => dispatch({
 	calculateType,
 	nominal
 })
+
+export const updateNorek = (norek, saldo) => dispatch => dispatch({
+	type: 'UPDATE_REK',
+	norek,
+	saldo
+})

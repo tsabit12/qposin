@@ -13,3 +13,4 @@ export { default as OrderView } from './OrderView';
 export { default as DataPenerima } from './DataPenerima';
 export { default as CityCourier } from './CityCourier';
 export { default as ScanBarcode } from './ScanBarcode';
+export { default as ConnectGiroView } from './ConnectGiroView';

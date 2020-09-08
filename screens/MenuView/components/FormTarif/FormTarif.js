@@ -193,6 +193,7 @@ const FormTarif = props => {
 			            		textAlign='center'
 			            		value={data.panjang}
 			            		onChangeText={(text) => handleChange(text, 'panjang')}
+			            		keyboardType='number-pad'
 			            	/>
 		            	</View>
 		            	<View style={styles.field}>
@@ -202,6 +203,7 @@ const FormTarif = props => {
 			            		placeholder='cm'
 			            		textAlign='center'
 			            		value={data.lebar}
+			            		keyboardType='number-pad'
 			            		onChangeText={(text) => handleChange(text, 'lebar')}
 			            	/>
 		            	</View>
@@ -212,6 +214,7 @@ const FormTarif = props => {
 			            		placeholder='cm'
 			            		textAlign='center'
 			            		value={data.tinggi}
+			            		keyboardType='number-pad'
 			            		onChangeText={(text) => handleChange(text, 'tinggi')}
 			            	/>
 		            	</View>

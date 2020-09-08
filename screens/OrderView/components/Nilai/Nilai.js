@@ -21,6 +21,7 @@ const numberWithCommas = (number) => {
 }
 
 const Nilai = props => {
+	const refInput = React.useRef();
 	const [state, setState] = React.useState({
 		modalVisible: false,
 		bounceValue: new Animated.Value(200),
@@ -37,6 +38,9 @@ const Nilai = props => {
 		      tension: 2,
 		      friction: 8
 		    }).start();
+		    setTimeout(function() {
+				refInput.current.focus();
+			}, 10);
 		}
 	}, [state.modalVisible]);
 
@@ -104,11 +108,13 @@ const Nilai = props => {
 							<Text style={{fontFamily:'Nunito-Bold', textAlign: 'center'}}>Nilai barang</Text>
 							<View style={styles.inputGroup}>
 								<TextInput 
+									ref={refInput}
 									style={styles.input}
 									placeholder='Masukkan nilai barang'
 									value={state.nilai}
 									onChangeText={(value) => handleChangenilai(value)}
 									keyboardType='number-pad'
+									onSubmitEditing={handleSimpan}
 								/>
 								<TouchableOpacity 
 									style={styles.btnGroup} 

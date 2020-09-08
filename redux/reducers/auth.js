@@ -32,6 +32,15 @@ export default function auth(state=initialState, action={}){
 						Number(state.session.saldo) + Number(action.nominal)
 				}
 			}
+		case 'UPDATE_REK': 
+			return {
+				...state,
+				session: {
+					...state.session,
+					saldo: action.saldo,
+					norek: action.norek
+				}
+			}
 		default: 
 			return state;
 	}

@@ -68,10 +68,11 @@ const EntriBetay = props => {
 							style={styles.input}
 							ref={refInput}
 							placeholder='Masukkan berat'
-							returnKeyType='send'
+							returnKeyType='done'
 							keyboardType='numeric'
 							onChangeText={(text) => setValue(text)}
 							value={value}
+							onSubmitEditing={handleSubmit}
 						/>
 						<TouchableOpacity 
 							style={styles.btn}

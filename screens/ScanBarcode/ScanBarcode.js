@@ -72,14 +72,16 @@ const ScanBarcode = props => {
 						...state,
 						scanned: true
 					}))
-					props.navigation.dispatch(
-					  CommonActions.reset({
-					    index: 1,
-					    routes: [
-					      { name: 'Home', params: { lacakList: tracks, nomor: data } }
-					    ],
-					  })
-					);
+					setTimeout(function() {
+						props.navigation.dispatch(
+						  CommonActions.reset({
+						    index: 1,
+						    routes: [
+						      { name: 'Home', params: { lacakList: tracks, nomor: data } }
+						    ],
+						  })
+						);
+					}, 10);
 				})
 				.catch(err => {
 					setState(state => ({

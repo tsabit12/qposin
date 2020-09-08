@@ -150,9 +150,7 @@ const MenuView = props => {
 
 	//handle redirect lacak
 	useEffect(() => {
-		if (!props.route.params) {
-			console.log('kosong');
-		}else{
+		if (props.route.params) {
 			const { lacakList, nomor } = props.route.params;
 			setLacak(lacak => ({
 				...lacak,
@@ -322,6 +320,7 @@ const MenuView = props => {
 			<View style={styles.content}>
 				<ScrollView
 					showsVerticalScrollIndicator={false}
+					keyboardShouldPersistTaps={'handled'}
 					ref={scrollRef}
 					//onContentSizeChange={() => scrollRef.current.scrollToEnd({animated: true})}
 				>
