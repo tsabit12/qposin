@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Text } from 'native-base';
 import { Ionicons, Feather } from '@expo/vector-icons'; 
+import { Icon } from 'native-base';
 import PropTypes from 'prop-types';
 import Hr from "react-native-hr-component";
 import {
@@ -44,6 +45,9 @@ const ListLacak = props => {
 
 	return(
 		<View style={{minHeight: hp('7%')}}>
+			<TouchableOpacity style={styles.close} onPress={props.onClose}>
+				<Icon name='close' style={{fontSize: 34, textAlign:'center'}} />
+			</TouchableOpacity>
 			<View style={stylesLacak.header}>
 				<TextDefault style={[stylesLacak.text]}>
 					Nomor Resi: 
@@ -205,7 +209,7 @@ const ModalLacak = props => {
 		    />
 			<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
 			<View style={[styles.backgroundModal, { height: state.active ? null : hp('23%')}]}>
-				<Animated.View style={[styles.modalContainer, {transform: [{translateY: bounceValue }] }]}>
+				<Animated.View style={[styles.modalContainer, {transform: [{translateY: bounceValue }] }]}>					
 					{ state.active === 1 ?  <React.Fragment>
 						<View style={styles.inputGroup}>
 							<TextInput 
@@ -238,7 +242,12 @@ const ModalLacak = props => {
 						>
 							<Text style={[styles.text, { color: '#FFF'}]}>Scan barcode</Text>
 						</TouchableOpacity>
-					</React.Fragment> : <ListLacak data={state.data} noresi={barcode} /> }
+					</React.Fragment> : 
+					<ListLacak 
+						data={state.data} 
+						noresi={barcode} 
+						onClose={props.onClose}
+					/> }
 				</Animated.View>
 			</View>
 		</Modal>
@@ -300,6 +309,13 @@ const styles = StyleSheet.create({
 	lottie: {
 	    width: 100,
 	    height: 100
+	},
+	close: {
+		position: 'absolute',
+		right: 0,
+		margin: 15,
+		zIndex: 1,
+		width: wp('8%')
 	}
 })
 
