@@ -436,7 +436,7 @@ const MenuView = props => {
 							<TouchableOpacity 
 									style={styles.icon}
 									activeOpacity={1}
-									onPress={() => props.navigation.navigate('CityCourier')}
+									// onPress={() => props.navigation.navigate('CityCourier')}
 								>
 								<View style={[styles.image, styles.elevationImage]}>
 									<Image 
