@@ -74,7 +74,7 @@ const OrderView = props => {
 		listTarif: [],
 		disabled: false,
 		mount: false,
-		shouldCod: true
+		shouldCod: false
 	})
 
 	const { data, errors } = state;
@@ -111,7 +111,7 @@ const OrderView = props => {
 			api.searchRekeningType(session.norek)
 				.then(responseRek => {
 					const sisaSaldo = parseInt(responseRek[2]);
-					if (sisaSaldo > 10000) {
+					if (sisaSaldo < 10000) {
 						setState(state => ({
 							...state,
 							loading: false,
