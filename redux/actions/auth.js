@@ -1,3 +1,5 @@
+import api from '../../api';
+
 export const setLocalUser = user => dispatch => dispatch({
 	type: 'SET_LOCAL_USER',
 	user
@@ -24,3 +26,10 @@ export const updateNorek = (norek, saldo) => dispatch => dispatch({
 	norek,
 	saldo
 })
+
+export const updateProfil = (param1, session) => dispatch => 
+	api.updateProfil(param1)
+		.then(() => dispatch({
+			type: 'UPDATE_PROFIL',
+			session
+		}))

@@ -1,9 +1,9 @@
 export { default as HomeScreen } from './HomeScreen';
 export { default as FormRegister } from './FormRegister';
-export { default as PulihkanAkun } from './PulihkanAkun';
+export { default as PulihkanAkun } from './PulihkanAkun'; 
 export { default as LoginView } from './LoginView';
 export { default as MenuView } from './MenuView';
-export { default as KotaView } from './KotaView';
+export { default as KotaView } from './KotaView'; 
 export { default as ListTarif } from './ListTarif';
 export { default as ProfileView } from './ProfileView';
 export { default as UbahPinView } from './UbahPinView';
@@ -14,3 +14,6 @@ export { default as DataPenerima } from './DataPenerima';
 export { default as CityCourier } from './CityCourier';
 export { default as ScanBarcode } from './ScanBarcode';
 export { default as ConnectGiroView } from './ConnectGiroView';
+export { default as HitoryOrderView } from './HistoryOrder';
+export { default as EditAlamatView } from './EditAlamatView';
+export { default as History } from './History';

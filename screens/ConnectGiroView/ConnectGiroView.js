@@ -141,37 +141,58 @@ const ConnectGiroView = props => {
 
 	const handleRequest = (norek) => {
 		setLoading(true);
-		api.connectToGiro(norek, user.userid)
+		
+		api.searchRekeningType(norek)
 			.then(res => {
-				setLoading(false);
+				api.connectToGiro(norek, user.userid)
+					.then(res => {
+						setLoading(false);
 
-				const resValue 		= res.response_data1.split("|");
-				const pgmPhone  	= res.response_data3;
-				const kodeVerify 	= resValue[2];
-				const curdate 		= getCurdate();
+						const resValue 		= res.response_data1.split("|");
+						const pgmPhone  	= res.response_data3;
+						const kodeVerify 	= resValue[2];
+						const curdate 		= getCurdate();
 
-				const payload 	= {
-					pin: kodeVerify,
-					pgmPhone,
-					curdate,
-					norek: state.norek
-				}
-				const saving = saveSession(payload);
-				if (saving) {
-					setData(data => ({
-						isConfirm: true,
-						pin: kodeVerify,
-						norek: state.norek,
-						message: `Kode verifikasi telah dikirim ke nomor ${pgmPhone} melalui WhatsApp. (Berlaku sampai pukul 00:00)`,
-					}))
-				}else{
-					Toast.show({
-		                text: 'FAILED!!',
-		                textStyle: { textAlign: 'center' },
-		                duration: 3000
-		            })
-				}
+						const payload 	= {
+							pin: kodeVerify,
+							pgmPhone,
+							curdate,
+							norek: norek
+						}
+						const saving = saveSession(payload);
+						if (saving) {
+							setData(data => ({
+								isConfirm: true,
+								pin: kodeVerify,
+								norek: norek,
+								message: `Kode verifikasi telah dikirim ke nomor ${pgmPhone} melalui WhatsApp. (Berlaku sampai pukul 00:00)`,
+							}))
+						}else{
+							Toast.show({
+				                text: 'FAILED!!',
+				                textStyle: { textAlign: 'center' },
+				                duration: 3000
+				            })
+						}
 
+					})
+					.catch(err => {
+						console.log(err);
+						setLoading(false);
+						if (err.global) {
+							Toast.show({
+				                text: err.global,
+				                textStyle: { textAlign: 'center' },
+				                duration: 3000
+				            })
+						}else{
+							Toast.show({
+				                text: 'Tidak dapat memproses permintaan anda, mohon coba beberapa saat lagi',
+				                textStyle: { textAlign: 'center' },
+				                duration: 3000
+				            })
+						}
+					})	
 			})
 			.catch(err => {
 				setLoading(false);
@@ -190,6 +211,14 @@ const ConnectGiroView = props => {
 				}
 			})
 	}	
+
+	// const checkRekening = async (norek) => {
+	// 	const result = {};
+
+	// 	await 
+
+	// 	return result;
+	// }
 
 	const saveSession = async (payload) => {
 		try {
@@ -222,7 +251,7 @@ const ConnectGiroView = props => {
 					<Icon name='ios-arrow-back' style={{color: '#FFF', fontSize: 25, marginTop: 20}} />
 				</TouchableOpacity>
 				<Text style={[styles.text, {marginTop: 20, fontSize: 17}]}>
-					{ data.isConfirm ? 'Verifkasi akun giro' : 'Hubungkan dengan akun giro'}
+					{ data.isConfirm ? 'Vertifikasi akun giro' : 'Hubungkan dengan akun giro'}
 				</Text>
 			</View>
 			<View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>

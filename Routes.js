@@ -18,7 +18,10 @@ import {
   DataPenerima as DataPenerimaView,
   CityCourier as CityCourierView,
   ScanBarcode as ScanBarcodeView,
-  ConnectGiroView 
+  ConnectGiroView,
+  HitoryOrderView,
+  EditAlamatView,
+  History
 } from './screens';
 
 
@@ -47,6 +50,8 @@ const Routes = props => {
 		        		<Stack.Screen name="CityCourier" component={CityCourierView} />
 		        		<Stack.Screen name="ScanBarcode" component={ScanBarcodeView} />
 		        		<Stack.Screen name="ConnectGiro" component={ConnectGiroView} />
+		        		<Stack.Screen name="History" component={History} />
+		        		<Stack.Screen name="UpdateAlamat" component={EditAlamatView} />
 		        	</React.Fragment> : <React.Fragment>
 						<Stack.Screen name="Home" component={HomeScreen} />
 						<Stack.Screen name="FormRegister" component={FormRegisterScreen} />

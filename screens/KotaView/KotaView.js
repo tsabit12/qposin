@@ -79,7 +79,7 @@ const KotaView = props => {
 					...state,
 					kota
 				}))
-			}, 70);
+			}, 10);
 
 			return () => clearTimeout(time);
 		}
@@ -112,6 +112,16 @@ const KotaView = props => {
 				)
 			}
 		}	
+	}else{
+		if (state.kotaValue) {
+			list.push(
+				<Text key={0} style={{textAlign: 'center'}}>Tidak ditemukan hasil untuk "{state.kotaValue}"</Text>
+			)
+		}else{
+			list.push(
+				<Text key={0} style={{textAlign: 'center'}}>Loading...</Text>
+			)
+		}
 	}
 
 	const handlePress = (value) => {
@@ -138,7 +148,7 @@ const KotaView = props => {
 
 		props.setOrder(payload);
 
-		if (params.fromRoute === 'order') {
+		//if (params.fromRoute === 'order') {
 			props.navigation.dispatch(state => {
 			  const routes = state.routes.filter(r => r.name !== 'Kota');
 			  return CommonActions.reset({
@@ -147,18 +157,18 @@ const KotaView = props => {
 			    index: routes.length - 1,
 			  });
 			});
-		}else{
-			props.navigation.dispatch(
-			  CommonActions.reset({
-			    index: 0,
-			    routes: [
-			      {
-			        name: 'Home'
-			      },
-			    ],
-			  })
-			);
-		}
+		// }else{
+		// 	props.navigation.dispatch(
+		// 	  CommonActions.reset({
+		// 	    index: 0,
+		// 	    routes: [
+		// 	      {
+		// 	        name: 'Home'
+		// 	      },
+		// 	    ],
+		// 	  })
+		// 	);
+		// }
 	}
 
 	const handelChangeText = (value) => {

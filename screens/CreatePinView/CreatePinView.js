@@ -102,16 +102,27 @@ const CreatePinView = props => {
 	}
 
 	const handleLogin = () => {
-		props.navigation.dispatch(state => {
-		  // Remove ubahpin route from the stack
-		  const routes = state.routes.filter(r => r.name !== 'CreatePin');
+		// props.navigation.dispatch(state => {
+		//   // Remove ubahpin route from the stack
+		//   const routes = state.routes.filter(r => r.name !== 'CreatePin');
 
-		  return CommonActions.reset({
-		    ...state,
-		    routes,
-		    index: routes.length - 3,
-		  });
-		});
+		//   return CommonActions.reset({
+		//     ...state,
+		//     routes,
+		//     index: routes.length - 3,
+		//   });
+		// });
+
+			props.navigation.dispatch(
+			  CommonActions.reset({
+			    index: 0,
+			    routes: [
+			      {
+			        name: 'Home'
+			      },
+			    ],
+			  })
+			);
 	}
 
 	return(

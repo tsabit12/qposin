@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
 	View, 
 	ImageBackground, 
@@ -6,14 +6,23 @@ import {
 	Text,
 	TouchableOpacity,
 	Image,
-	ScrollView
+	ScrollView,
+	BackHandler,
+	AsyncStorage
 } from 'react-native';
 import {
 	widthPercentageToDP as wp, 
 	heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
-import { Icon, Thumbnail, Text as TextNote } from 'native-base';
+import { Icon, Thumbnail, Text as TextNote, Toast } from 'native-base';
 import { connect } from 'react-redux';
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
+import {
+	EmailView,
+	NamaView
+} from './components';
+import { updateProfil } from '../../redux/actions/auth';
+import AnimatedLoader from "react-native-animated-loader";
 
 const numberWithCommas = (number) => {
 	if (isNaN(number)) {
@@ -38,16 +47,126 @@ const numberPhone = (number) => {
 
 
 const ProfileView = props => {
-	const { user, userid } = props;
+	const { user, userid } = props;	
+	const [state, setState] = useState({});
+	const [emailVisible, setEmailVisible] = useState(false);
+	const [namaVisible, setNamaVisible] = useState(false);
+	const [loading, setLoading] = useState(false);
 
-	// console.log(user);
-	console.log('welcome');
+	useEffect(() => {
+		BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+	    
+	    return () => {
+	      BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+	    };
+	}, [handleBackButtonClick, state]);
+
+	//if email is update then must reset storage
+	useEffect(() => {
+		if (Object.keys(user).length > 0) {
+			setState(user)
+		}
+	}, [user])
+
+	const handleUpdateEmail = (value) => {
+		setState(state => ({
+			...state,
+			email: value
+		}));
+
+		setEmailVisible(false);
+	}
+
+	const handleUpdateNama = (value) => {
+		setState(state => ({
+			...state,
+			nama: value
+		}));
+
+		setNamaVisible(false);
+	}
+
+	const handleBackButtonClick = () => {
+		const update = shouldUpdateProfile(props.user);
+		if (update) {
+			setLoading(true);
+			const param1 = `${props.userid}|${state.alamatOl}|${state.provinsi}|${state.kota}|${state.kecamatan}|${state.kelurahan}|${state.kodepos}|${state.nama}|${state.email}`;
+			
+			props.updateProfil(param1, state)
+				.then(async () => {
+					const newLocaluser = {
+						...props.local,
+						email: state.email
+					};
+
+					props.navigation.goBack();
+					// try{
+					// 	await AsyncStorage.setItem('qobUserPrivasi', JSON.stringify(newLocaluser));
+					// }catch(error){
+					// 	props.navigation.goBack();
+					// 	Toast.show({
+			  //               text: 'Fail',
+			  //               textStyle: { textAlign: 'center' },
+			  //               duration: 1000
+			  //           })
+					// }
+				})
+				.catch(err => {
+					props.navigation.goBack();
+					// setLoading(false);
+					if (err.global) {
+						Toast.show({
+			                text: err.global,
+			                textStyle: { textAlign: 'center' },
+			                duration: 1000
+			            })
+					}else{
+						Toast.show({
+			                text: 'Gagal update profil',
+			                textStyle: { textAlign: 'center' },
+			                duration: 1000
+			            })
+					}
+				})
+
+		}else{
+			props.navigation.goBack();
+		}
+		return true;
+	}
+
+	const shouldUpdateProfile = (defaultValue) => {
+		if (defaultValue.email !== state.email) return true;
+		if (defaultValue.nama !== state.nama) return true;
+		return false;
+	}
 
 	return(
 		<ImageBackground 
 			source={require('../../assets/images/background.png')} 
 			style={{flex: 1}}
 		>	
+			<AnimatedLoader
+		        visible={loading}
+		        overlayColor="rgba(0,0,0,0.6)"
+		        source={require("../../assets/images/loader/3098.json")}
+		        animationStyle={styles.lottie}
+		        speed={1}
+		    />
+
+			{ emailVisible && 
+				<EmailView 
+					handleClose={() => setEmailVisible(false)} 
+					values={state.email}
+					onUpdate={handleUpdateEmail}
+				/> }
+
+			{ namaVisible && 
+				<NamaView 
+					handleClose={() => setNamaVisible(false)} 
+					values={state.nama}
+					onUpdate={handleUpdateNama}
+				/> }
 			<View style={styles.header}>
 				<TouchableOpacity 
 					style={styles.btn} 
@@ -111,7 +230,11 @@ const ProfileView = props => {
 							
 						</View>
 
-						<View style={styles.list}>
+						<TouchableOpacity 
+							style={styles.list}
+							onPress={() => setNamaVisible(true)}
+							activeOpacity={0.5}
+						>
 							<View style={styles.listLeft}>
 								<View style={styles.icon}>
 									<Icon name='md-person' style={{color: '#919191', fontSize: 30}} />
@@ -119,12 +242,12 @@ const ProfileView = props => {
 								<View style={{marginLeft: 8}}>
 									<Text style={styles.textLabel}>Nama Lengkap</Text>
 									<TextNote note>
-										{capitalize(user.nama)}
+										{capitalize(state.nama)}
 									</TextNote>
 								</View>
 							</View>
-							{ /* <Icon name='ios-arrow-forward' style={{color: 'black', fontSize: 25}} /> */}
-						</View>
+							<MaterialCommunityIcons name="pencil" size={24} color="#b3b3b3" />
+						</TouchableOpacity>
 
 						<View style={styles.list}>
 							<View style={styles.listLeft}>
@@ -138,10 +261,13 @@ const ProfileView = props => {
 									</TextNote>
 								</View>
 							</View>
-							{ /* <Icon name='ios-arrow-forward' style={{color: 'black', fontSize: 25}} /> */}
 						</View>
 
-						<View style={styles.list}>
+						<TouchableOpacity 
+							style={styles.list}
+							onPress={() => setEmailVisible(true)}
+							activeOpacity={0.5}
+						>
 							<View style={styles.listLeft}>
 								<View style={styles.icon}>
 									<Icon name='ios-mail' style={{color: '#919191', fontSize: 30}} />
@@ -149,31 +275,38 @@ const ProfileView = props => {
 								<View style={{marginLeft: 8}}>
 									<Text style={styles.textLabel}>Email</Text>
 									<TextNote note>
-										{user.email}
+										{state.email}
 									</TextNote>
 								</View>
 							</View>
-							{ /* <Icon name='ios-arrow-forward' style={{color: 'black', fontSize: 25}} /> */}
-						</View>
+							<MaterialCommunityIcons name="pencil" size={24} color="#b3b3b3" />
+						</TouchableOpacity>
 
-						<View style={styles.list}>
+						<TouchableOpacity 
+							style={styles.list}
+							activeOpacity={0.5}
+							//onPress={() => props.navigation.navigate('UpdateAlamat')}
+						>
 							<View style={styles.listLeft}>
 								<View style={styles.icon}>
 									<Icon name='ios-home' style={{color: '#919191', fontSize: 30}} />
 								</View>
 								<View style={{marginLeft: 8}}>
 									<Text style={styles.textLabel}>Alamat</Text>
-									<TextNote note>
-										{capitalize(user.kota)}, {capitalize(user.kecamatan)} ({user.kodepos})
+									<TextNote note numberOfLines={1}>
+										{ user.kota !== '-' ? `${capitalize(user.kota)}, ${capitalize(user.kecamatan)} (${user.kodepos})` : '-'}
 									</TextNote>
 								</View>
 							</View>
-							{ /* <Icon name='ios-arrow-forward' style={{color: 'black', fontSize: 25}} /> */}
-						</View>
+							{/*<View style={styles.rightIcon}>
+								<MaterialCommunityIcons name="pencil" size={24} color="#b3b3b3" />
+							</View> */}
+						</TouchableOpacity>
 
 						<TouchableOpacity 
 							style={styles.list}
 							onPress={() => props.navigation.navigate('Ubahpin')}
+							activeOpacity={0.5}
 						>
 							<View style={styles.listLeft}>
 								<View style={styles.icon}>
@@ -186,7 +319,9 @@ const ProfileView = props => {
 									</TextNote>
 								</View>
 							</View>
-							<Icon name='ios-arrow-forward' style={{color: 'black', fontSize: 25}} />
+							<View style={styles.rightIcon}>
+								<Icon name='ios-arrow-forward' style={{color: '#b3b3b3', fontSize: 25}} />
+							</View>
 						</TouchableOpacity>
 					</View>
 				</View>
@@ -259,19 +394,30 @@ const styles = StyleSheet.create({
 	},
 	listLeft: {
 		flexDirection: 'row',
-		alignItems: 'center'
+		alignItems: 'center',
+		width: wp('88%')
 	},
 	textLabel: {
 		color: 'black', 
 		fontSize: 15
+	},
+	lottie: {
+		height: 100,
+		width: 100
+	},
+	rightIcon: {
+		justifyContent: 'center',
+		flex: 1,
+		alignItems: 'center'
 	}
 })
 
 function mapStateToProps(state) {
 	return{
 		user: state.auth.session,
-		userid: state.auth.localUser.userid
+		userid: state.auth.localUser.userid,
+		local: state.auth.localUser
 	}
 }
 
-export default connect(mapStateToProps, null)(ProfileView);
+export default connect(mapStateToProps, { updateProfil })(ProfileView);

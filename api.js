@@ -7,6 +7,14 @@ const url 	= 'https://qcomm.posindonesia.co.id:10444/a767e8eec95442bda80c4e35e06
 // const url 	= 'https://qcomm.posindonesia.co.id:10555/a767e8eec95442bda80c4e35e0660dbb'; //dev
 const url1 	= 'https://order.posindonesia.co.id/api';
 
+let configFast = {
+	headers: { 
+  		'content-type': 'application/json',
+  		'accept': 'application/json'
+  	}
+}
+
+
 const getLastStringAfterSpace = (words) => {
     var n = words.split(" ");
     return n[n.length - 1];
@@ -355,6 +363,82 @@ export default {
 		}else{
 			const errors = {
 				global: res.data.desk_mess
+			};
+			return Promise.reject(errors);
+		}
+	}),
+	updateProfil: (param1) => axios.post(url, {
+		messtype: '224',
+		param1,
+		hashing: hashing('224', param1)
+	}, configYuyus).then(res => {
+		console.log(res.data);
+		if (res.data.rc_mess === '00') {
+			return res.data;
+		}else{
+			const errors = {
+				global: res.data.desk_mess
+			};
+			return Promise.reject(errors);
+		}
+	}),
+	getDetailOrder: (payload) => axios.post(`${url1}/Qposinaja/detailOrder`, {
+		...payload
+	}).then(res => {
+		if (!res.data.result.data) {
+			return Promise.reject(res.data);
+		}else{
+			return res.data.result;
+		}
+	}),
+	addPickup: (payload) => axios.post('https://fasterv2.fastkurir.com/api/customer/bidding_v2', {
+		shipper: payload.shipper,
+		item: payload.item
+	}, configFast).then(res => {
+		if (res.data.status === true) {
+			return res.data;
+		}else{
+			return Promise.reject(res.data);
+		}
+	}),
+	getHistoryStatus: (payload) => axios.post(`${url1}/Qposinaja/history`, {
+		...payload
+	}).then(res => {
+		const { result } = res.data;
+		if (!result.data) {
+			return Promise.reject(result);
+		}else{
+			return result;
+		}
+	}),
+	searchRekeningType: (rekening) => axios.post(url, {
+		messtype: '226',
+		param1: rekening,
+		hashing: hashing('226', rekening)
+	}, configYuyus).then(res => {
+		if (res.data.rc_mess === '99') {
+			const { response_data2 } = res.data;
+			const value = response_data2.split("|");
+			if (value[5] === 'GIROPOS REGULER') {
+				// if (parseInt(value[2]) < 10000) {
+				// 	const errors = {
+				// 		global: 'Fitur COD dinonaktifkan. Saldo rekening minimal adalah 10.000 ribu, silahkan lakukan top up terlebih dahulu'
+				// 	};
+				// 	return Promise.reject(errors);
+				// }else{
+				// 	return Promise.resolve(res.data);
+				// }
+				return Promise.resolve(value);
+			}else{//invalid rekening type
+				const errors = {
+					global: 'Fitur COD dinonaktifkan. Harap hubungi CS untuk mengubah tipe rekening menjadi reguler'
+				};
+				return Promise.reject(errors);
+			}
+		}else{
+			const { desk_mess } = res.data;
+			const errors = {
+				global: desk_mess
 			};
 			return Promise.reject(errors);
 		}

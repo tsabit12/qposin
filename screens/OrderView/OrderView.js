@@ -72,13 +72,15 @@ const OrderView = props => {
 		errors: {},
 		loading: false,
 		listTarif: [],
-		disabled: false
+		disabled: false,
+		mount: false,
+		shouldCod: true
 	})
 
 	const { data, errors } = state;
 
 	const { params } = props.route;
-	console.log(params);
+	const { session }  = props;
 
 	const handlePress = (type) => {
 		props.navigation.navigate('Kota', {
@@ -100,7 +102,53 @@ const OrderView = props => {
 	};
 
 	useEffect(() => {
-		if (props.order.kecamatanA) {
+		if (session.norek !== '-') {
+			setState(state => ({
+				...state,
+				loading: true
+			}))
+
+			api.searchRekeningType(session.norek)
+				.then(responseRek => {
+					const sisaSaldo = parseInt(responseRek[2]);
+					if (sisaSaldo > 10000) {
+						setState(state => ({
+							...state,
+							loading: false,
+							mount: true
+						}));
+						Toast.show({
+					        text: 'Untuk menggunakan layanan COD saldo minimal 10 ribu',
+					        textStyle: { textAlign: 'center' },
+					        duration: 3000
+					    })
+					}else{
+						setState(state => ({
+							...state,
+							loading: false,
+							mount: true,
+							shouldCod: true
+						}))
+					}
+				})
+				.catch(err => {
+					console.log(err);
+					setState(state => ({
+						...state,
+						loading: false,
+						mount: true
+					}))
+				})
+		}else{
+			setState(state => ({
+				...state,
+				mount: true
+			}))
+		}
+	}, [session.norek]);
+
+	useEffect(() => {
+		if (props.order.kecamatanA && state.mount) {
 			setState(state => ({ 
 				...state,
 				errors:{
@@ -117,16 +165,16 @@ const OrderView = props => {
 				}
 			}))
 		}
-	}, [props.order]);
+	}, [props.order, state.mount]);
 
 	useEffect(() => {
-		if (state.listTarif.length > 0) {
+		if (state.listTarif.length > 0 && state.mount) {
 			setState(state => ({
 				...state,
 				disabled: true
 			}))
 		}
-	}, [state.listTarif])
+	}, [state.listTarif, state.mount])
 
 	const handleSaveBerat = (berat) => {
 		setState(state => ({
@@ -284,6 +332,8 @@ const OrderView = props => {
 		        speed={1}
 		    />
 		    { state.loading &&  <StatusBar backgroundColor="rgba(0,0,0,0.6)"/> }
+
+
 			<View style={styles.header}>
 				<View style={styles.subHeader}>
 					<TouchableOpacity 
@@ -315,8 +365,8 @@ const OrderView = props => {
 				</TouchableOpacity> }
 			</View>
 			<View style={{flex: 1, backgroundColor: '#f5f7f6'}}>
-				<ScrollView keyboardShouldPersistTaps={'handled'}>
-					<React.Fragment>
+				{ state.mount && 
+					<ScrollView keyboardShouldPersistTaps={'handled'}>
 						<List>
 							<Pengirim 
 								onPress={handlePress} 
@@ -353,7 +403,8 @@ const OrderView = props => {
 								error={!!errors.berat}
 								disabled={state.disabled}
 							/>
-							{ props.session.norek !== '-' && <Cod 
+
+							{ state.shouldCod &&  <Cod 
 								value={data.isCod}
 								onSimpan={(val) => setState(state => ({
 									...state,
@@ -364,6 +415,7 @@ const OrderView = props => {
 								}))}
 								disabled={state.disabled}
 							/> }
+
 							<Nilai 
 								value={data.nilai}
 								onPress={(value) => setState(state => ({
@@ -428,14 +480,13 @@ const OrderView = props => {
 				            	<Text style={[styles.text, {color: '#FFF'}]}>Cek Tarif</Text>
 				            </TouchableOpacity>}
 			            </View>
-		            </React.Fragment>
 
-		            { state.listTarif.length > 0 && 
-		            	<ListTarif 
-		            		data={state.listTarif} 
-		            		onChoose={handleChooseTarif}
-		            	/> }
-	            </ScrollView>
+			            { state.listTarif.length > 0 && 
+			            	<ListTarif 
+			            		data={state.listTarif} 
+			            		onChoose={handleChooseTarif}
+			            	/> }
+	            </ScrollView>}
 			</View>
 		</ImageBackground>
 	);

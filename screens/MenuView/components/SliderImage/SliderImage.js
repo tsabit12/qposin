@@ -10,19 +10,22 @@ const images = [
     require('../../../../assets/images/slider/2.jpg'),
     require('../../../../assets/images/slider/3.jpg'),
     require('../../../../assets/images/slider/4.jpg'),
-    require('../../../../assets/images/slider/5.jpg'),
+    require('../../../../assets/images/slider/6.jpg'),
 ];
+
+// console.log(Math.round(wp('100%')));
+// console.log(Math.round(hp('0%')));
 
 const SliderImage = props => {
 	return(
-		<SliderBox 
+		<SliderBox  
 			images={images} 
   			ImageComponentStyle={{
           width: wp('100%'),
-          height: hp('32%')
+          // height: hp('35%')
         }}
-  			resizeMode={'contain'}
-  			sliderBoxHeight={240}
+  			resizeMode={'cover'}
+  			sliderBoxHeight={hp('31.6%')}
 			  autoplay={true}
   			circleLoop
 		/>

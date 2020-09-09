@@ -63,7 +63,12 @@ async function registerForPushNotificationsAsync() {
     }
     
     if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!');
+      //alert('Failed to get push token for push notification!');
+      	Toast.show({
+	        text: 'Untuk mendapatkan notifikasi, aktifkan izin notifikasi di pengaturan ponsel anda',
+	        textStyle: { textAlign: 'center' },
+	        duration: 3000
+	    })
       return;
     }
 
@@ -360,7 +365,7 @@ const MenuView = props => {
 
 					<View style={styles.hr} />
 					
-					<Text style={styles.subTitle}>Layanan yang Kamu Butuhkan</Text>
+					<Text style={styles.subTitle}>Layanan yang kamu butuhkan</Text>
 					<View style={{alignItems: 'center', flex: 1}}>
 						<View style={{marginTop: 5}}>
 							<View style={[styles.menu]}>
@@ -377,7 +382,7 @@ const MenuView = props => {
 											resizeMode='contain'
 										/>
 									</View>
-									<Text style={styles.textLabel}>City {'\n'}Courier</Text>
+									<Text style={styles.textLabel}>City{'\n'}Courier</Text>
 								</TouchableOpacity>
 
 								<TouchableOpacity 
@@ -407,7 +412,7 @@ const MenuView = props => {
 											resizeMode='contain'
 										/>
 									</View>
-									<Text style={styles.textLabel}>Online {'\n'}Booking</Text>
+									<Text style={styles.textLabel}>Online{'\n'}Booking</Text>
 								</TouchableOpacity>
 							</View>
 						</View>
@@ -429,13 +434,13 @@ const MenuView = props => {
 										resizeMode='contain'
 									/>
 								</View>
-								<Text style={styles.textLabel}>Lacak {'\n'}Kiriman</Text>
+								<Text style={styles.textLabel}>Lacak{'\n'}Kiriman</Text>
 							</TouchableOpacity>
 
 							<TouchableOpacity 
 									style={styles.icon}
 									activeOpacity={1}
-									// onPress={() => props.navigation.navigate('CityCourier')}
+									onPress={() => props.navigation.navigate('History')}
 								>
 								<View style={[styles.image, styles.elevationImage]}>
 									<Image 
@@ -444,7 +449,7 @@ const MenuView = props => {
 										resizeMode='contain'
 									/>
 								</View>
-								<Text style={styles.textLabel}>History {'\n'}Kiriman</Text>
+								<Text style={styles.textLabel}>History{'\n'}Kiriman</Text>
 							</TouchableOpacity>
 
 							<TouchableOpacity 
@@ -513,7 +518,7 @@ const styles = StyleSheet.create({
 	},
 	slider: {
 		// backgroundColor: 'green',
-		height: hp('30%')
+		height: hp('31%')
 	},
 	icon: {
 		height: hp('12%'),
@@ -536,7 +541,7 @@ const styles = StyleSheet.create({
 	},
 	hr: {
 		width: wp('100%'),
-		height: hp('0.7%'),
+		height: hp('0.4%'),
 		backgroundColor: rgba('#c4c4c4', 0.4),
 		marginTop: 10,
 		//elevation: 2
@@ -558,12 +563,12 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		marginTop: 5,
 		fontSize: 12,
-		//fontFamily: 'Nunito-Bold'
+		color:'black',
+		fontFamily: 'Nunito'
 	},
 	subTitle: {
-		fontFamily: 'Nunito-Bold',
-		marginLeft: 6,
-		color: rgba('#3d3c3c', 0.7)
+		fontFamily: 'Nunito',
+		marginLeft: 6
 	},
 	elevationImage: {
 		elevation: 2, 

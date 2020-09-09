@@ -142,6 +142,7 @@ const PulihkanAkun = props => {
 				.then(res => {
 					//handle if verify code is empty 
 					const { response_data2 } = res;
+					console.log(response_data2);
 
 					const payload = {
 						...state.data,

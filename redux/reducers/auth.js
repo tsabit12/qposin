@@ -1,7 +1,7 @@
 const initialState = {
 	logged: false,
 	localUser: {},
-	session: {}
+	session: {} 
 }
 
 export default function auth(state=initialState, action={}){
@@ -39,6 +39,15 @@ export default function auth(state=initialState, action={}){
 					...state.session,
 					saldo: action.saldo,
 					norek: action.norek
+				}
+			}
+		case 'UPDATE_PROFIL':
+			return{
+				...state,
+				session: action.session,
+				localUser: {
+					...state.localUser,
+					email: action.session.email
 				}
 			}
 		default: 

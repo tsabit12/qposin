@@ -8,6 +8,13 @@ import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import { Root } from "native-base";
 import Routes from './Routes';
+import { EvaIconsPack } from '@ui-kitten/eva-icons';
+import { 
+  ApplicationProvider,
+  IconRegistry
+} from '@ui-kitten/components'; 
+import { mapping, light as lightTheme } from '@eva-design/eva'; 
+import { MenuProvider } from 'react-native-popup-menu';
 
 export default function App() {
   if (!global.btoa) { global.btoa = encode; }
@@ -37,6 +44,8 @@ export default function App() {
   const prepareResources = async () => {
     await Font.loadAsync({
       'Nunito-Bold': require('./assets/fonts/Nunito-Bold.ttf'),
+      'Nunito': require('./assets/fonts/Nunito-Black.ttf'),
+      'Nunito-italic': require('./assets/fonts/Nunito-Italic.ttf'),
       Roboto: require('native-base/Fonts/Roboto.ttf'),
       Roboto_medium: require('native-base/Fonts/Roboto_medium.ttf'),
       ...Ionicons.font,
@@ -51,7 +60,12 @@ export default function App() {
     return(
       <Root>
         <Provider store={store}>
-          <Routes />
+          <IconRegistry icons={EvaIconsPack} />
+          <ApplicationProvider mapping={mapping} theme={lightTheme}>
+            <MenuProvider>
+              <Routes />
+            </MenuProvider>
+          </ApplicationProvider>
           <StatusBar style="light" />
         </Provider>
       </Root>

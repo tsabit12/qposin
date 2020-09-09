@@ -152,7 +152,7 @@ const WelcomeScreen = props => {
 					    			activeOpacity={0.9}
 					    			onPress={handleNavigate}
 					    		>
-						            <Text style={styles.textBtn}>
+						            <Text style={[styles.textBtn, { fontFamily: 'Nunito-Bold'}]}>
 						            	{Object.keys(user).length === 0 ? 'Registrasi sekarang' : 'Masuk sebagai pengguna'} 
 						            </Text>
 						        </TouchableOpacity>
@@ -209,12 +209,12 @@ const WelcomeScreen = props => {
 									<Text 
 										style={{
 											textAlign: 'center', 
-											fontFamily: 'Nunito-Bold', 
+											fontFamily: 'Nunito', 
 											color: rgba('#FFF', 0.8),
 											fontSize: 14
 										}}
 									>
-										Butuh Bantuan? <Text style={[styles.text, {fontSize: 14}]}>Hubungi Contact Center 161</Text>
+										Butuh Bantuan? <Text style={{color: '#FFF', fontSize: 14}}>Hubungi Contact Center 161</Text>
 									</Text>
 								</View>
 						</ScrollView>
@@ -255,8 +255,12 @@ const styles = StyleSheet.create({
 		fontFamily: 'Nunito-Bold',
 		color: '#FFF'
 	},
+	text2: {
+		// fontFamily: 'Nunito-italic',
+		color: '#FFF'
+	},
 	textBtn: {
-		fontFamily: 'Nunito-Bold',
+		fontFamily: 'Nunito',
 		color: rgba('#FFF', 0.7)
 	},
 	container: {

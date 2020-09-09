@@ -69,7 +69,7 @@ const ChangePinView = props => {
 							style={[styles.text, {color: rgba('#2e2e2d', 0.7), marginBottom: 3}]}
 						>Konfirmasi PIN</Text>
 						<TextInput 
-							placeholder='Masukkan kembali pin baru kamu disini'
+							placeholder='Konfirmasi pin kamu disini'
 							style={styles.input}
 							textAlign='center'
 							value={state.pinConfirm}
