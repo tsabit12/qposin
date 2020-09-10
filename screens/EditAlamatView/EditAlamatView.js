@@ -101,7 +101,7 @@ const EditAlamatView = props => {
 			})
 			
 			return CommonActions.reset({
-			    ...state,
+			    ...stateNavigation,
 			    routes: newRoutes,
 			    index: routes.length - 1,
 			 });
