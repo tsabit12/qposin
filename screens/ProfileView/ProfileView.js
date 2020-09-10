@@ -8,7 +8,8 @@ import {
 	Image,
 	ScrollView,
 	BackHandler,
-	AsyncStorage
+	AsyncStorage,
+	StatusBar
 } from 'react-native';
 import {
 	widthPercentageToDP as wp, 
@@ -48,6 +49,7 @@ const numberPhone = (number) => {
 
 const ProfileView = props => {
 	const { user, userid } = props;	
+	const { params } = props.route;
 	const [state, setState] = useState({});
 	const [emailVisible, setEmailVisible] = useState(false);
 	const [namaVisible, setNamaVisible] = useState(false);
@@ -63,10 +65,14 @@ const ProfileView = props => {
 
 	//if email is update then must reset storage
 	useEffect(() => {
-		if (Object.keys(user).length > 0) {
-			setState(user)
+		if (params) {
+			setState(params);
+		}else{
+			if (Object.keys(user).length > 0) {
+				setState(user)
+			}
 		}
-	}, [user])
+	}, [user, params])
 
 	const handleUpdateEmail = (value) => {
 		setState(state => ({
@@ -94,6 +100,7 @@ const ProfileView = props => {
 			
 			props.updateProfil(param1, state)
 				.then(async () => {
+					setLoading(false); //handle navigate to ubah pin
 					const newLocaluser = {
 						...props.local,
 						email: state.email
@@ -112,8 +119,8 @@ const ProfileView = props => {
 					// }
 				})
 				.catch(err => {
+					setLoading(false); //handle navigate to ubah pin
 					props.navigation.goBack();
-					// setLoading(false);
 					if (err.global) {
 						Toast.show({
 			                text: err.global,
@@ -130,6 +137,7 @@ const ProfileView = props => {
 				})
 
 		}else{
+			setLoading(false); //handle navigate to ubah pin
 			props.navigation.goBack();
 		}
 		return true;
@@ -138,7 +146,19 @@ const ProfileView = props => {
 	const shouldUpdateProfile = (defaultValue) => {
 		if (defaultValue.email !== state.email) return true;
 		if (defaultValue.nama !== state.nama) return true;
+		if (defaultValue.kelurahan !== state.kelurahan) return true;
+		if (defaultValue.kota !== state.kota) return true;
+		if (defaultValue.kecamatan !== state.kecamatan) return true;
+		if (defaultValue.kodepos !== state.kodepos) return true;
+		if (defaultValue.alamatOl !== state.alamatOl) return true;
 		return false;
+	}
+
+	//using replace because this route using backhandler
+	const handleNavigateAlamat = () => {
+		props.navigation.replace('UpdateAlamat', {
+			...state
+		})
 	}
 
 	return(
@@ -153,6 +173,7 @@ const ProfileView = props => {
 		        animationStyle={styles.lottie}
 		        speed={1}
 		    />
+		    { loading &&  <StatusBar backgroundColor="rgba(0,0,0,0.6)"/> }
 
 			{ emailVisible && 
 				<EmailView 
@@ -285,7 +306,7 @@ const ProfileView = props => {
 						<TouchableOpacity 
 							style={styles.list}
 							activeOpacity={0.5}
-							//onPress={() => props.navigation.navigate('UpdateAlamat')}
+							onPress={handleNavigateAlamat}
 						>
 							<View style={styles.listLeft}>
 								<View style={styles.icon}>
@@ -294,13 +315,13 @@ const ProfileView = props => {
 								<View style={{marginLeft: 8}}>
 									<Text style={styles.textLabel}>Alamat</Text>
 									<TextNote note numberOfLines={1}>
-										{ user.kota !== '-' ? `${capitalize(user.kota)}, ${capitalize(user.kecamatan)} (${user.kodepos})` : '-'}
+										{ state.kota !== '-' ? `${capitalize(state.kota)}, ${capitalize(state.kecamatan)} (${state.kodepos})` : '-'}
 									</TextNote>
 								</View>
 							</View>
-							{/*<View style={styles.rightIcon}>
-								<MaterialCommunityIcons name="pencil" size={24} color="#b3b3b3" />
-							</View> */}
+							<View style={styles.rightIcon}>
+								<Icon name='ios-arrow-forward' style={{color: '#b3b3b3', fontSize: 25}} />
+							</View>
 						</TouchableOpacity>
 
 						<TouchableOpacity 

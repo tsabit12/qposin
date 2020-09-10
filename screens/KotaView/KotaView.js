@@ -61,7 +61,7 @@ const KotaView = props => {
 
 	useEffect(() => {
 		setTimeout(function() {
-			dataKota.sort(dynamicSort("kota"));
+			// dataKota.sort(dynamicSort("kota"));
 			setState(state => ({
 				...state,
 				kota: dataKota,
@@ -136,19 +136,50 @@ const KotaView = props => {
 	const handleChooseKec = (choosedKec) => {
 		const payload = {};
 
-		if (params.type === 'sender') {
-			payload.kodeposA = choosedKec.kodepos;
-			payload.kecamatanA = capitalize(choosedKec.KEC);
-			payload.kotaA = capitalize(state.kotaValue);
+		if (params.type === 'empty') {
+			payload.kodepos = choosedKec.kodepos;
+			payload.kecamatan = capitalize(choosedKec.KEC);
+			payload.kota = capitalize(state.kotaValue);
+
+			props.navigation.dispatch(state => {
+			  	const routes = state.routes.filter(r => r.name !== 'Kota');
+			  	const newRoutes = []
+				routes.forEach(row => {
+					if (row.name === 'UpdateAlamat') {
+						newRoutes.push({
+							key: row.key,
+							name: row.name,
+							params: {
+								...row.params,
+								newPayload: {
+									...payload
+								}
+							}
+						})
+					}else{
+						newRoutes.push(row);
+					}
+				})
+
+				return CommonActions.reset({
+					...state,
+					routes: newRoutes,
+					index: routes.length - 1,
+				});
+			});
 		}else{
-			payload.kodeposB = choosedKec.kodepos;
-			payload.kecamatanB = capitalize(choosedKec.KEC);
-			payload.kotaB = capitalize(state.kotaValue);
-		}
+			if (params.type === 'sender') {
+				payload.kodeposA = choosedKec.kodepos;
+				payload.kecamatanA = capitalize(choosedKec.KEC);
+				payload.kotaA = capitalize(state.kotaValue);
+			}else{
+				payload.kodeposB = choosedKec.kodepos;
+				payload.kecamatanB = capitalize(choosedKec.KEC);
+				payload.kotaB = capitalize(state.kotaValue);
+			}
 
-		props.setOrder(payload);
+			props.setOrder(payload);
 
-		//if (params.fromRoute === 'order') {
 			props.navigation.dispatch(state => {
 			  const routes = state.routes.filter(r => r.name !== 'Kota');
 			  return CommonActions.reset({
@@ -157,18 +188,7 @@ const KotaView = props => {
 			    index: routes.length - 1,
 			  });
 			});
-		// }else{
-		// 	props.navigation.dispatch(
-		// 	  CommonActions.reset({
-		// 	    index: 0,
-		// 	    routes: [
-		// 	      {
-		// 	        name: 'Home'
-		// 	      },
-		// 	    ],
-		// 	  })
-		// 	);
-		// }
+		}
 	}
 
 	const handelChangeText = (value) => {
