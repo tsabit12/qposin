@@ -96,7 +96,7 @@ const CityCourier = props => {
 
 	React.useEffect(() => {
 		const googleApikey =  Constants.manifest.android.config.googleMaps.apiKey;
-		if (googleApikey !== 'AIzaSyA7czY728UVajvsFfYCGLq67OPIjVpqFPc') {
+		if (googleApikey === 'AIzaSyA7czY728UVajvsFfYCGLq67OPIjVpqFPc') {
 			setState(state => ({
 				...state,
 				supprotedManifest: true
