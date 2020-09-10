@@ -19,6 +19,7 @@ import {
 	AlamatView,
 	KelurahanView
 } from './components';
+import { CommonActions, StackActions } from '@react-navigation/native';
 
 const capitalize = (string) => {
 	if (string) {
@@ -28,9 +29,10 @@ const capitalize = (string) => {
 	}
 }
 
+
 const EditAlamatView = props => {
 	const { params } = props.route;
-	const [state, setState] = useState(params);
+	const [state, setState] = useState({});
 	const [alamatVisible, setAlamatVisible] = useState(false);
 	const [kelurahanVisible, setKelurahanVisible] = useState(false);
 
@@ -48,13 +50,18 @@ const EditAlamatView = props => {
 				...state,
 				...params.newPayload
 			}))
+		}else if(params){
+			setState(params);
 		}
 	}, [params])
 
 	const handleBackButtonClick = () => {
-		props.navigation.replace('Profile', {
-			...state
-		})
+		if (props.navigation.isFocused()) {
+			handleGoback();
+		}else{
+			const popAction = StackActions.pop(1);
+			props.navigation.dispatch(popAction);
+		}
 		return true;
 	}
 
@@ -74,10 +81,35 @@ const EditAlamatView = props => {
 		setKelurahanVisible(false);
 	}
 
-	const handleGoback = () => {
-		props.navigation.replace('Profile', {
-			...state
-		})
+	const handleGoback = () => { 
+		props.navigation.dispatch(stateNavigation => {
+			const routes = stateNavigation.routes.filter(r => r.name !== 'UpdateAlamat');
+			const newRoutes = [];
+
+			routes.forEach(row => {
+				if (row.name === 'Profile') {
+					newRoutes.push({
+						key: row.key,
+						name: row.name,
+						params: {
+							...state
+						}
+					})
+				}else{
+					newRoutes.push(row);
+				}
+			})
+			
+			return CommonActions.reset({
+			    ...state,
+			    routes: newRoutes,
+			    index: routes.length - 1,
+			 });
+		});
+
+		// props.navigation.replace('Profile', {
+		// 	...state
+		// })
 	}
 
 	return(
@@ -152,7 +184,7 @@ const EditAlamatView = props => {
 						<View style={styles.labelTitle}>
 							<Text style={styles.textLabel}>Kelurahan</Text>
 							<TextNote note>
-								{ state.kelurahan.length === 1 ? '-' : capitalize(state.kelurahan)}
+								{ !state.kelurahan ? '-' : capitalize(state.kelurahan)}
 							</TextNote>
 						</View>
 					</View>

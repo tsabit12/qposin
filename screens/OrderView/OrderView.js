@@ -24,7 +24,8 @@ import {
 	Berat,
 	Cod,
 	Nilai,
-	ListTarif
+	ListTarif,
+	UpdateMessage
 } from './components';
 import AnimatedLoader from "react-native-animated-loader";
 import api from '../../api';
@@ -77,10 +78,24 @@ const OrderView = props => {
 		shouldCod: false
 	})
 
+	const [senderValues, setSender] = useState({
+		kec: '',
+		kota: '',
+		kodepos: ''
+	});
+
+	const [receiverValue, setReceiver] = useState({
+		kec: '',
+		kota: '',
+		kodepos: ''
+	})
+
+	const [shouldUpdateAddres, setShouldUpdateAddres] = useState(false);
+
 	const { data, errors } = state;
 
 	const { params } = props.route;
-	const { session }  = props;
+	const { session, order }  = props;
 
 	const handlePress = (type) => {
 		props.navigation.navigate('Kota', {
@@ -89,17 +104,78 @@ const OrderView = props => {
 		});
 	} 
 
-	const senderValues = {
-		kec: props.order.kecamatanA,
-		kota: props.order.kotaA,
-		kodepos: props.order.kodeposA
-	};
+	useEffect(() => {
+		if (state.mount) {
+			if (order.kecamatanA && order.kecamatanB) {
+				setSender(sender => ({
+					kec: order.kecamatanA,
+					kota: order.kotaA,
+					kodepos: order.kodeposA
+				}));
+				setReceiver(sender => ({
+					kec: order.kecamatanB,
+					kota: order.kotaB,
+					kodepos: order.kodeposB
+				}))
+				setState(state => ({ 
+					...state,
+					errors:{
+						...state.errors,
+						penerima: undefined,
+						pengirim: undefined
+					}
+				}))
+			}else{
+				if (order.kecamatanA) {
+					setSender(sender => ({
+						kec: order.kecamatanA,
+						kota: order.kotaA,
+						kodepos: order.kodeposA
+					}));
+					setState(state => ({ 
+						...state,
+						errors:{
+							...state.errors,
+							pengirim: undefined
+						}
+					}))
+				}else if(order.kecamatanB){
+					setReceiver(sender => ({
+						kec: order.kecamatanB,
+						kota: order.kotaB,
+						kodepos: order.kodeposB
+					}))
+					setState(state => ({ 
+						...state,
+						errors:{
+							...state.errors,
+							penerima: undefined
+						}
+					}))
+				}else if(session.kodepos !== '-'){
+					setSender({
+						kec: session.kecamatan,
+						kota: session.kota,
+						kodepos: session.kodepos
+					})
+				}else{
+					setShouldUpdateAddres(true);
+				}
+			}
+		}
+	}, [order, state.mount, session])
 
-	const receiverValue = {
-		kec: props.order.kecamatanB,
-		kota: props.order.kotaB,
-		kodepos: props.order.kodeposB
-	};
+	// const senderValues = {
+	// 	kec: props.order.kecamatanA,
+	// 	kota: props.order.kotaA,
+	// 	kodepos: props.order.kodeposA
+	// };
+
+	// const receiverValue = {
+	// 	kec: props.order.kecamatanB,
+	// 	kota: props.order.kotaB,
+	// 	kodepos: props.order.kodeposB
+	// };
 
 	useEffect(() => {
 		if (session.norek !== '-') {
@@ -146,26 +222,6 @@ const OrderView = props => {
 			}))
 		}
 	}, [session.norek]);
-
-	useEffect(() => {
-		if (props.order.kecamatanA && state.mount) {
-			setState(state => ({ 
-				...state,
-				errors:{
-					...state.errors,
-					pengirim: undefined
-				}
-			}))
-		}else if(props.order.kecamatanB){
-			setState(state => ({ 
-				...state,
-				errors:{
-					...state.errors,
-					penerima: undefined
-				}
-			}))
-		}
-	}, [props.order, state.mount]);
 
 	useEffect(() => {
 		if (state.listTarif.length > 0 && state.mount) {
@@ -215,7 +271,7 @@ const OrderView = props => {
 			const panjangVal = data.panjang ? data.panjang : '0';
 			const lebarVal = data.lebar ? data.lebar : '0';
 			const tinggiVal = data.tinggi ? data.tinggi : '0';
-			const param1 = `#1#${data.jenis}#${values.kodeposA}#${values.kodeposB}#${data.berat}#${panjangVal}#${lebarVal}#${tinggiVal}#0#${data.nilai}`;
+			const param1 = `#1#${data.jenis}#${senderValues.kodepos}#${receiverValue.kodeposB}#${data.berat}#${panjangVal}#${lebarVal}#${tinggiVal}#0#${data.nilai}`;
 
 			api.getTarif(param1)
 				.then(res => {
@@ -271,8 +327,8 @@ const OrderView = props => {
 		}else{
 			if (Number(field.berat) <= 0)  errors.berat = "Harus lebih dari 0";
 		}
-		if (!props.order.kecamatanA) errors.pengirim = 'Alamat pengirim belum dipilih';
-		if (!props.order.kecamatanB) errors.penerima = 'Alamat penerima belum dipilih';
+		if (!senderValues.kec) errors.pengirim = 'Alamat pengirim belum dipilih';
+		if (!receiverValue.kec) errors.penerima = 'Alamat penerima belum dipilih';
 		if (!data.nilai) errors.nilai = 'Nilai barang belum diisi';
 		return errors;
 	}
@@ -303,20 +359,38 @@ const OrderView = props => {
 			payloadTarif,
 			...state.data,
 			pengirim: {
-				kec: props.order.kecamatanA,
-				kota: props.order.kotaA,
-				kodepos: props.order.kodeposA	
+				kec: senderValues.kec,
+				kota: senderValues.kota,
+				kodepos: senderValues.kodepos
 			},
 			penerima: {
-				kec: props.order.kecamatanB,
-				kota: props.order.kotaB,
-				kodepos: props.order.kodeposB
+				kec: receiverValue.kec,
+				kota: receiverValue.kota,
+				kodepos: receiverValue.kodepos
 			}
 		}
 
 		props.navigation.navigate('DataPenerima', {
 			data: payload
 		})
+	}
+
+	const handleCloseUpdate = () => {
+		setShouldUpdateAddres(false);
+
+		setTimeout(function() {
+			props.navigation.goBack();
+		}, 10);
+	}
+
+	const handleSubmitUpdate = () => {
+		setShouldUpdateAddres(false);
+
+		setTimeout(function() {
+			props.navigation.replace('UpdateAlamat', {
+				...session
+			})
+		}, 10);
 	}
 
 	return(
@@ -331,6 +405,12 @@ const OrderView = props => {
 		        animationStyle={styles.lottie}
 		        speed={1}
 		    />
+
+		    { shouldUpdateAddres && 
+		    	<UpdateMessage 
+		    		handleClose={handleCloseUpdate} 
+		    		onSubmit={handleSubmitUpdate}
+		    	/> }
 		    { state.loading &&  <StatusBar backgroundColor="rgba(0,0,0,0.6)"/> }
 
 

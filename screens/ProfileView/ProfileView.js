@@ -15,9 +15,11 @@ import {
 	widthPercentageToDP as wp, 
 	heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
+import { StackActions } from '@react-navigation/native';
 import { Icon, Thumbnail, Text as TextNote, Toast } from 'native-base';
 import { connect } from 'react-redux';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
+import { CommonActions } from '@react-navigation/native';
 import {
 	EmailView,
 	NamaView
@@ -92,53 +94,70 @@ const ProfileView = props => {
 		setNamaVisible(false);
 	}
 
+	const goBack = () => {
+		props.navigation.dispatch(
+		  CommonActions.reset({
+		    index: 0,
+		    routes: [
+		      {
+		        name: 'Home'
+		      },
+		    ],
+		  })
+		);
+	}
+
 	const handleBackButtonClick = () => {
-		const update = shouldUpdateProfile(props.user);
-		if (update) {
-			setLoading(true);
-			const param1 = `${props.userid}|${state.alamatOl}|${state.provinsi}|${state.kota}|${state.kecamatan}|${state.kelurahan}|${state.kodepos}|${state.nama}|${state.email}`;
-			
-			props.updateProfil(param1, state)
-				.then(async () => {
-					setLoading(false); //handle navigate to ubah pin
-					const newLocaluser = {
-						...props.local,
-						email: state.email
-					};
+		if (props.navigation.isFocused()) {
+			const update = shouldUpdateProfile(props.user);
+			if (update) {
+				setLoading(true);
+				const param1 = `${props.userid}|${state.alamatOl}|${state.provinsi}|${state.kota}|${state.kecamatan}|${state.kelurahan}|${state.kodepos}|${state.nama}|${state.email}`;
+				
+				props.updateProfil(param1, state)
+					.then(async () => {
+						const newLocaluser = {
+							...props.local,
+							email: state.email
+						};
 
-					props.navigation.goBack();
-					// try{
-					// 	await AsyncStorage.setItem('qobUserPrivasi', JSON.stringify(newLocaluser));
-					// }catch(error){
-					// 	props.navigation.goBack();
-					// 	Toast.show({
-			  //               text: 'Fail',
-			  //               textStyle: { textAlign: 'center' },
-			  //               duration: 1000
-			  //           })
-					// }
-				})
-				.catch(err => {
-					setLoading(false); //handle navigate to ubah pin
-					props.navigation.goBack();
-					if (err.global) {
-						Toast.show({
-			                text: err.global,
-			                textStyle: { textAlign: 'center' },
-			                duration: 1000
-			            })
-					}else{
-						Toast.show({
-			                text: 'Gagal update profil',
-			                textStyle: { textAlign: 'center' },
-			                duration: 1000
-			            })
-					}
-				})
+						props.navigation.goBack();
 
+						
+						// try{
+						// 	await AsyncStorage.setItem('qobUserPrivasi', JSON.stringify(newLocaluser));
+						// }catch(error){
+						// 	props.navigation.goBack();
+						// 	Toast.show({
+				  //               text: 'Fail',
+				  //               textStyle: { textAlign: 'center' },
+				  //               duration: 1000
+				  //           })
+						// }
+					})
+					.catch(err => {
+						props.navigation.goBack();
+						if (err.global) {
+							Toast.show({
+				                text: err.global,
+				                textStyle: { textAlign: 'center' },
+				                duration: 1000
+				            })
+						}else{
+							Toast.show({
+				                text: 'Gagal update profil',
+				                textStyle: { textAlign: 'center' },
+				                duration: 1000
+				            })
+						}
+					})
+
+			}else{
+				props.navigation.goBack();
+			}
 		}else{
-			setLoading(false); //handle navigate to ubah pin
-			props.navigation.goBack();
+			const popAction = StackActions.pop(1);
+			props.navigation.dispatch(popAction);
 		}
 		return true;
 	}
@@ -156,7 +175,7 @@ const ProfileView = props => {
 
 	//using replace because this route using backhandler
 	const handleNavigateAlamat = () => {
-		props.navigation.replace('UpdateAlamat', {
+		props.navigation.navigate('UpdateAlamat', {
 			...state
 		})
 	}

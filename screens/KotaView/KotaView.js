@@ -211,7 +211,9 @@ const KotaView = props => {
 					<Icon name='ios-arrow-back' style={{color: '#FFF', fontSize: 25, marginTop: 20}} />
 				</TouchableOpacity>
 				<Text style={[styles.text, {marginTop: 20, fontSize: 17}]}>
-					Cari kota {params.type === 'sender' ? 'pengirim' : 'penerima'}
+					{ params.type === 'empty' && 'Cari kota' }
+					{ params.type === 'sender' && 'Cari kota pengirim'}
+					{ params.type === 'receiver' && 'Cari kota penerima'}
 				</Text>
 			</View>
 			<View style={{flex: 1, backgroundColor: '#f5f7f6'}}>
@@ -222,13 +224,13 @@ const KotaView = props => {
 								<Entypo name="location-pin" size={24} color="black" />
 							</View>
 							<TextInput 
-								placeholder={params.type === 'sender' ? 'Cari kota kamu disini' : 'Cari kota penerima disini'}
+								placeholder='Cari kota disini'
 								style={styles.input}
 								value={state.kotaValue}
 								onChangeText={(text) => handelChangeText(text)}
 							/>
 						</View>
-						<TouchableOpacity style={styles.iconSearch}>
+						<TouchableOpacity style={styles.iconSearch} disabled>
 							<Ionicons name="ios-search" size={27} color="black" />
 						</TouchableOpacity>
 					</View>

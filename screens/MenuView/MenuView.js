@@ -210,13 +210,15 @@ const MenuView = props => {
 	}
 
 	const handlePressOrder = (type) => {
-		props.navigation.navigate('Order', {
-			type
-		});
+		props.resetOrder();
+
+
 
 		setTimeout(function() {
-			props.resetOrder();
-		}, 100);
+			props.navigation.navigate('Order', {
+				type
+			});
+		}, 10);
 	}
 
 	const onGenerateToken = () => {

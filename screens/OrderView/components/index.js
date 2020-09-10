@@ -5,3 +5,4 @@ export { default as Berat } from './Berat';
 export { default as Cod } from './Cod';
 export { default as Nilai } from './Nilai';
 export { default as ListTarif } from './ListTarif';
+export { default as UpdateMessage } from './UpdateMessage';

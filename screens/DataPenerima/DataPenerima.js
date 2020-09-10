@@ -29,7 +29,8 @@ const DataPenerima = props => {
 		data: {
 			nama: '',
 			email: '',
-			phone: ''
+			phone: '',
+			street: ''
 		},
 		modalVisible: false,
 		errors: {},
@@ -73,6 +74,7 @@ const DataPenerima = props => {
 
 		if (!field.nama) errors.nama = 'Nama belum diisi';
 		if (!field.phone) errors.phone = 'Nomor handphone belum diisi';
+		if (!field.street) errors.street = 'Alamat utama belum diisi';
 
 		return errors;
 	}
@@ -88,7 +90,7 @@ const DataPenerima = props => {
 			shipperemail: localUser.email,
 			"shipperphone": localUser.nohp,
 			"receivername": data.nama,
-			"receiveraddress": 'kosong',
+			"receiveraddress": data.street,
 			"receiveremail": data.email ? data.email : '-',
 			"receiverphone": data.phone
 		}
@@ -273,6 +275,18 @@ const DataPenerima = props => {
 						</View>
 
 						<View style={styles.field}>
+							<Text style={styles.label}>Alamat utama</Text>
+							<TextInput 
+								style={styles.input}
+								value={data.street}
+								placeholder='Contoh: jln xxx no 12'
+								onChangeText={(text) => handleChange(text, 'street')}
+								autoCapitalize='none'
+							/>
+							{ errors.street && <Text style={styles.labelErr}>{errors.street}</Text> }
+						</View>
+
+						<View style={styles.field}>
 							<Text style={styles.label}>Email <Text style={{color: rgba('#4d4d4d', 0.6)}}>(optional)</Text></Text>
 							<TextInput 
 								style={styles.input}
@@ -357,7 +371,7 @@ const styles = StyleSheet.create({
 		marginTop: 20
 	},
 	labelErr: {
-		textAlign: 'center',
+		marginLeft: 8,
 		color: 'red'
 	},
 	lottie: {
