@@ -5,3 +5,4 @@ export { default as ModalView } from './ModalView';
 export { default as EditView } from './EditView';
 export { default as CartView } from './CartView';
 export { default as ResultOrder } from './ResultOrder';
+export { default as UpdateRequiredView } from './UpdateRequiredView';

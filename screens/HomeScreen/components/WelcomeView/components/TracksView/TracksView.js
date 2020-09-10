@@ -20,12 +20,11 @@ const { width, height } = Dimensions.get('window');
 
 const TracksView = props => {
 	const { data } = props;
+	
 	const total = data.length - 1;
+	
 	const lastdata 		= data[total];
-	const description 	= lastdata.description.split(';'); 
-	const penerima 	= description[2].split(':')[1].trim();
-	const status 	= description[1].split(':')[1].trim();
-	const waktu 	= description[0].split(':');
+	const description 	= lastdata.description.split(';');
 
 
 	return(
@@ -54,13 +53,14 @@ const TracksView = props => {
 									<View style={styles.circle} />
 									<View>
 										<Text style={[styles.textList, {marginLeft: 15}]}>
-											Status : {capitalize(lastdata.eventName)}
+											Status: {capitalize(lastdata.eventName)} ({capitalize(lastdata.officeName)})
 										</Text>
-										<Text style={[styles.textList, {marginLeft: 15}]}>
-											Penerima : {capitalize(penerima)}
-										</Text>
+										{lastdata.eventName.toLowerCase() === 'selesai antar' && 
+											<Text style={[styles.textList, {marginLeft: 15}]}>
+												Keterangan/Penerima: {description[2].split(':')[1]}
+											</Text> }
 										<Text style={[styles.textList, {marginLeft: 15, fontSize: 12}]}>
-											{waktu[1].trim()}:{waktu[2].trim()}
+											{lastdata.eventDate}
 										</Text>
 									</View>
 								</View>

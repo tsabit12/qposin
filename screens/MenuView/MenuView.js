@@ -464,7 +464,7 @@ const MenuView = props => {
 										resizeMode='contain'
 									/>
 								</View>
-								<Text style={styles.textLabel}>Generate Password Web</Text>
+								<Text style={styles.textLabel}>Generate{'\n'}Password Web</Text>
 							</TouchableOpacity>
 							
 						</View>

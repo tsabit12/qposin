@@ -15,6 +15,9 @@ const ListKecamatan = props => {
 					 setKec(res);
 					 setLoading(false)
 				})
+				.catch(err => {
+					setLoading(false);
+				})
 		}
 	}, [props.kota])
 

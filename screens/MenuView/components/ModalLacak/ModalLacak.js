@@ -37,11 +37,9 @@ const capitalize = (string) => {
 const ListLacak = props => {
 	const { data } = props;
 	const total = data.length - 1;
+	
 	const lastdata 		= data[total];
-	const description 	= lastdata.description.split(';'); 
-	const penerima 	= description[2].split(':')[1].trim();
-	const status 	= description[1].split(':')[1].trim();
-	const waktu 	= description[0].split(':');
+	const description 	= lastdata.description.split(';');
 
 	return(
 		<View style={{minHeight: hp('7%')}}>
@@ -62,13 +60,14 @@ const ListLacak = props => {
 						<View style={stylesLacak.circle} />
 						<View>
 							<TextDefault style={[stylesLacak.textList, {marginLeft: 15}]}>
-								Status : {capitalize(lastdata.eventName)}
+								Status: {capitalize(lastdata.eventName)} ({capitalize(lastdata.officeName)})
 							</TextDefault>
-							<TextDefault style={[stylesLacak.textList, {marginLeft: 15}]}>
-								Penerima : {capitalize(penerima)}
-							</TextDefault>
+							{lastdata.eventName.toLowerCase() === 'selesai antar' && 
+								<TextDefault style={[stylesLacak.textList, {marginLeft: 15}]}>
+									Keterangan/Penerima: {description[2].split(':')[1]}
+								</TextDefault> }
 							<TextDefault style={[stylesLacak.textList, {marginLeft: 15, fontSize: 12}]}>
-								{waktu[1].trim()}:{waktu[2].trim()}
+								{lastdata.eventDate}
 							</TextDefault>
 						</View>
 					</View>

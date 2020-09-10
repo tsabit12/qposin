@@ -25,7 +25,8 @@ import {
 	MarkerLabel,
 	ResultOrder,
 	EditView,
-	CartView
+	CartView,
+	UpdateRequiredView
 } from './components';
 
 const { height, width } = Dimensions.get( 'window' );
@@ -87,22 +88,42 @@ const CityCourier = props => {
 		update: false,
 		cart: false,
 		success: false,
-		positionMessage: new Animated.Value(200)
+		positionMessage: new Animated.Value(200),
+		supprotedManifest: false
 	})
 
-	const { location, addres, positionInput } = state;
+	const { location, addres, positionInput, supprotedManifest } = state;
+
+	React.useEffect(() => {
+		const googleApikey =  Constants.manifest.android.config.googleMaps.apiKey;
+		if (googleApikey !== 'AIzaSyA7czY728UVajvsFfYCGLq67OPIjVpqFPc') {
+			setState(state => ({
+				...state,
+				supprotedManifest: true
+			}))
+		}else{
+			setState(state => ({
+				...state,
+				loading: false
+			}))
+		}
+	}, []);
 
 	React.useEffect(() =>  {
-		(async () => {
-			setPositionInput();
-			let { status } = await Location.requestPermissionsAsync();
-			if (status === 'granted') {
-				handleGetLocation();	
-			}else{
-				props.navigation.goBack();
-			}
-		})();
-	}, [])
+		if (supprotedManifest) {
+			(async () => {
+				let { status } = await Location.requestPermissionsAsync();
+				if (status === 'granted') {
+					setPositionInput();
+					setTimeout(function() {
+						handleGetLocation();	
+					}, 10);
+				}else{
+					props.navigation.goBack();
+				}
+			})();
+		}
+	}, [supprotedManifest])
 
 	React.useEffect(() => {
 		if (state.mount) {
@@ -611,132 +632,140 @@ const CityCourier = props => {
 		setPositionInput();
 	}
 
-	return(
-		<KeyboardAvoidingView
-			style={{flex:1}} 
-			behavior="padding" 
-			enabled={false}
-		>
+	if (supprotedManifest) {
+		return(
+			<KeyboardAvoidingView
+				style={{flex:1}} 
+				behavior="padding" 
+				enabled={false}
+			>
 
-			{ !state.cart && !state.update && <TouchableOpacity style={styles.chart} onPress={goToCart}>
-				<Icon name="md-cart" iconStyle={{color: "blue"}} />
-			</TouchableOpacity> }
+				{ !state.cart && !state.update && <TouchableOpacity style={styles.chart} onPress={goToCart}>
+					<Icon name="md-cart" iconStyle={{color: "blue"}} />
+				</TouchableOpacity> }
 
-			{ state.modalVisible && 
-				<ResultOrder 
-					sender={state.sender}
-					receiver={state.receiver}
-					kiriman={state.kiriman}
-					tarif={state.tarif}
-					jarak={state.jarak}
-					onSubmit={handleOrder}
-					closeModal={handleCloseModal}
-					isSuccess={state.success}
-					error={state.errors}
-					user={props.detail}
-				/> }
-			
-			{ state.loading ? <AppLoading /> : 
-				<React.Fragment> 
-					{ !state.locationIsEnabled ? <ErrorPermissionView getLocation={handleGetLocation} /> : <View style={{flex: 1}}>
-						<MapView 
-							initialRegion={{
-								latitude: location.latitude,
-					            longitude: location.longitude,
-					            latitudeDelta: location.latitudeDelta,
-					            longitudeDelta: location.longitudeDelta,
-							}} 
-							style={styles.map}
-							showUserLocation={true}
-							onRegionChangeComplete={handleCompleteRegion}
-							onRegionChange={handleChangeRegion}
-							zoomControlEnabled={false}
-						>
-							{ state.routeForMap.length > 0 &&  
-								<Polyline 
-									coordinates={state.routeForMap} 
-									strokeWidth={3} 
-									strokeColor="#f26522" 
-									geodesic={true}/> }
-							<Marker.Animated 
-								coordinate={region}
+				{ state.modalVisible && 
+					<ResultOrder 
+						sender={state.sender}
+						receiver={state.receiver}
+						kiriman={state.kiriman}
+						tarif={state.tarif}
+						jarak={state.jarak}
+						onSubmit={handleOrder}
+						closeModal={handleCloseModal}
+						isSuccess={state.success}
+						error={state.errors}
+						user={props.detail}
+					/> }
+				
+				{ state.loading ? <AppLoading /> : 
+					<React.Fragment> 
+						{ !state.locationIsEnabled ? <ErrorPermissionView getLocation={handleGetLocation} /> : <View style={{flex: 1}}>
+							<MapView 
+								initialRegion={{
+									latitude: location.latitude,
+						            longitude: location.longitude,
+						            latitudeDelta: location.latitudeDelta,
+						            longitudeDelta: location.longitudeDelta,
+								}} 
+								style={styles.map}
+								showUserLocation={true}
+								onRegionChangeComplete={handleCompleteRegion}
+								onRegionChange={handleChangeRegion}
+								zoomControlEnabled={false}
 							>
-								<MarkerLabel
-									name='Pengirim'
-								/>
-							</Marker.Animated>
-							{ state.moveMarker !== 'sender' && <Marker.Animated coordinate={regionReceiver}>
-								<MarkerLabel
-									name='Penerima'
-								/>
-							</Marker.Animated> }
-						</MapView>
-					</View> }  
-			</React.Fragment> }
+								{ state.routeForMap.length > 0 &&  
+									<Polyline 
+										coordinates={state.routeForMap} 
+										strokeWidth={3} 
+										strokeColor="#f26522" 
+										geodesic={true}/> }
+								<Marker.Animated 
+									coordinate={region}
+								>
+									<MarkerLabel
+										name='Pengirim'
+									/>
+								</Marker.Animated>
+								{ state.moveMarker !== 'sender' && <Marker.Animated coordinate={regionReceiver}>
+									<MarkerLabel
+										name='Penerima'
+									/>
+								</Marker.Animated> }
+							</MapView>
+						</View> }  
+				</React.Fragment> }
 
-			{ state.update && 
-				<EditView 
-					values={state.addres} 
-					close={handleCloseEdit} 
-					markerType={state.moveMarker}
-					handleChooseStreet={onEditStreet}
-			/> }
-
-			{ state.cart && <CartView 
-					goBack={handleCloseCart}
-					userid={props.user.userid}
-					user={props.detail}
-					calculateSaldo={props.calculateSaldo}
+				{ state.update && 
+					<EditView 
+						values={state.addres} 
+						close={handleCloseEdit} 
+						markerType={state.moveMarker}
+						handleChooseStreet={onEditStreet}
 				/> }
 
-			<View>
-				<Animated.View 
-					style={
-						[{
-							transform: [{translateY: positionInput }], 
-							opacity: state.opacityInput
-						}, 
-						styles.backdrop
-					]}
-					pointerEvents={state.modalVisible ? 'none' : 'auto'}
-				>
-	        		<InputView 
-	        			addres={addres}
-	        			onSubmit={handleSubmit} 
-	        			errors={state.errors}
-	        			markerType={state.moveMarker}
-	        			onSubmitKiriman={handleSubmitKiriman}
-	        			jarak={state.jarak}
-	        			handleEditAddress={onUpdateAddress}
-	        			resetSenderAndReceiver={resetAllstate}
-	        		/>
-		        </Animated.View>
-	        </View>
+				{ state.cart && <CartView 
+						goBack={handleCloseCart}
+						userid={props.user.userid}
+						user={props.detail}
+						calculateSaldo={props.calculateSaldo}
+					/> }
 
-	        { state.success && 
-	        <Modal
-	        	transparent={true}
-	        	visible={true}
-	        	//onRequestClose={() => handleClose()}
-	        	animationType="fade"
-	        >
-	        	<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
-	        	<View style={{backgroundColor: 'rgba(0,0,0,0.5)', flex: 1}}>
-		        <Animated.View 
-		        	style={[
-		        		styles.message, { 
-		        			transform: [{translateX: state.positionMessage }],
-		        		} 
-		        	]}>
-		        	<Text style={{color: '#FFFF', fontFamily: 'Roboto_medium'}}>ORDER SUKSES</Text>
-		        	<Button style={{borderRadius: 0}} transparent onPress={resetAllstate}>
-		        		<Text>Kembali Order</Text>
-		        	</Button>
-		        </Animated.View>
+				<View>
+					<Animated.View 
+						style={
+							[{
+								transform: [{translateY: positionInput }], 
+								opacity: state.opacityInput
+							}, 
+							styles.backdrop
+						]}
+						pointerEvents={state.modalVisible ? 'none' : 'auto'}
+					>
+		        		<InputView 
+		        			addres={addres}
+		        			onSubmit={handleSubmit} 
+		        			errors={state.errors}
+		        			markerType={state.moveMarker}
+		        			onSubmitKiriman={handleSubmitKiriman}
+		        			jarak={state.jarak}
+		        			handleEditAddress={onUpdateAddress}
+		        			resetSenderAndReceiver={resetAllstate}
+		        		/>
+			        </Animated.View>
 		        </View>
-	        </Modal> }
-		</KeyboardAvoidingView>
-	);
+
+		        { state.success && 
+		        <Modal
+		        	transparent={true}
+		        	visible={true}
+		        	//onRequestClose={() => handleClose()}
+		        	animationType="fade"
+		        >
+		        	<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
+		        	<View style={{backgroundColor: 'rgba(0,0,0,0.5)', flex: 1}}>
+			        <Animated.View 
+			        	style={[
+			        		styles.message, { 
+			        			transform: [{translateX: state.positionMessage }],
+			        		} 
+			        	]}>
+			        	<Text style={{color: '#FFFF', fontFamily: 'Nunito-Bold'}}>ORDER SUKSES</Text>
+			        	<Button style={{borderRadius: 0}} transparent onPress={resetAllstate}>
+			        		<Text>Kembali Order</Text>
+			        	</Button>
+			        </Animated.View>
+			        </View>
+		        </Modal> }
+			</KeyboardAvoidingView>
+		);
+	}else{
+		return(
+			<React.Fragment>
+				{ state.loading ? <AppLoading /> : <UpdateRequiredView navigation={props.navigation} /> }
+			</React.Fragment>
+		)
+	}
 }
 
 const styles = StyleSheet.create({
@@ -761,7 +790,7 @@ const styles = StyleSheet.create({
   	},
   	textError: {
   		textAlign: 'center',
-  		fontFamily: 'Roboto-Regular'
+  		fontFamily: 'Nunito'
   	},
   	box: {
   		borderWidth: 0.1, 
