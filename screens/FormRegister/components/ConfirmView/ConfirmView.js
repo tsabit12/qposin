@@ -143,29 +143,16 @@ const ConfirmView = props => {
 			...state,
 			loading: true
 		}))
-		
-		props.getLinkWa()
-			.then(link => {
-				props.sendWa(payload, link)
-					.then(res => {
-						console.log(res);
-						setState(state => ({
-							...state,
-							loading: false,
-							success: true
-						}))
-					})
-					.catch(err => {
-						// console.log(err);
-						setState(state => ({
-							...state,
-							loading: false,
-							success: true
-						}))
-					})
+
+		props.getLinkWa(payload)
+			.then(res => {
+				setState(state => ({
+					...state,
+					loading: false,
+					success: true
+				}))	
 			})
 			.catch(err => {
-				// console.log(err);
 				setState(state => ({
 					...state,
 					loading: false,
@@ -265,7 +252,7 @@ const styles = StyleSheet.create({
 })
 
 ConfirmView.propTypes = {
-	sendWa: PropTypes.func.isRequired,
+	// sendWa: PropTypes.func.isRequired,
 	getLinkWa: PropTypes.func.isRequired
 }
 

@@ -99,8 +99,8 @@ const FormRegister = props => {
 						...state,
 						modalVisible: false
 					}))}
-					sendWa={(payload, url) => api.sendWhatsApp(payload, url)}
-					getLinkWa={() => api.getLinkWa()}
+					//sendWa={(payload, url) => api.sendWhatsApp(payload, url)}
+					getLinkWa={(payload) => api.getLinkWa(payload)}
 					onDone={handleDone}
 				/> }
 			<View style={styles.form}>

@@ -137,7 +137,9 @@ export default {
 			return Promise.reject(res.data);
 		}
 	}),
-	getLinkWa: () => axios.post(`${url1}/qposinaja/getLinkWa`).then(res => res.data.result.link),
+	getLinkWa: (payload) => axios.post(`${url1}/qposinaja/whatsapp`, {
+		...payload
+	}).then(res => res.data),
 	registrasi: (payload) => axios.post(url, {
 		messtype: '215',
 		...payload,
