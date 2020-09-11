@@ -90,7 +90,7 @@ const OrderView = props => {
 		kodepos: ''
 	})
 
-	const [shouldUpdateAddres, setShouldUpdateAddres] = useState(true);
+	const [shouldUpdateAddres, setShouldUpdateAddres] = useState(false);
 
 	const { data, errors } = state;
 
