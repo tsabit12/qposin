@@ -90,7 +90,7 @@ const OrderView = props => {
 		kodepos: ''
 	})
 
-	const [shouldUpdateAddres, setShouldUpdateAddres] = useState(false);
+	const [shouldUpdateAddres, setShouldUpdateAddres] = useState(true);
 
 	const { data, errors } = state;
 
@@ -394,9 +394,7 @@ const OrderView = props => {
 		setShouldUpdateAddres(false);
 
 		setTimeout(function() {
-			props.navigation.replace('UpdateAlamat', {
-				...session
-			})
+			props.navigation.replace('Profile');
 		}, 10);
 	}
 
