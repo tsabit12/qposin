@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-	View
+	View,
+	StyleSheet
 } from 'react-native';
 import { ListItem, Body, Left, Right, Text } from 'native-base';
 import { Entypo, Ionicons } from '@expo/vector-icons'; 
@@ -18,7 +19,9 @@ const Penerima = props => {
 				<Entypo name="location-pin" size={24} color="black" />
 			</Left>
 			<Body>
-				<Text style={{color: error ? 'red' : 'black'}}>Ke</Text>
+				<Text style={[styles.labelErr, {color: props.error ? 'red': 'black' }]}>
+					Ke
+				</Text>
 				<Text note numberOfLines={1}>
 					{ values.kota ? `${values.kota}, ${values.kec}, ${values.kodepos}` : '-' }
 				</Text>
@@ -30,10 +33,18 @@ const Penerima = props => {
 	);
 }
 
+const styles = StyleSheet.create({
+	labelErr: {
+		color: 'red',
+		fontFamily: 'Nunito-semi',
+		fontSize: 15
+	}
+})
+
 Penerima.propTypes = {
 	onPress: PropTypes.func.isRequired,
 	values: PropTypes.object.isRequired,
-	error: PropTypes.bool.isRequired
+	error: PropTypes.bool.isRequired,
 }
 
 export default Penerima;

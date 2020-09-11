@@ -46,6 +46,7 @@ export default function App() {
       'Nunito-Bold': require('./assets/fonts/Nunito-Bold.ttf'),
       'Nunito': require('./assets/fonts/Nunito-Black.ttf'),
       'Nunito-italic': require('./assets/fonts/Nunito-Italic.ttf'),
+      'Nunito-semi': require('./assets/fonts/Nunito-SemiBold.ttf'),
       Roboto: require('native-base/Fonts/Roboto.ttf'),
       Roboto_medium: require('native-base/Fonts/Roboto_medium.ttf'),
       ...Ionicons.font,

@@ -268,10 +268,11 @@ const OrderView = props => {
 				loading: true
 			}))	
 
+			const nilaiValue = data.nilai ? data.nilai : '0';
 			const panjangVal = data.panjang ? data.panjang : '0';
 			const lebarVal = data.lebar ? data.lebar : '0';
 			const tinggiVal = data.tinggi ? data.tinggi : '0';
-			const param1 = `#1#${data.jenis}#${senderValues.kodepos}#${receiverValue.kodeposB}#${data.berat}#${panjangVal}#${lebarVal}#${tinggiVal}#0#${data.nilai}`;
+			const param1 = `#1#${data.jenis}#${senderValues.kodepos}#${receiverValue.kodepos}#${data.berat}#${panjangVal}#${lebarVal}#${tinggiVal}#0#${nilaiValue}`;
 
 			api.getTarif(param1)
 				.then(res => {
@@ -329,7 +330,13 @@ const OrderView = props => {
 		}
 		if (!senderValues.kec) errors.pengirim = 'Alamat pengirim belum dipilih';
 		if (!receiverValue.kec) errors.penerima = 'Alamat penerima belum dipilih';
-		if (!data.nilai) errors.nilai = 'Nilai barang belum diisi';
+		if (data.isCod !== '0') {
+			if (!data.nilai){
+				errors.nilai = 'Nilai barang belum diisi';
+			}else if(Number(data.nilai) < 10000){
+				errors.nilai = 'Nilai barang minimal 10.000';
+			} 
+		}
 		return errors;
 	}
 
@@ -509,14 +516,14 @@ const OrderView = props => {
 										nilai: undefined
 									}
 								}))}
-								error={!!errors.nilai}
+								error={errors.nilai}
 								disabled={state.disabled}
 							/>
 						</List>
 						<View style={{alignItems: 'center'}}>
 				            <View style={styles.group}>
 				            	<View style={styles.field}>
-				            		<Text style={styles.text}>Panjang</Text>
+				            		<Text style={styles.textInput}>Panjang</Text>
 					            	<TextInput 
 					            		style={styles.input}
 					            		placeholder='cm'
@@ -528,7 +535,7 @@ const OrderView = props => {
 					            	/>
 				            	</View>
 				            	<View style={styles.field}>
-				            		<Text style={styles.text}>Lebar</Text>
+				            		<Text style={styles.textInput}>Lebar</Text>
 					            	<TextInput 
 					            		style={styles.input}
 					            		placeholder='cm'
@@ -540,7 +547,7 @@ const OrderView = props => {
 					            	/>
 				            	</View>
 				            	<View style={styles.field}>
-				            		<Text style={styles.text}>Tinggi</Text>
+				            		<Text style={styles.textInput}>Tinggi</Text>
 					            	<TextInput 
 					            		style={styles.input}
 					            		placeholder='cm'
@@ -632,6 +639,10 @@ const styles = StyleSheet.create({
 	lottie: {
 	    width: 100,
 	    height: 100
+	},
+	textInput: {
+		fontFamily: 'Nunito-semi',
+		fontSize: 15
 	}
 })
 

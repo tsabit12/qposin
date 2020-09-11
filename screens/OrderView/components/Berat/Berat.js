@@ -82,12 +82,14 @@ const Berat = props => {
 				disabled={props.disabled}
 			>
 				<Left>
-					<FontAwesome name="balance-scale" size={20} color="black" />
+					<FontAwesome name="balance-scale" size={19} color="black" />
 				</Left>
 				<Body>
-					<Text style={{color: props.error ? 'red': 'black'}}>Berat</Text>
+					<Text style={[styles.labelErr, {color: props.error ? 'red': 'black' }]}>
+						Berat (gram)
+					</Text>
 					<Text note numberOfLines={1}>
-						{props.value} gram
+						{props.value ? props.value : '-'}
 					</Text>
 				</Body>
 				<Right style={{justifyContent: 'center'}}>
@@ -178,6 +180,11 @@ const styles = StyleSheet.create({
 		borderWidth: 0.3,
 		borderColor: '#737272'
 	},
+	labelErr: {
+		color: 'red',
+		fontFamily: 'Nunito-semi',
+		fontSize: 15
+	}
 })
 
 export default Berat;

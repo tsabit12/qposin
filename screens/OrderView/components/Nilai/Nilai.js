@@ -86,7 +86,9 @@ const Nilai = props => {
 					<MaterialIcons name="attach-money" size={24} color="black" />
 				</Left>
 				<Body>
-					<Text style={{color: props.error ? 'red': 'black'}}>Nilai barang</Text>
+					<Text style={[styles.labelErr, {color: props.error ? 'red': 'black' }]}>
+						Nilai barang 
+					</Text>
 					<Text note numberOfLines={1}>
 						{props.value ? `Rp ${numberWithCommas(props.value)}` : '-'}
 					</Text>
@@ -95,6 +97,7 @@ const Nilai = props => {
 		            <Ionicons name="ios-arrow-forward" size={24} color="black" />
 		        </Right>
 			</ListItem>
+			{ props.error && <Text style={styles.error}>{props.error}</Text>}
 			{ state.modalVisible && 
 				<Modal
 					transparent={true}
@@ -133,7 +136,7 @@ const Nilai = props => {
 Nilai.propTypes = {
 	value: PropTypes.string.isRequired,
 	onPress: PropTypes.func.isRequired,
-	error: PropTypes.bool.isRequired
+	// error: PropTypes.bool.isRequired
 }
 
 const styles = StyleSheet.create({
@@ -187,6 +190,16 @@ const styles = StyleSheet.create({
 		flex: 1,
 		borderTopRightRadius: 30,
 		borderBottomRightRadius: 30
+	},
+	labelErr: {
+		color: 'red',
+		fontFamily: 'Nunito-semi',
+		fontSize: 15
+	},
+	error: {
+		fontSize: 12, color: 'red', 
+		fontFamily: 'Nunito',
+		textAlign: 'center'
 	}
 })
 

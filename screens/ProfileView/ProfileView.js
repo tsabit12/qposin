@@ -333,9 +333,11 @@ const ProfileView = props => {
 								</View>
 								<View style={{marginLeft: 8}}>
 									<Text style={styles.textLabel}>Alamat</Text>
-									<TextNote note numberOfLines={1}>
+									{ state.kota ? <TextNote note numberOfLines={1}>
 										{ state.kota !== '-' ? `${capitalize(state.kota)}, ${capitalize(state.kecamatan)} (${state.kodepos})` : '-'}
-									</TextNote>
+									</TextNote> : <TextNote note numberOfLines={1}>
+										-
+									</TextNote>}
 								</View>
 							</View>
 							<View style={styles.rightIcon}>

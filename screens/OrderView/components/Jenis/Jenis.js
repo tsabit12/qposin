@@ -99,7 +99,9 @@ const Jenis = props => {
 					<Feather name="box" size={23} color="black" />
 				</Left>
 				<Body>
-					<Text style={{color: error ? 'red' : 'black'}}>Kiriman</Text>
+					<Text style={[styles.labelErr, {color: props.error ? 'red': 'black' }]}>
+						Kiriman
+					</Text>
 					{ props.values === '-' ? <Text note numberOfLines={1}>
 						-
 					</Text> : <Text note numberOfLines={1}>
@@ -237,6 +239,11 @@ const styles = StyleSheet.create({
 		flex: 1,
 		borderTopRightRadius: 30,
 		borderBottomRightRadius: 30
+	},
+	labelErr: {
+		color: 'red',
+		fontFamily: 'Nunito-semi',
+		fontSize: 15
 	}
 })
 
