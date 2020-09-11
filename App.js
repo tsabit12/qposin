@@ -14,17 +14,34 @@ import {
   IconRegistry
 } from '@ui-kitten/components'; 
 import { mapping, light as lightTheme } from '@eva-design/eva'; 
+import * as Updates from 'expo-updates';
 import { MenuProvider } from 'react-native-popup-menu';
+import UpdateView from './UpdateView';
 
 export default function App() {
   if (!global.btoa) { global.btoa = encode; }
   
   const [appIsReady, setAppReady] = useState(false);
+  const [shoudUpdate, setShouldUpdate] = useState(false);
 
   useEffect(() => {
     (async () => {
       try {
         await SplashScreen.preventAutoHideAsync();
+        try {
+          const update = await Updates.checkForUpdateAsync();
+          if (update.isAvailable) {
+            setTimeout(function() {
+              setShouldUpdate(true);
+            }, 1000);
+          }
+        }catch(err){
+          console.log(err);
+          // setTimeout(function() {
+          //   setShouldUpdate(true);
+          // }, 5000);
+        }
+
       } catch (e) {
         console.warn(e);
       }
@@ -65,6 +82,7 @@ export default function App() {
           <ApplicationProvider mapping={mapping} theme={lightTheme}>
             <MenuProvider>
               <Routes />
+              { shoudUpdate && <UpdateView onClose={() => setShouldUpdate(false)} /> }
             </MenuProvider>
           </ApplicationProvider>
           <StatusBar style="light" />

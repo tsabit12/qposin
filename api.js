@@ -443,4 +443,14 @@ export default {
 			return Promise.reject(errors);
 		}
 	}),
+	syncronizeCod: (payload) => axios.post(`${url1}/Qposinaja/syncGiro`, {
+		...payload
+	}).then(res => {
+		const { result } = res.data;
+		if (result.respcode === '00' || result.respcode === '21') {
+			return result;
+		}else{
+			return Promise.reject(result);
+		}
+	})
 }

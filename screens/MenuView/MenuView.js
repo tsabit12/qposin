@@ -9,7 +9,8 @@ import {
 	StatusBar, 
 	Platform, 
 	TouchableOpacity,
-	Animated
+	Animated,
+	AsyncStorage
 } from 'react-native';
 import { connect } from 'react-redux';
 import {
@@ -96,8 +97,6 @@ const MenuView = props => {
 		lacakList: [],
 		nomor: ''
 	})
-	// const [showLacak, setLacak] = useState(false);
-	// const [lacakList, setLacakList ] = useState([]);
 
 	const [state, setState] = useState({
 		loading: false,
@@ -106,17 +105,19 @@ const MenuView = props => {
 		showToken: false,
 		tokenValue: ''
 	})
+	const [mount, setMount] = useState(false);
 
-	const { user, order } = props;
+	const { user, order, local } = props;
 
 	useEffect(() => {
-		registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+		registerForPushNotificationsAsync()
+			.then(token => setExpoPushToken(token))
+			.catch(() => setMount(true))
 	}, []);
 
 	//update expo token to database
 	useEffect(() => {
 		if (expoPushToken !== '') {
-			const { local } = props;
 			const payload = {
     			token: expoPushToken,
     			email: local.email,
@@ -124,10 +125,29 @@ const MenuView = props => {
     			phone: local.nohp
     		};
     		api.pushToken(payload)
-    			.then(res => console.log(res))
-    			.catch(err => console.log(err))
+    			.then(res => {
+    				setMount(true);
+    			})
+    			.catch(err => {
+    				console.log(err);
+    				setMount(true);
+    			})
 		}
 	}, [expoPushToken]);
+
+	useEffect(() => {
+		if (mount) {
+			(async () => {
+				const { norek } = user;
+				if (norek !== '-') {
+					const fuckingValue = await AsyncStorage.getItem('isCod'); //define user was syncronize 
+					if (fuckingValue === null) { //web required to syncronize user when using cod
+						handleAsyncGiro(local, user);
+					}
+				}
+			})();
+		}
+	}, [mount])
 
 	useEffect(() => {
 		if (state.tarifVisible) {
@@ -211,9 +231,6 @@ const MenuView = props => {
 
 	const handlePressOrder = (type) => {
 		props.resetOrder();
-
-
-
 		setTimeout(function() {
 			props.navigation.navigate('Order', {
 				type
@@ -244,7 +261,8 @@ const MenuView = props => {
 						}))
 					})
 					.catch(err => {
-						setError('Tidak dapat memproses permintaan anda, mohon coba beberapa saat lagi (500)');
+						console.log(err);
+						setError(`(${err.respcode ? err.respcode : '500'})\nTidak dapat memproses permintaan anda, mohon coba beberapa saat lagi`);
 					})
 			})
 			.catch(err => {
@@ -262,10 +280,46 @@ const MenuView = props => {
 			loading: false
 		}));
 		Toast.show({
-            text: 'Tidak dapat memproses permintaan anda, mohon coba beberapa saat lagi',
+            text: msg,
             textStyle: { textAlign: 'center' },
             duration: 3000
         })
+	}
+
+	const handleAsyncGiro = async (local, session) => {
+		api.generateToken(local.userid)
+			.then(pin => {
+				const payload = {
+					email: local.email,
+					pin: pin.response_data1
+				}
+
+				api.syncronizeUserPwd(payload)
+					.then(res => {
+						//keep send
+						if (res.respcode === '21' || res.respcode === '00') {
+							const payloadSyncGiro = {
+								email: local.email,
+								norek: session.norek
+							}
+							api.syncronizeCod(payloadSyncGiro)
+								.then(async lastResponse => {
+									try{
+										await AsyncStorage.setItem('isCod', JSON.stringify(true));
+										Toast.show({
+									        text: 'Sinkronisasi giro sukses!',
+									        textStyle: { textAlign: 'center' },
+									        duration: 2000
+									    })	
+									}catch(lastFuckingError){
+										console.log(lastFuckingError);
+									}
+								})
+						}
+					})
+				// console.log(payload);
+			})
+		//console.log({ local, session });
 	}
 	
 	return(
