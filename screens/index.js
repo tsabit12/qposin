@@ -17,3 +17,4 @@ export { default as ConnectGiroView } from './ConnectGiroView';
 export { default as HitoryOrderView } from './HistoryOrder';
 export { default as EditAlamatView } from './EditAlamatView';
 export { default as History } from './History';
+export { default as UpdatePlaystoreView } from './UpdatePlaystoreView';

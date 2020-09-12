@@ -53,8 +53,8 @@ export default function App() {
           }else{ //check release channel for update force from playstore
             handleGetReleaseChannel();
           }
-        }catch(err){
-          handleGetReleaseChannel();
+        }catch(err){ //dev mode
+          // handleGetReleaseChannel();
         }
       })();
     }
