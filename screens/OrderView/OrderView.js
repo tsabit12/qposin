@@ -516,6 +516,7 @@ const OrderView = props => {
 								}))}
 								error={errors.nilai}
 								disabled={state.disabled}
+								cod={data.isCod}
 							/>
 						</List>
 						<View style={{alignItems: 'center'}}>

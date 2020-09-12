@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "276330527145",
+    "firebase_url": "https://qposin-a9cb7.firebaseio.com",
+    "project_id": "qposin-a9cb7",
+    "storage_bucket": "qposin-a9cb7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:276330527145:android:53c7773c7763830239acb8",
+        "android_client_info": {
+          "package_name": "com.posindonesia.cob"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "276330527145-uq0imu3dk2m48rt5da8bfjaauce6esbb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.posindonesia.cob",
+            "certificate_hash": "486ac1a7d172293e52dae3ae6217c673f14b7cd7"
+          }
+        },
+        {
+          "client_id": "276330527145-oj4k39u6c4611idul1brtf79ge76v8vn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC03ReQgeVPQ9N0OAn08yMABeNGcrJzx7s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "276330527145-oj4k39u6c4611idul1brtf79ge76v8vn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

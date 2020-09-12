@@ -17,31 +17,21 @@ import { mapping, light as lightTheme } from '@eva-design/eva';
 import * as Updates from 'expo-updates';
 import { MenuProvider } from 'react-native-popup-menu';
 import UpdateView from './UpdateView';
+import getReleaseChannel from './utils/releaseChannel';
 
 export default function App() {
   if (!global.btoa) { global.btoa = encode; }
   
   const [appIsReady, setAppReady] = useState(false);
-  const [shoudUpdate, setShouldUpdate] = useState(false);
+  //handle update from same channel
+  const [shoudUpdate, setShouldUpdate] = useState(false); 
+  //handle update from playstore
+  const [newVersionAvailable, setNewVersionAvailable] = useState(false);
 
   useEffect(() => {
     (async () => {
       try {
         await SplashScreen.preventAutoHideAsync();
-        try {
-          const update = await Updates.checkForUpdateAsync();
-          if (update.isAvailable) {
-            setTimeout(function() {
-              setShouldUpdate(true);
-            }, 1000);
-          }
-        }catch(err){
-          console.log(err);
-          // setTimeout(function() {
-          //   setShouldUpdate(true);
-          // }, 5000);
-        }
-
       } catch (e) {
         console.warn(e);
       }
@@ -54,6 +44,18 @@ export default function App() {
     if (appIsReady) {
       (async () => {
         await SplashScreen.hideAsync();
+        try {
+          const update = await Updates.checkForUpdateAsync();
+          if (update.isAvailable) {
+            setTimeout(function() {
+              setShouldUpdate(true);
+            }, 1000);
+          }else{ //check release channel for update force from playstore
+            handleGetReleaseChannel();
+          }
+        }catch(err){
+          handleGetReleaseChannel();
+        }
       })();
     }
   }, [appIsReady]);
@@ -72,6 +74,13 @@ export default function App() {
     setAppReady(true);
   }
 
+  const handleGetReleaseChannel = () => {
+    const { channelName } = getReleaseChannel();
+    if (channelName !== 'prod-v1') {
+      setNewVersionAvailable(true);
+    }
+  }
+
   if (!appIsReady) {
     return null;
   }else{
@@ -81,7 +90,9 @@ export default function App() {
           <IconRegistry icons={EvaIconsPack} />
           <ApplicationProvider mapping={mapping} theme={lightTheme}>
             <MenuProvider>
-              <Routes />
+              <Routes 
+                updateAvailable={newVersionAvailable}
+              />
               { shoudUpdate && <UpdateView onClose={() => setShouldUpdate(false)} /> }
             </MenuProvider>
           </ApplicationProvider>

@@ -36,6 +36,7 @@ import * as Notifications from 'expo-notifications';
 import * as Linking from 'expo-linking';
 import { Ionicons } from '@expo/vector-icons';
 
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -74,7 +75,6 @@ async function registerForPushNotificationsAsync() {
     }
 
    	token = (await Notifications.getExpoPushTokenAsync()).data;
-  
 
   	if (Platform.OS === 'android') {
     	Notifications.setNotificationChannelAsync('qposin-messages', {
@@ -112,7 +112,10 @@ const MenuView = props => {
 	useEffect(() => {
 		registerForPushNotificationsAsync()
 			.then(token => setExpoPushToken(token))
-			.catch(() => setMount(true))
+			.catch(err => {
+				console.log(err);
+				setMount(true);
+			})
 	}, []);
 
 	//update expo token to database
@@ -543,6 +546,12 @@ const MenuView = props => {
 
 						</View>
 					</View>
+					<View style={styles.footer}>
+						<Text style={{
+							fontFamily: 'Nunito',
+							fontSize: 13
+						}}>Version {Constants.manifest.version}</Text>
+					</View>
 				</ScrollView>
 			</View>
 		</ImageBackground>
@@ -630,6 +639,12 @@ const styles = StyleSheet.create({
 		elevation: 2, 
 		borderRadius: 12, 
 		backgroundColor: 'white'
+	},
+	footer: {
+		alignItems:'center',
+		justifyContent: 'center',
+		height: hp('5%'),
+		// backgroundColor: '#f0f2f1'
 	}
 })
 

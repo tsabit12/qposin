@@ -118,7 +118,7 @@ const UpdateView = props => {
 							activeOpacity={0.7}
 							onPress={props.onClose}
 						>
-							<Icon name='ios-close' color='white' />
+							<Icon name='ios-close' style={{color: '#FFF'}} />
 						</TouchableOpacity>
 						<View 
 							style={{
@@ -170,14 +170,14 @@ const styles = StyleSheet.create({
 	content: {
 		height: hp('30%'),
 		width: wp('85%'),
-		borderRadius: 3,
+		borderRadius: 10,
 		alignItems: 'center',
 		backgroundColor: '#FFF'
 	},
 	header: {
 		backgroundColor: '#e0162b',
-		borderTopLeftRadius: 3,
-		borderTopRightRadius: 3,
+		borderTopLeftRadius: 10,
+		borderTopRightRadius: 10,
 		height: hp('7%'),
 		justifyContent: 'center',
 		width: wp('85%')
@@ -227,17 +227,17 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		right: 0,
 		top: 0,
+		margin: 5,
 		height: 40,
 		width: 40,
-		elevation: 2,
-		backgroundColor: 'white',
-		borderBottomLeftRadius: 45 / 2,
-		borderBottomRightRadius: 45 / 2,
-		borderTopLeftRadius: 45 / 2,
-		borderTopRightRadius: 3,
+		//elevation: 2,
+		//backgroundColor: 'white',
+		borderRadius: 45 / 2,
 		// borderTopRightRadius: 7,
 		justifyContent: 'center',
-		alignItems: 'center'
+		alignItems: 'center',
+		borderWidth: 1,
+		borderColor: '#FFF'
 	}
 })
 

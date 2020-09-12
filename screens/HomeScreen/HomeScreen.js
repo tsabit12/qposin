@@ -29,7 +29,7 @@ const HomeScreen = props => {
 			if (value !== null) { //detect user was register
 				const toObje  = JSON.parse(value);
 				
-				// props.setLocalUser(toObje); //store to redux
+				props.setLocalUser(toObje); //store to redux
 				
 				setState(state => ({
 					...state,

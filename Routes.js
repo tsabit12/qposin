@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import PropTypes from 'prop-types';
 import {
   HomeScreen,
   FormRegister as FormRegisterScreen,
@@ -64,6 +65,11 @@ const Routes = props => {
 		    </NavigationContainer>
 	    </React.Fragment>
 	);
+}
+
+Routes.propTypes = {
+	isLoggedin: PropTypes.bool.isRequired,
+	updateAvailable: PropTypes.bool.isRequired
 }
 
 function mapStateToProps(state) {

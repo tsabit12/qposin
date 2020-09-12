@@ -6,7 +6,8 @@ import {
 	Animated,
 	StyleSheet,
 	TextInput,
-	TouchableOpacity
+	TouchableOpacity,
+	Image
 } from 'react-native';
 import { ListItem, Body, Left, Right, Text } from 'native-base';
 import { MaterialIcons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
@@ -83,14 +84,22 @@ const Nilai = props => {
 				disabled={props.disabled}
 			>
 				<Left>
-					<MaterialIcons name="attach-money" size={24} color="black" />
+					<Image 
+						source={require('../../../../assets/images/icon/rp.png')}
+						style={{
+							width: wp('5%'),
+							height: hp('4%')
+						}}
+						resizeMode='contain'
+					/>
 				</Left>
 				<Body>
 					<Text style={[styles.labelErr, {color: props.error ? 'red': 'black' }]}>
 						Nilai barang 
+						{ props.cod === '0' && ' (Optional)'}
 					</Text>
 					<Text note numberOfLines={1}>
-						{props.value ? `Rp ${numberWithCommas(props.value)}` : '-'}
+						{props.value ? `${numberWithCommas(props.value)}` : '-'}
 					</Text>
 				</Body>
 				<Right style={{justifyContent: 'center'}}>
@@ -108,7 +117,9 @@ const Nilai = props => {
 					<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
 					<View style={styles.backgroundModal}>
 						<Animated.View style={[styles.modalContainer, {transform: [{translateY: bounceValue }] }]}>
-							<Text style={{fontFamily:'Nunito-Bold', textAlign: 'center'}}>Nilai barang</Text>
+							<Text style={{fontFamily:'Nunito-Bold', textAlign: 'center'}}>
+								Nilai barang
+							</Text>
 							<View style={styles.inputGroup}>
 								<TextInput 
 									ref={refInput}
