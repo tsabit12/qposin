@@ -26,8 +26,7 @@ const ResultOrder = props => {
 	const positionInput = new Animated.Value(100);
 
 	const [state, setState] = React.useState({
-		loading: false,
-		sendLoading: false,
+		loading: true,
 		jenisPembayaran: '1'
 	})
 
@@ -52,53 +51,22 @@ const ResultOrder = props => {
 		}
 	}, [props.tarif, props.error])
 
-
-	React.useEffect(() => {
-		if (props.isSuccess) {
-			setState(state => ({
-				...state,
-				sendLoading: false
-			}))
-		}else{
-			if (props.error.order) {
-				setState(state => ({
-					...state,
-					sendLoading: false
-				}))
-			}
-		}
-	}, [props.isSuccess, props.error])
-
 	const handleSubmit = () => {
-		//make sure user type order button once
-		if (!state.sendLoading) {
-			if (state.jenisPembayaran === '2') {
-				const sisaSaldo = Number(user.saldo) - Number(props.tarif);
-				if (Number(sisaSaldo) < 10000) {
-					Alert.alert(
-				      `NOTIFIKASI`,
-				      `Saldo Setelah Transaksi Minimal 10.000, Silahkan Top-Up Terlebih dahulu Lalu Login Kembali Atau Pilih Metode Pembayaran Secara Tunai`,
-				      [
-				        { text: "OK", onPress: () => console.log("OK Pressed") }
-				      ]
-				    );
-				}else{ //success 
-					setState(state => ({
-						...state,
-						sendLoading: true
-					}))
-
-					props.onSubmit(state.jenisPembayaran);
-				}
-			}else{ //success
-				setState(state => ({
-					...state,
-					sendLoading: true
-				}))
-
+		if (state.jenisPembayaran === '2') {
+			const sisaSaldo = Number(user.saldo) - Number(props.tarif);
+			if (Number(sisaSaldo) < 10000) {
+				Alert.alert(
+			      `NOTIFIKASI`,
+			      `Saldo Setelah Transaksi Minimal 10.000, Silahkan Top-Up Terlebih dahulu Lalu Login Kembali Atau Pilih Metode Pembayaran Secara Tunai`,
+			      [
+			        { text: "OK", onPress: () => console.log("OK Pressed") }
+			      ]
+			    );
+			}else{ //success 
 				props.onSubmit(state.jenisPembayaran);
 			}
-			
+		}else{ //success
+			props.onSubmit(state.jenisPembayaran);
 		}
 	}
 
@@ -170,23 +138,24 @@ const ResultOrder = props => {
 
 					<View style={styles.group}>
 						{ !state.loading && <React.Fragment>
-							{ props.error.tarif ? <Button style={styles.btn} danger onPress={props.closeModal}>
-								<Text>Tutup</Text>
-							</Button> :  <React.Fragment>
+							{ props.error.tarif ? 
 								<TouchableOpacity style={styles.button} danger onPress={props.closeModal}>
-									<Text style={styles.text}>Batal</Text>
-								</TouchableOpacity>
-								<TouchableOpacity 
-									style={[styles.button, {backgroundColor: '#ffac30'}]}
-									onPress={handleSubmit}
-								>
-									<Text style={styles.text}>
-										{state.sendLoading ? 'Loading...' : `Order ${numberWithCommas(props.tarif)}`}	
-									</Text>
-								</TouchableOpacity>
-							</React.Fragment> }
+									<Text style={styles.text}>Tutup</Text>
+								</TouchableOpacity> :  
+								<React.Fragment>
+									<TouchableOpacity style={styles.button} danger onPress={props.closeModal}>
+										<Text style={styles.text}>Batal</Text>
+									</TouchableOpacity>
+									<TouchableOpacity 
+										style={[styles.button, {backgroundColor: '#ffac30'}]}
+										onPress={handleSubmit}
+									>
+										<Text style={styles.text}>
+											{`Order ${numberWithCommas(props.tarif)}`}	
+										</Text>
+									</TouchableOpacity>
+								</React.Fragment> }
 						</React.Fragment>}
-
 					</View>
 				</Animated.View>
 			</View>
@@ -199,7 +168,6 @@ ResultOrder.propTypes = {
 	receiver: PropTypes.object.isRequired,
 	kiriman: PropTypes.object.isRequired,
 	tarif: PropTypes.number.isRequired,
-	isSuccess: PropTypes.bool.isRequired,
 	error: PropTypes.object.isRequired
 }
 

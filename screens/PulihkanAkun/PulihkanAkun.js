@@ -55,15 +55,14 @@ const getCurdate = () => {
 }
 
 const PulihkanAkun = props => {
-	const useridRef = useRef();
 	const phoneRef = useRef();
 	const emailRef = useRef();
 
 	const [state, setState] = useState({
 		data: {
-			userid: '',
 			phone: '',
-			email: ''
+			email: '',
+			userid: ''
 		},
 		errors: {},
 		loading: false,
@@ -80,16 +79,16 @@ const PulihkanAkun = props => {
 
 	useEffect(() => {
 		(async () => {
-			const value = await AsyncStorage.getItem("HISTORI_REQUST_PEMULIHAN");
+			const value = await AsyncStorage.removeItem("HISTORI_REQUST_PEMULIHAN");
 			if (value !== null) {
 				const toObj = JSON.parse(value);
 				if (toObj.curdate === getCurdate()) { //1 request expired in 1 day, so remove if date in storage is not now
 					setState(state => ({
 						...state,
 						data: {
-							userid: toObj.userid,
-							phone: toObj.nohp,
-							email: toObj.email
+							phone: toObj.phone,
+							email: toObj.email,
+							userid: toObj.userid
 						},
 						verifyCode: toObj.verifyCode,
 						showVerifyCode: true
@@ -98,6 +97,7 @@ const PulihkanAkun = props => {
 			}
 		})();
 	}, []);
+
 
 	useEffect(() => {
 		if (props.route.params) {
@@ -136,16 +136,16 @@ const PulihkanAkun = props => {
 			}))
 
 			// const param1 = `${data.userid}|-|${data.phone}|${data.email}|${Constants.deviceId}|${state.type}`;
-			const param1 = `${data.userid}|-|${data.phone}|${data.email}|${Constants.deviceId}|2`;
+			const param1 = `-|-|${data.phone}|${data.email}|${Constants.deviceId}|2`;
 			
-			api.bantuan(param1, data.userid)
+			api.bantuan(param1)
 				.then(res => {
 					//handle if verify code is empty 
-					const { response_data2 } = res;
-					console.log(response_data2);
+					const { response_data2, response_data5 } = res;
 
 					const payload = {
 						...state.data,
+						userid: response_data5,
 						curdate: getCurdate(),
 						verifyCode: response_data2
 					};
@@ -155,6 +155,10 @@ const PulihkanAkun = props => {
 					if (savedCodeVerify) {
 						setState(state => ({
 							...state,
+							data: {
+								...state.data,
+								userid: response_data5
+							},
 							loading: false,
 							verifyCode: response_data2,
 							showVerifyCode: true
@@ -203,19 +207,18 @@ const PulihkanAkun = props => {
 		}))
 		const param1 = `${data.userid}|-|${data.phone}|${data.email}|${Constants.deviceId}|${code}|2`;
 		
-		api.verifikasiBantuan(param1, data.userid)
+		api.verifikasiBantuan(param1)
 			.then(res => {
-				//console.log(res);
 				const { response_data2, response_data1 } = res;
 				const parsing 	 = response_data2.split('|');
 
 				const payloadQobUser = {
-					userid: parsing[0],
 					username: parsing[1],
 					pinMd5: parsing[2],
 					nama: parsing[3],
 					nohp: parsing[4],
-					email: parsing[5]
+					email: parsing[5],
+					userid: data.userid
 				};
 
 				const savePayloadQobUser = saveQobUser(payloadQobUser);
@@ -231,7 +234,6 @@ const PulihkanAkun = props => {
 						...state,
 						loading: false,
 						data: {
-							userid: '',
 							phone: '',
 							email: ''
 						},
@@ -255,7 +257,6 @@ const PulihkanAkun = props => {
 				}
 			})
 			.catch(err => {
-				console.log(err);
 				setState(state => ({
 					...state,
 					loading: false,
@@ -265,13 +266,15 @@ const PulihkanAkun = props => {
 					Toast.show({
 		                text: err.global,
 		                textStyle: { textAlign: 'center' },
-		                duration: 4000
+		                duration: 4000,
+		                position:'top'
 		            })
 				}else{
 					Toast.show({
 		                text: 'Tidak dapat memproses permintaan anda, silahkan coba beberapa saat lagi',
 		                textStyle: { textAlign: 'center' },
-		                duration: 4000
+		                duration: 4000,
+		                position:'top'
 		            })
 				}
 			})
@@ -280,7 +283,6 @@ const PulihkanAkun = props => {
 	const validate = (field) => {
 		const errors = {};
 
-		if (!field.userid) errors.userid = 'Userid belum diisi';
 		if (!field.phone) errors.phone = 'Nomor ponsel belum diisi';
 		if (!field.email) errors.email = 'Alamat email belum diisi';
 
@@ -316,7 +318,6 @@ const PulihkanAkun = props => {
 
 		props.navigation.replace('Home');
 	}
-
 
 	return(
 		<ImageBackground 
@@ -354,21 +355,6 @@ const PulihkanAkun = props => {
 				</Text>
 			</View>
 			<View style={styles.container}>
-				<View style={styles.field}>
-					<Text style={[styles.text, {marginLeft: 5}]}>Userid</Text>
-					<TextInput 
-						ref={useridRef}
-						style={styles.input}
-						placeholder='Masukkan userid anda'
-						value={data.userid}
-						onChangeText={(value) => handleChange('userid', value)}
-						keyboardType='number-pad'
-						returnKeyType='next'
-						onSubmitEditing={() => phoneRef.current.focus()}
-					/>
-					{ errors.userid && <Text style={styles.textError}>{errors.userid}</Text>}
-				</View>
-
 				<View style={styles.field}>
 					<Text style={[styles.text, {marginLeft: 5}]}>Nomor Ponsel</Text>
 					<TextInput 

@@ -102,8 +102,7 @@ const CityCourier = props => {
 		tarif: 0,
 		update: false,
 		cart: false,
-		success: false,
-		positionMessage: new Animated.Value(200)
+		success: false
 	})
 
 	const { location, addres, positionInput } = state;
@@ -214,22 +213,8 @@ const CityCourier = props => {
 		}
 	}, [state.modalVisible])
 
-	React.useEffect(() => {
-		if (state.success) {
-			Animated.spring(state.positionMessage, {
-		      toValue: 0,
-		      useNativeDriver: true
-		    }).start();	
-
-		    setState(state => ({
-		    	...state,
-		    	modalVisible: false
-		    }))
-		}
-	}, [state.success]);
-
-
 	const handleBackButtonClick = () => {
+		console.log('oyyy');
 		if (currentView === 'update') {
 			handleCloseEdit();
 		}else if(currentView === 'cart'){
@@ -501,7 +486,7 @@ const CityCourier = props => {
 				},
 				customer: {
 					id: props.user.userid,
-					name: props.user.nama,
+					name: props.detail.nama,
 					email: props.user.email,
 					phone: props.user.nohp,
 				},
@@ -522,37 +507,46 @@ const CityCourier = props => {
 			}
 		}
 
-		
+		setState(state => ({
+			...state,
+			modalVisible: false
+		}))		
 
-		api.cityCourier.order(payload)
-			.then(res => {
-				if (res.rc_mess === '00') {
-					if (jenisPembayaran === '2') {
-						props.calculateSaldo(payload.param2.order.tariff, 'min');
-					}
-					setState(state => ({
-						...state,
-						success: true
-					}))
-				}else{
-					setState(state => ({
-						...state,
-						errors: {
-							order: 'Gagal Order',
-							orderCode: res.rc_mess
-						}
-					}))
-				}
+		setTimeout(function() {
+	    	props.navigation.replace('Bidding', {
+				payload
 			})
-			.catch(err => {
-				setState(state => ({
-					...state,
-					errors: {
-						order: 'Internal Server Error',
-						orderCode: 500	
-					}
-				}))
-			})
+		}, 10);
+
+		// api.cityCourier.order(payload)
+		// 	.then(res => {
+		// 		if (res.rc_mess === '00') {
+		// 			if (jenisPembayaran === '2') {
+		// 				props.calculateSaldo(payload.param2.order.tariff, 'min');
+		// 			}
+		// 			setState(state => ({
+		// 				...state,
+		// 				success: true
+		// 			}))
+		// 		}else{
+		// 			setState(state => ({
+		// 				...state,
+		// 				errors: {
+		// 					order: 'Gagal Order',
+		// 					orderCode: res.rc_mess
+		// 				}
+		// 			}))
+		// 		}
+		// 	})
+		// 	.catch(err => {
+		// 		setState(state => ({
+		// 			...state,
+		// 			errors: {
+		// 				order: 'Internal Server Error',
+		// 				orderCode: 500	
+		// 			}
+		// 		}))
+		// 	})
 	}
 
 	const onUpdateAddress = () => {
@@ -637,8 +631,7 @@ const CityCourier = props => {
 			tarif: 0,
 			update: false,
 			cart: false,
-			success: false,
-			positionMessage: new Animated.Value(200)
+			success: false
 		}))
 		setPositionInput();
 	}
@@ -663,7 +656,6 @@ const CityCourier = props => {
 					jarak={state.jarak}
 					onSubmit={handleOrder}
 					closeModal={handleCloseModal}
-					isSuccess={state.success}
 					error={state.errors}
 					user={props.detail}
 				/> }
@@ -679,7 +671,7 @@ const CityCourier = props => {
 					            longitudeDelta: location.longitudeDelta,
 							}} 
 							style={styles.map}
-							showUserLocation={true}
+							// showsUserLocation={true}
 							onRegionChangeComplete={handleCompleteRegion}
 							onRegionChange={handleChangeRegion}
 							zoomControlEnabled={false}
@@ -744,29 +736,6 @@ const CityCourier = props => {
 	        		/>
 		        </Animated.View>
 	        </View>
-
-	        { state.success && 
-	        <Modal
-	        	transparent={true}
-	        	visible={true}
-	        	//onRequestClose={() => handleClose()}
-	        	animationType="fade"
-	        >
-	        	<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
-	        	<View style={{backgroundColor: 'rgba(0,0,0,0.5)', flex: 1}}>
-		        <Animated.View 
-		        	style={[
-		        		styles.message, { 
-		        			transform: [{translateX: state.positionMessage }],
-		        		} 
-		        	]}>
-		        	<Text style={{color: '#FFFF', fontFamily: 'Nunito-Bold'}}>ORDER SUKSES</Text>
-		        	<Button style={{borderRadius: 0}} transparent onPress={resetAllstate}>
-		        		<Text>Kembali Order</Text>
-		        	</Button>
-		        </Animated.View>
-		        </View>
-	        </Modal> }
 		</KeyboardAvoidingView>
 	);
 }

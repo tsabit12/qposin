@@ -40,6 +40,8 @@ const LoginView = props => {
 	    }
 	}, [pin]);
 
+	console.log(props.localUser);
+
 	const handleLogin = (pinValue) => {
 		setLoading(true);
 
@@ -47,8 +49,10 @@ const LoginView = props => {
 		const pinMd5 	= md5.hex_md5(userid+pinValue+nohp+email+Constants.deviceId+'8b321770897ac2d5bfc26965d9bf64a1');
 		
 		const payload 	= `${userid}|${pinMd5}|${nohp}|${email}|${Constants.deviceId}`;
+
 		api.login(payload, userid)
 			.then(res => {
+				console.log(res);
 				if (res.rc_mess === '00') {
 					const { response_data1, response_data4, response_data5 } = res;
 					const x 	= response_data4.split('|');
@@ -87,6 +91,7 @@ const LoginView = props => {
 				}
 			})
 			.catch(err => {
+				console.log(err);
 				setLoading(false);
 				Toast.show({
 	              text: err.global,

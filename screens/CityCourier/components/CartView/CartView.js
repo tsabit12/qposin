@@ -184,6 +184,7 @@ const CartView = props => {
 				}
 			})
 			.catch(err => {
+				console.log(err);
 				setState(state => ({
 					...state,
 					loading: false,
@@ -361,6 +362,7 @@ const CartView = props => {
 
 			api.cityCourier.cancle(payload)
 				.then(res => {
+					console.log(res);
 					//add back saldo
 					if (order.payment_type === '2') {
 						props.calculateSaldo(order.tariff, 'add');
@@ -388,6 +390,7 @@ const CartView = props => {
 				    }))
 				})
 				.catch(err => {
+					console.log(err);
 					if (err.msg) {
 						setError(err.msg, err.status);
 					}else{

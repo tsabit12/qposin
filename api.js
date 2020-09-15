@@ -2,6 +2,7 @@ import axios from 'axios';
 import hashing from './utils/hashing';
 
 const urlCityCourier = 'https://qcomm.posindonesia.co.id:10444/a767e8eec95442bda80c4e35e0660dbb';
+
 const getOrderUrl = 'https://qcomm.posindonesia.co.id:10444/getOrder';
 const url 	= 'https://qcomm.posindonesia.co.id:10444/a767e8eec95442bda80c4e35e0660dbb'; //live
 // const url 	= 'https://qcomm.posindonesia.co.id:10555/a767e8eec95442bda80c4e35e0660dbb'; //dev
@@ -167,6 +168,7 @@ export default {
 			if (res.data.results.length > 0) {
 				const { results } = res.data;
 				const addressArr = results[0].formatted_address.split(',');
+				// console.log(results);
 				var response = {};
 				
 				if (addressArr.length === 6) {

@@ -54,7 +54,7 @@ export default function App() {
             handleGetReleaseChannel();
           }
         }catch(err){ //dev mode
-          // handleGetReleaseChannel();
+          //handleGetReleaseChannel();
         }
       })();
     }

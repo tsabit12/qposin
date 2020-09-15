@@ -23,7 +23,8 @@ import {
   HitoryOrderView,
   EditAlamatView,
   History,
-  UpdatePlaystoreView
+  UpdatePlaystoreView,
+  FindDriverView
 } from './screens';
 
 
@@ -55,6 +56,7 @@ const Routes = props => {
 			        		<Stack.Screen name="ConnectGiro" component={ConnectGiroView} />
 			        		<Stack.Screen name="History" component={History} />
 			        		<Stack.Screen name="UpdateAlamat" component={EditAlamatView} />
+			        		<Stack.Screen name="Bidding" component={FindDriverView} />
 			        	</React.Fragment> : <React.Fragment>
 							<Stack.Screen name="Home" component={HomeScreen} />
 							<Stack.Screen name="FormRegister" component={FormRegisterScreen} />

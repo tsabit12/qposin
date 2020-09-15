@@ -58,7 +58,7 @@ const UpdatePlaystoreView = props => {
 					style={styles.root}
 				>	
 					<View style={styles.main}>
-						<View style={{height: hp('35%')}}>
+						<View style={{height: hp('33%')}}>
 		        			<Text style={styles.title}>
 		        				VERSI BARU TELAH HADIR {'\n'}(V 0.2.4)
 		        			</Text>
@@ -71,10 +71,8 @@ const UpdatePlaystoreView = props => {
 			        			</Text>
 			        			<View style={styles.point}>
 			        				<Text style={[styles.subTitle]}>1. Penambahan fitur notifikasi</Text>
-			        				<Text style={[styles.subTitle]}>2. Pencarian history kirman berdasarkan kota/isi kiriman</Text>
-			        				<Text style={[styles.subTitle]}>3. Penambahan fitur tracking pickup</Text>
-			        				<Text style={[styles.subTitle]}>4. Perbaikan bug di versi sebelumnya</Text>
-			        				<Text style={[styles.subTitle]}>5. Dan lainnya</Text>
+			        				<Text style={[styles.subTitle]}>2. Penambahan fitur tracking pickup</Text>
+			        				<Text style={[styles.subTitle]}>3. Perbaikan bug di versi sebelumnya</Text>
 			        			</View>
 		        			</View>
 	        			</View>
