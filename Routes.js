@@ -24,7 +24,8 @@ import {
   EditAlamatView,
   History,
   UpdatePlaystoreView,
-  FindDriverView
+  FindDriverView,
+  DetailOrder as DetailOrderView
 } from './screens';
 
 
@@ -54,9 +55,10 @@ const Routes = props => {
 			        		<Stack.Screen name="CityCourier" component={CityCourierView} />
 			        		<Stack.Screen name="ScanBarcode" component={ScanBarcodeView} />
 			        		<Stack.Screen name="ConnectGiro" component={ConnectGiroView} />
-			        		<Stack.Screen name="History" component={History} />
+			        		<Stack.Screen name="History" component={HitoryOrderView} />
 			        		<Stack.Screen name="UpdateAlamat" component={EditAlamatView} />
 			        		<Stack.Screen name="Bidding" component={FindDriverView} />
+			        		<Stack.Screen name="DetailOrder" component={DetailOrderView} />
 			        	</React.Fragment> : <React.Fragment>
 							<Stack.Screen name="Home" component={HomeScreen} />
 							<Stack.Screen name="FormRegister" component={FormRegisterScreen} />

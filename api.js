@@ -22,7 +22,8 @@ const getLastStringAfterSpace = (words) => {
 
 }
 
-const GOOGLE_API_KEY = 'AIzaSyA8xP2eX_my7NBK-ysRHyg4QP-znaTxAsg';
+// const GOOGLE_API_KEY = 'AIzaSyA8xP2eX_my7NBK-ysRHyg4QP-znaTxAsg';
+const GOOGLE_API_KEY = 'AIzaSyCfveavBzHw8zjByDPonahtt2VzpwUAIBA';
 
 
 const config = {
@@ -202,6 +203,7 @@ export default {
 
 				return Promise.resolve(response);
 			}else{
+				console.log(res.data);
 				const errors = {
 					global: 'Address not found'
 				}
@@ -281,7 +283,10 @@ export default {
 
 				return Promise.reject(errors);
 			}
-		})
+		}),
+		mapping: (kota) => axios.post(`${url1}/Qposinaja/kotaQcc`, {
+			kota
+		}).then(res => res.data.result)
 	},
 	getNotification: (payload) => axios.post(`${url1}/Qposinaja/logNotif`, {
 		...payload
@@ -319,6 +324,7 @@ export default {
 		}
 	}),
 	generateToken: (userid) => axios.post(url, {
+		userid,
 		messtype: '213',
 		param1: userid,
 		hashing: hashing('213', userid)
@@ -371,12 +377,13 @@ export default {
 			return Promise.reject(errors);
 		}
 	}),
-	updateProfil: (param1) => axios.post(url, {
+	updateProfil: (param1, userid) => axios.post(url, {
+		userid,
 		messtype: '224',
 		param1,
 		hashing: hashing('224', param1)
 	}, configYuyus).then(res => {
-		console.log(res.data);
+		console.log(res);
 		if (res.data.rc_mess === '00') {
 			return res.data;
 		}else{
@@ -386,23 +393,36 @@ export default {
 			return Promise.reject(errors);
 		}
 	}),
-	getDetailOrder: (payload) => axios.post(`${url1}/Qposinaja/detailOrder`, {
+	getDetailOrder: (payload) => axios.post(`${url1}/history/getOrder`, {
 		...payload
 	}).then(res => {
-		if (!res.data.result.data) {
-			return Promise.reject(res.data);
+		const { status, result } = res.data;
+		if (status === 200) {
+			if (result.length > 0) {
+				return Promise.resolve(result);
+			}else{
+				const errors = {
+					msg: 'Data kiriman kamu kosong, silahkan melakukan order terlebih dahulu'
+				}
+				return Promise.reject(errors);
+			}
 		}else{
-			return res.data.result;
+			const errors = {
+				msg: 'Tidak dapat memproses permintaan anda, mohon coba beberapa saat lagi'
+			}
+			return Promise.reject(errors);
 		}
 	}),
 	addPickup: (payload) => axios.post('https://fasterv2.fastkurir.com/api/customer/bidding_v2', {
-		shipper: payload.shipper,
-		item: payload.item
+		...payload
 	}, configFast).then(res => {
 		if (res.data.status === true) {
 			return res.data;
 		}else{
-			return Promise.reject(res.data);
+			const errors = {
+				msg: 'Duplicate extid'
+			}
+			return Promise.reject(errors);
 		}
 	}),
 	getHistoryStatus: (payload) => axios.post(`${url1}/Qposinaja/history`, {
@@ -456,5 +476,15 @@ export default {
 		}else{
 			return Promise.reject(result);
 		}
-	})
+	}),
+	testApi: () => axios.post(`${url1}/test`).then(res => res.data),
+	updateStatusPickup: (payload) => axios.post(`${url1}/qposinaja/confirmPickup`, {
+		...payload
+	}).then(res => {
+		if (!res.data) {
+			return Promise.reject(res);
+		}else{
+			return res.data;
+		}
+	}),
 }

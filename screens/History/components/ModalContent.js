@@ -33,7 +33,6 @@ const numberWithCommas = (number) => {
 
 
 const ModalContent = ({ data }) => {
-	console.log(data);
 	return(
 		<View style={{margin: 15}}>
 	      	<View style={styles.list}>

@@ -106,6 +106,7 @@ const OrderView = props => {
 
 	useEffect(() => {
 		if (state.mount) {
+			console.log(session);
 			if (order.kecamatanA && order.kecamatanB) {
 				setSender(sender => ({
 					kec: order.kecamatanA,
@@ -152,14 +153,20 @@ const OrderView = props => {
 							penerima: undefined
 						}
 					}))
-				}else if(session.kodepos !== '-'){
-					setSender({
-						kec: session.kecamatan,
-						kota: session.kota,
-						kodepos: session.kodepos
-					})
 				}else{
-					setShouldUpdateAddres(true);
+					if (session.kecamatan === undefined) {
+						setShouldUpdateAddres(true);
+					}else{
+						if (session.kecamatan !== '-') {
+							setSender({
+								kec: session.kecamatan,
+								kota: session.kota,
+								kodepos: session.kodepos
+							})
+						}else{
+							setShouldUpdateAddres(true);
+						}
+					}
 				}
 			}
 		}

@@ -112,9 +112,9 @@ const ProfileView = props => {
 			const update = shouldUpdateProfile(props.user);
 			if (update) {
 				setLoading(true);
-				const param1 = `${props.userid}|${state.alamatOl}|${state.provinsi}|${state.kota}|${state.kecamatan}|${state.kelurahan}|${state.kodepos}|${state.nama}|${state.email}`;
+				const param1 = `${props.userid}|${state.alamatOl}|${state.provinsi}|${state.kota}|${state.kecamatan}|${state.kelurahan}|${state.kodepos}|${state.nama}|${state.email}|${state.namaOl}|${state.jenisOl}|${state.alamatOl}|${state.provinsi}|${state.kota}|${state.kecamatan}|${state.kelurahan}|${state.kodepos}`;
 				
-				props.updateProfil(param1, state)
+				props.updateProfil(param1, state, props.userid)
 					.then(async () => {
 						const newLocaluser = {
 							...props.local,
@@ -123,17 +123,6 @@ const ProfileView = props => {
 
 						props.navigation.goBack();
 
-						
-						// try{
-						// 	await AsyncStorage.setItem('qobUserPrivasi', JSON.stringify(newLocaluser));
-						// }catch(error){
-						// 	props.navigation.goBack();
-						// 	Toast.show({
-				  //               text: 'Fail',
-				  //               textStyle: { textAlign: 'center' },
-				  //               duration: 1000
-				  //           })
-						// }
 					})
 					.catch(err => {
 						props.navigation.goBack();
@@ -305,7 +294,8 @@ const ProfileView = props => {
 
 						<TouchableOpacity 
 							style={styles.list}
-							onPress={() => setEmailVisible(true)}
+							//onPress={() => setEmailVisible(true)}
+							disabled
 							activeOpacity={0.5}
 						>
 							<View style={styles.listLeft}>
@@ -319,7 +309,7 @@ const ProfileView = props => {
 									</TextNote>
 								</View>
 							</View>
-							<MaterialCommunityIcons name="pencil" size={24} color="#b3b3b3" />
+							{/*<MaterialCommunityIcons name="pencil" size={24} color="#b3b3b3" />*/}
 						</TouchableOpacity>
 
 						<TouchableOpacity 

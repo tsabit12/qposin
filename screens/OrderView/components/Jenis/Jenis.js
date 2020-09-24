@@ -139,7 +139,7 @@ const Jenis = props => {
 								<TouchableOpacity 
 									style={[styles.btn, {borderTopRightRadius: 30, borderBottomRightRadius: 30}]} 
 									activeOpacity={0.7}
-									onPress={() => handleChoosed('2')}
+									onPress={() => handleChoosed('0')}
 								>
 									<Text style={[styles.text, {color: '#FFF'}]}>SURAT</Text>
 								</TouchableOpacity>

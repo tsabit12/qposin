@@ -46,6 +46,21 @@ const { width, height } = Dimensions.get('window');
 // 3 terima:
 // 9 batal (order & bidding):
 
+const getStatus = (value) => {
+	switch(value){
+		case '0':
+			return 'Order';
+		case '1':
+			return 'Bidding';
+		case '2':
+			return 'Bayar';
+		case '3':
+			return 'Selesai';
+		default: 
+			return '-';
+	}
+}
+
 const numberWithCommas = (number) => {
 	return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
@@ -131,9 +146,9 @@ const CartView = props => {
 
 					const sorted = response_data2.sort(dynamicSort("wkt_order"));
 
-					const data = sorted.filter(list => list.stat === '1' || list.stat === '0');
+					const data = sorted.filter(list => list.stat === '1' || list.stat === '0' || list.stat === '2');
 					const data2 = sorted.filter(list => list.stat === '9');
-					const data3 = sorted.filter(list => list.stat === '3' || list.stat === '2');
+					const data3 = sorted.filter(list => list.stat === '3');
 
 					data.forEach(row => {
 						const convertJson = JSON.parse(row.jsonnya);
@@ -433,7 +448,6 @@ const CartView = props => {
 	// 	}))
 	// }
 
-
 	if (loading) {
 		return(
 			<LoadingApp />
@@ -523,7 +537,7 @@ const CartView = props => {
 					      		>
 					      			{ !state.confirmCancel ? <Content style={styles.content}>
 								        	<View style={styles.confirmContent}>
-								        		<Text style={styles.title}>KONFIRMASI PEMBAYARAN {presedItem.order.payment_type === '1' && '(TUNAI)'}</Text>
+								        		<Text style={styles.title}>DETAIL ORDER</Text>
 								        		<View style={styles.list}>
 								        			<Text numberOfLines={1}>Isi Kiriman</Text>
 									        		<Text note numberOfLines={1}>{presedItem.order.information}</Text>
@@ -538,11 +552,22 @@ const CartView = props => {
 									        		<Text note numberOfLines={1}>{presedItem.destination.address_name}</Text>
 									        		<Text note numberOfLines={1}>{presedItem.destination.address}</Text>
 								        		</View>
+								        		<View style={styles.list}>
+									        		<Text numberOfLines={1}>Status</Text>
+									        		<Text note numberOfLines={1}>{getStatus(presedItem.status)}</Text>
+								        		</View>
+								        		<View style={styles.list}>
+									        		<Text numberOfLines={1}>Jenis Pembayaran</Text>
+									        		<Text note numberOfLines={1}>
+									        			{presedItem.order.payment_type === '1' && '(TUNAI)'}
+									        		</Text>
+								        		</View>
 								        	</View>
 								        	{ presedItem.order.payment_type === '2' && <Button 
 								        		style={{justifyContent: 'space-between', backgroundColor: "#FF9501"}}
 								        		onPress={handleBayar}
 								        		disabled={state.sendLoading}
+								        		block
 								        	>
 								        		{ state.sendLoading ? <Text>Sedang diproses...</Text> : <React.Fragment>
 								        			<Text style={styles.btntext}>VIA PGM</Text>
@@ -552,12 +577,13 @@ const CartView = props => {
 								        	<Button 
 								        		transparent 
 								        		style={{justifyContent: 'center', alignItems: 'center'}}
+								        		block
 								        		onPress={() => setState(state => ({
 								        			...state,
 								        			confirmCancel: true
 								        		}))}
 								        	>
-									        	<Text>BATALKAN ORDER</Text>	
+									        	<Text style={{textAlign: 'center'}}>BATALKAN ORDER</Text>	
 									      	</Button>
 								        </Content> : <CencelForm onCencel={handleCancle} />}
 						      	</Animated.View> 

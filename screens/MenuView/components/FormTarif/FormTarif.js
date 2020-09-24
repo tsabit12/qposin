@@ -98,6 +98,8 @@ const FormTarif = props => {
 	  outputRange: [0, .5, 0.75, 1]
 	});
 
+	console.log(state);
+
 	return(
 		<Animated.View 
 			style={{transform: [{  scaleY: ViewScaleValue }]}}

@@ -96,7 +96,6 @@ const ResultView = props => {
 		    "shipperzipcode": pengirim.kodepos,
 		    "receiverzipcode": penerima.kodepos,
 		    "serviceid": payloadTarif.id,
-		    "shipperaddress": '-',
 		    "shippersubsubdistrict": "0",
 		    "shippersubdistrict": pengirim.kec,
 		    "shippercity": pengirim.kota,

@@ -29,21 +29,6 @@ import {
 	UpdateRequiredView
 } from './components';
 
-const cityList = [
-	{nopend: '10000', kota: 'kota jakarta pusat'},
-	{nopend: '10000', kota: 'kota jakarta'},
-	{nopend: '10000', kota: 'kota jkt'},
-	{nopend: '10000', kota: 'jkt'},
-	{nopend: '40000', kota: 'kota bandung'},
-	{nopend: '50000', kota: 'kota semarang'},
-	{nopend: '55000', kota: 'kota yogyakarta'},
-	{nopend: '57100', kota: 'kota solo'},
-	{nopend: '57100', kota: 'kota surakarta'},
-	{nopend: '60000', kota: 'kota surabaya'},
-	{nopend: '60000', kota: 'kota sby'},
-	{nopend: '65100', kota: 'kota malang'},
-]
-
 const { height, width } = Dimensions.get( 'window' );
 const LATITUDE = -6.9160014;
 const LONGITUDE = 107.6571561;
@@ -283,7 +268,8 @@ const CityCourier = props => {
 							}
 						}))
 					})
-				.catch(() => {
+				.catch(err => {
+					console.log(err);
 					Toast.show({
 		                text: "Tidak 	dapat menemukan alamat berdasarkan map",
 		                type: "danger",
@@ -402,7 +388,11 @@ const CityCourier = props => {
 
 	const filterItems = (needle, heystack) => {
 	  let query = needle.toLowerCase().replace(/\s/g,'');
-	  return heystack.filter(item => item.kota.toLowerCase().replace(/\s/g,'').indexOf(query) >= 0);
+	  //var re = new RegExp(query);
+
+	  return heystack.filter(item => 
+	  	//item.kota.match(re));
+		item.kota.toLowerCase().replace(/\s/g,'').indexOf(query) >= 0);
 	}
 
 
@@ -418,38 +408,43 @@ const CityCourier = props => {
 
 		//kec, kota, prov
 		const { sender, jarak } = state;
-		const fuckingGetNopend = filterItems(sender.kota, cityList);
-		
-		let   fuckingNopendVal = '-';	
-		if (fuckingGetNopend.length > 0) {
-			fuckingNopendVal = fuckingGetNopend[0].nopend;
-		}
 
-		const payload = {
-			param1: props.user.userid,
-			param2: `${fuckingNopendVal}|${sender.kota.toUpperCase()}|${data.berat.replace(/\D/g, '')}|${sender.latitude}|${sender.longitude}|${Number(jarak / 1000).toFixed(1)}`
-		}
-
-		// console.log(payload);
-
-		api.cityCourier.getTarif(payload)
-			.then(res => {
-				if (res.rc_mess === '00') {
-					setState(state => ({
-						...state,
-						tarif: res.response_data1
-					}))
-				}else{
-					setState(state => ({
-						...state,
-						errors: {
-							tarif: res.desk_mess,
-							code: res.rc_mess
-						}
-					}))
+		api.cityCourier.mapping(sender.kota)
+			.then(result => {
+				const payload = {
+					param1: props.user.userid,
+					param2: `${result[0].nopend}|${sender.kota.toUpperCase()}|${data.berat.replace(/\D/g, '')}|${sender.latitude}|${sender.longitude}|${Number(jarak / 1000).toFixed(1)}`
 				}
+
+				api.cityCourier.getTarif(payload)
+					.then(res => {
+						if (res.rc_mess === '00') {
+							setState(state => ({
+								...state,
+								tarif: res.response_data1
+							}))
+						}else{
+							setState(state => ({
+								...state,
+								errors: {
+									tarif: res.desk_mess,
+									code: res.rc_mess
+								}
+							}))
+						}
+					})
+					.catch(err => {
+						setState(state => ({
+							...state,
+							errors: {
+								tarif: `Gagal mengambil tarif`,
+								code: 500
+							}
+						}))
+					})
 			})
 			.catch(err => {
+				//console.log(err);
 				setState(state => ({
 					...state,
 					errors: {

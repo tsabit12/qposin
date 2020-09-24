@@ -27,8 +27,8 @@ export const updateNorek = (norek, saldo) => dispatch => dispatch({
 	saldo
 })
 
-export const updateProfil = (param1, session) => dispatch => 
-	api.updateProfil(param1)
+export const updateProfil = (param1, session, userid) => dispatch => 
+	api.updateProfil(param1, userid)
 		.then(() => dispatch({
 			type: 'UPDATE_PROFIL',
 			session

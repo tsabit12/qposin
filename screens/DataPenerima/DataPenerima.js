@@ -92,7 +92,8 @@ const DataPenerima = props => {
 			"receivername": data.nama,
 			"receiveraddress": data.street,
 			"receiveremail": data.email ? data.email : '-',
-			"receiverphone": data.phone
+			"receiverphone": data.phone,
+			"shipperaddress": session.alamatOl
 		}
 
 		setState(state => ({

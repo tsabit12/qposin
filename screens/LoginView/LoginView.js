@@ -40,8 +40,6 @@ const LoginView = props => {
 	    }
 	}, [pin]);
 
-	console.log(props.localUser);
-
 	const handleLogin = (pinValue) => {
 		setLoading(true);
 

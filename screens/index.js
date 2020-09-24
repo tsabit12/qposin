@@ -19,3 +19,4 @@ export { default as EditAlamatView } from './EditAlamatView';
 export { default as History } from './History';
 export { default as UpdatePlaystoreView } from './UpdatePlaystoreView';
 export { default as FindDriverView } from './FindDriverView';
+export { default as DetailOrder } from './DetailOrder';

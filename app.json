@@ -3,7 +3,7 @@
     "name": "QPOSin AJA",
     "slug": "qob",
     "privacy": "public",
-    "version": "0.2.4",
+    "version": "0.3.7",
     "sdkVersion": "38.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
@@ -24,7 +24,7 @@
     "android": {
       "package": "com.posindonesia.cob",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 12,
+      "versionCode": 13,
       "useNextNotificationsApi": true,
       "config": {
         "googleMaps": {

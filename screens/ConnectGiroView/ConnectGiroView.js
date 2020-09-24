@@ -107,14 +107,22 @@ const ConnectGiroView = props => {
 					const { response_data5 } = res;
 					props.updateNorek(data.norek, response_data5); //& saldo
 					setTimeout(function() {
-						props.navigation.dispatch(state => {
-						  const routes = state.routes.filter(r => r.name !== 'ConnectGiro');
-						  return CommonActions.reset({
-						    ...state,
-						    routes,
-						    index: routes.length - 1,
-						  });
-						});
+						// props.navigation.dispatch(state => {
+						//   const routes = state.routes.filter(r => r.name !== 'ConnectGiro');
+						//   return CommonActions.reset({
+						//     ...state,
+						//     routes,
+						//     index: routes.length - 1,
+						//   });
+						// });
+						props.navigation.dispatch(
+						  CommonActions.reset({
+						    index: 1,
+						    routes: [
+						      { name: 'Home' }
+						    ],
+						  })
+						);
 					}, 10);
 				})
 				.catch(err => {

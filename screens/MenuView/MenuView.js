@@ -143,7 +143,7 @@ const MenuView = props => {
 			(async () => {
 				const { norek } = user;
 				if (norek !== '-') {
-					const fuckingValue = await AsyncStorage.getItem('isCod'); //define user was syncronize 
+					const fuckingValue = await AsyncStorage.getItem('isCodBaru'); //define user was syncronize 
 					if (fuckingValue === null) { //web required to syncronize user when using cod
 						handleAsyncGiro(local, user);
 					}
@@ -247,7 +247,9 @@ const MenuView = props => {
 			loading: true
 		}))
 
-		const { userid, email } = props.local;
+		const { userid } 	= props.local;
+		const email 		= props.user.email;
+
 		api.generateToken(userid)
 			.then(res => {
 				const payload = {
@@ -307,8 +309,9 @@ const MenuView = props => {
 							}
 							api.syncronizeCod(payloadSyncGiro)
 								.then(async lastResponse => {
+									console.log(lastResponse);
 									try{
-										await AsyncStorage.setItem('isCod', JSON.stringify(true));
+										await AsyncStorage.setItem('isCodBaru', JSON.stringify(true));
 										Toast.show({
 									        text: 'Sinkronisasi giro sukses!',
 									        textStyle: { textAlign: 'center' },

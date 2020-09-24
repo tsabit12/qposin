@@ -48,7 +48,7 @@ const PilihJenis = props => {
 						<TouchableOpacity 
 							style={[styles.btn, {borderTopRightRadius: 30, borderBottomRightRadius: 30}]} 
 							activeOpacity={0.7}
-							onPress={() => props.onChoosed('2')}
+							onPress={() => props.onChoosed('0')}
 						>
 							<Text style={[styles.text, {color: '#FFF'}]}>SURAT</Text>
 						</TouchableOpacity>
