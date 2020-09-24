@@ -9,7 +9,8 @@ import {
 	SafeAreaView,
 	TouchableOpacity,
 	Clipboard,
-	ToastAndroid
+	ToastAndroid,
+	RefreshControl
 } from 'react-native';
 import {
 	widthPercentageToDP as wp, 
@@ -33,6 +34,7 @@ const capitalize = (string) => {
 	}
 }
 
+
 const Item  = props => {
 	const handleCopy = (extid) => {
 		Clipboard.setString(props.id);
@@ -42,141 +44,155 @@ const Item  = props => {
 	      ToastAndroid.BOTTOM
 	    );
 	}
+
 	return(
-		<View style={styles.list}>
-			<View style={styles.header}>
-				<Text style={styles.status}>{props.status}</Text>
-				<Icon name='ios-checkmark-circle' style={styles.icon} />
-				<Menu>
-					<MenuTrigger>
-						<Icon name="ios-more" style={{fontSize: 20, marginRight: 5}}/>
-					</MenuTrigger>
-					<MenuOptions>
-						{ props.pickupnumber === null && <MenuOption onSelect={() => props.onPress(props.id, '1')}>
-				          	<View style={styles.textMenu}>
-				          		<Text>Pickup</Text>
-				          	</View>
-				        </MenuOption> }
-				        
-				        {/* <MenuOption>
-				          	<View style={styles.textMenu}>
-				          		<Text>Order ulang</Text>
-				          	</View>
-				        </MenuOption> */}
+		<React.Fragment>
+			{ props.index === 0 && <View style={{height: hp('11%')}} />}
+			<View style={[styles.list]}>
+				<View style={styles.header}>
+					<Text 
+						style={styles.status}
+						onPress={()=> handleCopy(props.id)}
+					>{props.id}</Text>
+					<Icon name='ios-checkmark-circle' style={styles.icon} />
+					<Menu>
+						<MenuTrigger>
+							<Icon name="ios-more" style={{fontSize: 20, marginRight: 5}}/>
+						</MenuTrigger>
+						<MenuOptions>
+							{ props.pickupnumber === null && <MenuOption onSelect={() => props.onPress(props.id, '1')}>
+					          	<View style={styles.textMenu}>
+					          		<Text>Pickup</Text>
+					          	</View>
+					        </MenuOption> }
+					        
+					        {/* <MenuOption>
+					          	<View style={styles.textMenu}>
+					          		<Text>Order ulang</Text>
+					          	</View>
+					        </MenuOption> */}
 
-				        <MenuOption onSelect={() => props.onPress(props.id, '3')}>
-				          	<View style={styles.textMenu}>
-				          		<Text>Lacak kiriman</Text>
-				          	</View>
-				        </MenuOption>
-						<MenuOption onSelect={() => props.onPress(props.id, '4')}>
-				        	<View style={styles.textMenu}>
-				          		<Text>Lihat detail</Text>
-				          	</View>
-				        </MenuOption>
-					</MenuOptions>
-				</Menu> 
-				
-			</View>
-			<View style={styles.box}>
-				<View style={[styles.boxinside, {borderRightWidth: 0.3}]}>
-					<View style={styles.item}>
-						<View style={styles.left}>
-							<Image 
-								source={require('../../../../../../assets/images/icon/from.png')}
-								style={styles.image}
-								resizeMode='contain'
-							/>
+					        <MenuOption onSelect={() => props.onPress(props.id, '3')}>
+					          	<View style={styles.textMenu}>
+					          		<Text>Lacak kiriman</Text>
+					          	</View>
+					        </MenuOption>
+							<MenuOption onSelect={() => props.onPress(props.id, '4')}>
+					        	<View style={styles.textMenu}>
+					          		<Text>Lihat detail</Text>
+					          	</View>
+					        </MenuOption>
+						</MenuOptions>
+					</Menu> 
+					
+				</View>
+				<View style={styles.box}>
+					<View style={[styles.boxinside, {borderRightWidth: 0.3}]}>
+						<View style={styles.item}>
+							<View style={styles.left}>
+								<Image 
+									source={require('../../../../../../assets/images/icon/from.png')}
+									style={styles.image}
+									resizeMode='contain'
+								/>
+							</View>
+							<View style={{flex: 1}}>
+								<Text style={styles.textItem}>Dari</Text>
+								<Text 
+									style={[styles.textItem, {color: '#a3a3a2'}]}
+									numberOfLines={2}
+								>
+									{ props.shippercity }
+								</Text>
+							</View>
 						</View>
-						<View style={{flex: 1}}>
-							<Text style={styles.textItem}>Dari</Text>
-							<Text 
-								style={[styles.textItem, {color: '#a3a3a2'}]}
-								numberOfLines={2}
-							>
-								{ props.shippercity }
-							</Text>
+					</View>
+					<View style={styles.boxinside}>
+						<View style={styles.item}>
+							<View style={styles.left}>
+								<Image 
+									source={require('../../../../../../assets/images/icon/kiriman.png')}
+									style={styles.image}
+									resizeMode='contain'
+								/>
+							</View>
+							<View style={{flex: 1}}>
+								<Text style={styles.textItem}>Kiriman</Text>
+								<Text 
+									style={[styles.textItem, {color: '#a3a3a2'}]}
+									numberOfLines={2}
+								>
+									{ props.kiriman }
+								</Text>
+							</View>
 						</View>
 					</View>
 				</View>
-				<View style={styles.boxinside}>
-					<View style={styles.item}>
-						<View style={styles.left}>
-							<Image 
-								source={require('../../../../../../assets/images/icon/kiriman.png')}
-								style={styles.image}
-								resizeMode='contain'
-							/>
+
+				<View style={styles.box}>
+					<View style={styles.hr} />
+					<View style={styles.hr} />
+				</View>
+
+				<View style={styles.box}>
+					<View style={[styles.boxinside, {borderRightWidth: 0.3}]}>
+						<View style={styles.item}>
+							<View style={styles.left}>
+								<Image 
+									source={require('../../../../../../assets/images/icon/to.png')}
+									style={styles.image}
+									resizeMode='contain'
+								/>
+							</View>
+							<View style={{flex: 1}}>
+								<Text style={styles.textItem}>Ke</Text>
+								<Text 
+									style={[styles.textItem, {color: '#a3a3a2'}]}
+									numberOfLines={2}
+								>
+									{ props.receivercity }
+								</Text>
+							</View>
 						</View>
-						<View style={{flex: 1}}>
-							<Text style={styles.textItem}>Kiriman</Text>
-							<Text 
-								style={[styles.textItem, {color: '#a3a3a2'}]}
-								numberOfLines={2}
-							>
-								{ props.kiriman }
-							</Text>
+					</View>
+					<View style={styles.boxinside}>
+						<View style={styles.item}>
+							<View style={styles.left}>
+								<Image 
+									source={require('../../../../../../assets/images/icon/people.png')}
+									style={styles.image}
+									resizeMode='contain'
+								/>
+							</View>
+							<View style={{flex: 1}}>
+								<Text style={styles.textItem}>Penerima</Text>
+								<Text 
+									style={[styles.textItem, {color: '#a3a3a2'}]}
+									numberOfLines={2}
+								>
+									{ props.receivername }
+								</Text>
+							</View>
 						</View>
 					</View>
 				</View>
-			</View>
 
-			<View style={styles.box}>
-				<View style={styles.hr} />
-				<View style={styles.hr} />
-			</View>
-
-			<View style={styles.box}>
-				<View style={[styles.boxinside, {borderRightWidth: 0.3}]}>
-					<View style={styles.item}>
-						<View style={styles.left}>
-							<Image 
-								source={require('../../../../../../assets/images/icon/to.png')}
-								style={styles.image}
-								resizeMode='contain'
-							/>
-						</View>
-						<View style={{flex: 1}}>
-							<Text style={styles.textItem}>Ke</Text>
-							<Text 
-								style={[styles.textItem, {color: '#a3a3a2'}]}
-								numberOfLines={2}
-							>
-								{ props.receivercity }
-							</Text>
-						</View>
-					</View>
-				</View>
-				<View style={styles.boxinside}>
-					<View style={styles.item}>
-						<View style={styles.left}>
-							<Image 
-								source={require('../../../../../../assets/images/icon/people.png')}
-								style={styles.image}
-								resizeMode='contain'
-							/>
-						</View>
-						<View style={{flex: 1}}>
-							<Text style={styles.textItem}>Penerima</Text>
-							<Text 
-								style={[styles.textItem, {color: '#a3a3a2'}]}
-								numberOfLines={2}
-							>
-								{ props.receivername }
-							</Text>
-						</View>
+				<View style={styles.footer}>
+					<Text style={[styles.textItem, {color: '#a3a3a2', flex: 1, marginLeft: 5}]}>Dikirim : {props.date.substring(0, 10)}</Text>
+					<View style={{flex: 1, alignItems: 'flex-end', marginRight: 5}}>
+						<Text 
+							//ellipsizeMode='tail'
+							style={[
+								styles.textItem, {
+									color: '#a3a3a2'
+								}]
+							} 
+							numberOfLines={1}>Status : {props.status}
+						</Text>
 					</View>
 				</View>
 			</View>
-
-			<View style={styles.footer}>
-				<Text style={[styles.textItem, {color: '#a3a3a2'}]}>Dikirim : {props.date.substring(0, 10)}</Text>
-				<Text 
-					style={[styles.textItem, {color: '#f59300'}]}
-					onPress={()=> handleCopy(props.id)}
-				>{props.id}</Text>
-			</View>
-		</View>
+		</React.Fragment>
 	);
 } 
 
@@ -208,7 +224,7 @@ const ListView = props => {
 			});
 	}
 
-	const renderItem = ({ item }) => (
+	const renderItem = ({ item, index }) => (
 		<Item 
 			status={item.laststatus}
 			shippercity={capitalize(item.shippercity)}
@@ -219,21 +235,28 @@ const ListView = props => {
 			pickupnumber={item.pickupnumber}
 			id={item.extid}
 			onPress={handlePress}
+			index={index}
 		/>
 	);
 
 	return(
-		<SafeAreaView style={styles.container}>
-			 <FlatList
-		        data={DATA}
-		        renderItem={renderItem}
-		        refreshing={loading}
-		        onEndReached={() => props.getNewData()}
-		        // onEndReachedThreshold={0.4}
-		        onRefresh={handleRefresh}
-		        keyExtractor={item => item.id.toString()}
-		     />
-	    </SafeAreaView>
+		<FlatList
+	        data={DATA}
+	        renderItem={renderItem}
+	        //refreshing={loading}
+	        onEndReached={() => props.getNewData()}
+	        refreshControl={
+                <RefreshControl
+                    refreshing={loading}
+                    progressViewOffset={90}
+                    onRefresh={handleRefresh}
+                />
+            }
+	        // onEndReachedThreshold={0.4}
+	        onScroll={(e) => props.onScroll(e.nativeEvent.contentOffset.y)}
+	        //onRefresh={handleRefresh}
+	        keyExtractor={item => item.id.toString()}
+	    />
 	);
 }
 
@@ -243,10 +266,7 @@ const styles = StyleSheet.create({
 		height: hp('26%'),
 		borderRadius: 6,
 		elevation: 3,
-		marginLeft: 15,
-		marginRight: 15,
-		marginTop: 5,
-		marginBottom: 5
+		margin: 7
 	},
 	footer: {
 		padding: 5,
@@ -263,7 +283,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between'
 	},
 	status: {
-		width: wp('43%'),
+		width: wp('45%'),
 		color: '#f59300',
 		fontSize: 12
 	},
@@ -284,7 +304,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		width: wp('40%'),
+		width: wp('43%'),
 		height: hp('9%')
 	},
 	hr: {
@@ -318,7 +338,8 @@ ListView.propTypes = {
 	lacakKiriman: PropTypes.func.isRequired,
 	onPickup: PropTypes.func.isRequired,
 	getNewData: PropTypes.func.isRequired,
-	onRefresh: PropTypes.func.isRequired
+	onRefresh: PropTypes.func.isRequired,
+	onScroll: PropTypes.func.isRequired
 }
 
 export default ListView;

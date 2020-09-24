@@ -27,7 +27,6 @@ import * as Location from 'expo-location';
 const ListQob = props => {
 	const { error } = props;
 	const [bounceValue] = useState(new Animated.Value(400));
-	//const [data, setData] = useState([]);
 	const [dataLacak, setDataLacak] = useState({
 		loading: false,
 		data: [],
@@ -46,12 +45,6 @@ const ListQob = props => {
 			delay: 100
 		}).start();
 	}, []);
-
-	// useEffect(() => {
-	// 	if (props.list) {
-	// 		setData(props.list);
-	// 	}
-	// }, [props.list]);
 
 	const handleLacak = (extid) => {
 		setDataLacak(lacak => ({
@@ -176,11 +169,7 @@ const ListQob = props => {
 	}
 
 	return(
-		<Animated.View 
-			style={[
-				{transform: [{translateX: bounceValue }]},
-				{flex: 1}
-			]}>
+		<View style={{flex: 1}}>
 			<AnimatedLoader
 		        visible={dataLacak.loading}
 		        overlayColor="rgba(0,0,0,0.6)"
@@ -202,6 +191,7 @@ const ListQob = props => {
 							lacakKiriman={handleLacak}
 							onPickup={handlePickup}
 							getNewData={props.getNewData}
+							onScroll={props.onScroll}
 							onRefresh={props.handleRefresh}
 						/> : <View style={styles.err}>
 						<Text style={styles.textErr}>Loading...</Text>
@@ -222,7 +212,7 @@ const ListQob = props => {
 
 			{ pickupLoading.loading && <PickupLoading text={pickupLoading.text} /> }
 
-		</Animated.View>
+		</View>
 	);
 }
 

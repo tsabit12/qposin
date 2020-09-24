@@ -5,7 +5,9 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	ImageBackground,
-	ToastAndroid
+	ToastAndroid,
+	Animated,
+	StatusBar
 } from 'react-native';
 import { Icon, Footer, FooterTab, Button, Content } from 'native-base';
 import {
@@ -26,12 +28,21 @@ const daysInMonth = (iMonth, iYear) => {
 }
 
 const HistoryOrder = props => {
+	const scrollY = new Animated.Value(0);
+
 	const [activePage, setActivepage] = useState(1);
 	const [loading, setLoading] = useState(false);
 	const [errors, setErrors] = useState({});
 	const [offestQob, setOffsetQob] = useState(0);
 	const [qobIsDone, setQobDone] = useState(false); //notif once
 	const { email } = props.user;
+
+	const diffClamp =  Animated.diffClamp(scrollY, 0, hp('10%'));
+	const translateY = diffClamp.interpolate({
+		inputRange: [0, hp('10%')],
+		outputRange: [0, hp('-10%')],
+		extrapolateLeft: 'clamp'
+	})
 
 	useEffect(() => {
 		if (activePage === 1) {
@@ -99,8 +110,12 @@ const HistoryOrder = props => {
 		}
 	}
 
+	const handleHideHeader = (yOffset) => {
+		scrollY.setValue(yOffset);
+	}
+
 	return(
-		<View style={styles.root}> 
+		<View style={StyleSheet.absoluteFillObject}> 
 			<AnimatedLoader
 		        visible={loading}
 		        overlayColor="rgba(0,0,0,0.1)"
@@ -108,52 +123,20 @@ const HistoryOrder = props => {
 		        animationStyle={styles.lottie}
 		        speed={1}
 		    />
-			<ImageBackground 
-				source={require('../../assets/images/backgroundHeader.png')} 
-				style={{
-					height: hp('9%')
-				}}
-			>	
-				<View style={styles.header}>
-					<TouchableOpacity 
-						style={styles.btn} 
-						onPress={() => props.navigation.goBack()}
-					>
-						<Icon name='ios-arrow-back' style={{color: '#FFF', fontSize: 25, marginTop: 20}} />
-					</TouchableOpacity>
-					<View style={{marginTop: 20}}>
-						<Text style={[styles.text, {fontSize: 17}]}>
-							History kiriman
-						</Text>
-					</View>
+		    <StatusBar backgroundColor="#C51C16"/>
+		    <Animated.View style={[styles.header, { transform: [{ translateY }]}]}>
+				<TouchableOpacity 
+					style={styles.btn} 
+					onPress={() => props.navigation.goBack()}
+				>
+					<Icon name='ios-arrow-back' style={{color: '#FFF', fontSize: 25, marginTop: 20}} />
+				</TouchableOpacity>
+				<View>
+					<Text style={[styles.text, {fontSize: 17, marginTop: 20}]}>
+						History kiriman
+					</Text>
 				</View>
-				{/*<View style={styles.tab}>
-					<TouchableOpacity 
-						style={[styles.tabbtn, {backgroundColor: activePage === 1 ? '#d1cdcd' : '#FFF'}]}
-						activeOpacity={0.7}
-						onPress={() => setActivepage(1)}
-					>
-						<Text style={[styles.text, {color: activePage === 1 ? '#FFF' : 'black'}]}>
-							QOB / QCOMM
-						</Text>
-					</TouchableOpacity>
-
-					<TouchableOpacity 
-						style={[styles.tabbtn, {backgroundColor: activePage === 2 ? '#d1cdcd' : '#FFF'}]}
-						onPress={() => {
-							setActivepage(2);
-							setErrors({});
-							setOffsetQob(0);
-							setQobDone(false);
-						}}
-						activeOpacity={0.7}
-					>
-						<Text style={[styles.text, {color: activePage === 2 ? '#FFF' : 'black'}]}>
-							Q9 Plus
-						</Text>
-					</TouchableOpacity>
-				</View> */}
-			</ImageBackground>
+			</Animated.View>
 
 			{ activePage === 1 && 
 				<ListQob 
@@ -165,6 +148,7 @@ const HistoryOrder = props => {
 					onPickup={handlePickup}
 					getNewData={handleGetNewDataQob}
 					handleRefresh={onRefreshQob}
+					onScroll={handleHideHeader}
 				/> }
 			{ activePage === 2 && <ListQ9 /> }
 		</View>
@@ -176,11 +160,16 @@ const styles = StyleSheet.create({
 		flex: 1
 	},
 	header: {
-		height: hp('9%'),
+		height: hp('10%'),
 		flexDirection: 'row',
-		//backgroundColor: 'white',
+		backgroundColor: '#C51C16',
 		alignItems: 'center',
-		marginLeft: 20
+		paddingLeft: 20,
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		zIndex: 100
 	},
 	text: {
 		fontFamily: 'Nunito-Bold',
