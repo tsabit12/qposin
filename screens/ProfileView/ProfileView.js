@@ -199,7 +199,7 @@ const ProfileView = props => {
 			<View style={styles.header}>
 				<TouchableOpacity 
 					style={styles.btn} 
-					onPress={() => props.navigation.goBack()}
+					onPress={handleBackButtonClick}
 				>
 					<Icon name='ios-arrow-back' style={{color: '#FFF', fontSize: 25, marginTop: 20}} />
 				</TouchableOpacity>

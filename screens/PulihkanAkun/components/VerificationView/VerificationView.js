@@ -72,7 +72,7 @@ const VerificationView = props => {
 			<View style={styles.backgroundModal}>
 				<Animated.View style={[styles.modalContainer, {transform: [{translateY: bounceValue }] }]}>
 					<Text style={[styles.text, { textAlign: 'center', margin: 5}]}>
-						Kode verifikasi telah dikirim melalui WhatsApp ke {props.phone}
+						Kode verifikasi telah dikirim melalui WhatsApp ke {props.phone} dan email kamu
 					</Text>
 					<View style={{height: hp('15%')}}>
 						<CodeInput

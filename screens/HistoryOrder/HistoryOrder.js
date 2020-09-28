@@ -16,7 +16,8 @@ import {
 } from 'react-native-responsive-screen';
 import {
 	ListQob,
-	ListQ9
+	ListQ9,
+	SearchForm
 } from './components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -29,11 +30,13 @@ const daysInMonth = (iMonth, iYear) => {
 
 const HistoryOrder = props => {
 	const scrollY = new Animated.Value(0);
+	// const animateContent = new Animated.Value(-100);
 
 	const [activePage, setActivepage] = useState(1);
 	const [loading, setLoading] = useState(false);
 	const [errors, setErrors] = useState({});
 	const [offestQob, setOffsetQob] = useState(0);
+	const [searchQob, setSeacrhQob] = useState(false);
 	const [qobIsDone, setQobDone] = useState(false); //notif once
 	const { email } = props.user;
 
@@ -68,10 +71,17 @@ const HistoryOrder = props => {
 		}
 	}, [activePage]);
 
+	// useEffect(() => {
+	// 		Animated.spring(animateContent, {
+	// 			toValue: 0,
+	// 			useNativeDriver: true
+	// 		}).start();
+	// }, [searchQob])
+
 	const handlePickup = (pickupNumber, extid) => props.onPickuped(pickupNumber, extid)
 
 	const handleGetNewDataQob = () => {
-		// console.log(offestQob);
+		console.log(offestQob);
 		if (offestQob !== 0) {
 			const payload = {
 				email,
@@ -114,6 +124,11 @@ const HistoryOrder = props => {
 		scrollY.setValue(yOffset);
 	}
 
+	// const scaleY = animateContent.interpolate({
+	// 	inputRange: [0, 20, 40, 60],
+ //  		outputRange: [100, 80, 60, 0]
+	// })
+
 	return(
 		<View style={StyleSheet.absoluteFillObject}> 
 			<AnimatedLoader
@@ -125,19 +140,20 @@ const HistoryOrder = props => {
 		    />
 		    <StatusBar backgroundColor="#C51C16"/>
 		    <Animated.View style={[styles.header, { transform: [{ translateY }]}]}>
-				<TouchableOpacity 
-					style={styles.btn} 
-					onPress={() => props.navigation.goBack()}
-				>
-					<Icon name='ios-arrow-back' style={{color: '#FFF', fontSize: 25, marginTop: 20}} />
-				</TouchableOpacity>
-				<View>
-					<Text style={[styles.text, {fontSize: 17, marginTop: 20}]}>
+		    	<View style={{flexDirection: 'row', marginLeft: 20,  marginTop: 20}}>
+					<TouchableOpacity 
+						style={styles.btn} 
+						onPress={() => props.navigation.goBack()}
+					>
+						<Icon name='ios-arrow-back' style={{color: '#FFF', fontSize: 25}} />
+					</TouchableOpacity>
+					
+					<Text style={[styles.text, {fontSize: 17}]}>
 						History kiriman
 					</Text>
 				</View>
 			</Animated.View>
-
+			
 			{ activePage === 1 && 
 				<ListQob 
 					error={errors.qob}
@@ -150,7 +166,9 @@ const HistoryOrder = props => {
 					handleRefresh={onRefreshQob}
 					onScroll={handleHideHeader}
 				/> }
+
 			{ activePage === 2 && <ListQ9 /> }
+	
 		</View>
 	);
 }
@@ -163,8 +181,8 @@ const styles = StyleSheet.create({
 		height: hp('10%'),
 		flexDirection: 'row',
 		backgroundColor: '#C51C16',
+		justifyContent: 'space-between',
 		alignItems: 'center',
-		paddingLeft: 20,
 		position: 'absolute',
 		top: 0,
 		left: 0,

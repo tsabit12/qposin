@@ -243,7 +243,6 @@ const ListView = props => {
 		<FlatList
 	        data={DATA}
 	        renderItem={renderItem}
-	        //refreshing={loading}
 	        onEndReached={() => props.getNewData()}
 	        refreshControl={
                 <RefreshControl
@@ -252,9 +251,8 @@ const ListView = props => {
                     onRefresh={handleRefresh}
                 />
             }
-	        // onEndReachedThreshold={0.4}
+	        onEndReachedThreshold={0.5}
 	        onScroll={(e) => props.onScroll(e.nativeEvent.contentOffset.y)}
-	        //onRefresh={handleRefresh}
 	        keyExtractor={item => item.id.toString()}
 	    />
 	);

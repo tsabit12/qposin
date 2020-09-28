@@ -196,8 +196,7 @@ const ListQob = props => {
 						/> : <View style={styles.err}>
 						<Text style={styles.textErr}>Loading...</Text>
 					</View> }
-				</React.Fragment>
-			}			
+				</React.Fragment> }			
 
 			{ dataLacak.data.length > 0 && 
 				<LacakView 
