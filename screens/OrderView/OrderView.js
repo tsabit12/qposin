@@ -7,7 +7,8 @@ import {
 	TouchableOpacity,
 	TextInput,
 	ScrollView,
-	StatusBar
+	StatusBar,
+	AsyncStorage
 } from 'react-native';
 import { connect } from 'react-redux';
 import { resetOrder } from '../../redux/actions/order';
@@ -25,7 +26,8 @@ import {
 	Cod,
 	Nilai,
 	ListTarif,
-	UpdateMessage
+	UpdateMessage,
+	SyncCard
 } from './components';
 import AnimatedLoader from "react-native-animated-loader";
 import api from '../../api';
@@ -78,6 +80,8 @@ const OrderView = props => {
 		shouldCod: false
 	})
 
+	const [visibleSync, setVisibleSync] = useState(false);
+
 	const [senderValues, setSender] = useState({
 		kec: '',
 		kota: '',
@@ -95,7 +99,7 @@ const OrderView = props => {
 	const { data, errors } = state;
 
 	const { params } = props.route;
-	const { session, order }  = props;
+	const { session, order, local }  = props;
 
 	const handlePress = (type) => {
 		props.navigation.navigate('Kota', {
@@ -104,9 +108,14 @@ const OrderView = props => {
 		});
 	} 
 
+	// useEffect(() => {
+	// 	(async () => {
+	// 		await AsyncStorage.removeItem('isCodBaru');
+	// 	})();
+	// }, [])
+
 	useEffect(() => {
 		if (state.mount) {
-			console.log(session);
 			if (order.kecamatanA && order.kecamatanB) {
 				setSender(sender => ({
 					kec: order.kecamatanA,
@@ -172,62 +181,63 @@ const OrderView = props => {
 		}
 	}, [order, state.mount, session])
 
-	// const senderValues = {
-	// 	kec: props.order.kecamatanA,
-	// 	kota: props.order.kotaA,
-	// 	kodepos: props.order.kodeposA
-	// };
-
-	// const receiverValue = {
-	// 	kec: props.order.kecamatanB,
-	// 	kota: props.order.kotaB,
-	// 	kodepos: props.order.kodeposB
-	// };
-
 	useEffect(() => {
-		if (session.norek !== '-') {
-			setState(state => ({
-				...state,
-				loading: true
-			}))
-
-			api.searchRekeningType(session.norek)
-				.then(responseRek => {
-					const sisaSaldo = parseInt(responseRek[2]);
-					if (sisaSaldo < 10000) {
-						setState(state => ({
-							...state,
-							loading: false,
-							mount: true
-						}));
-						Toast.show({
-					        text: 'Untuk menggunakan layanan COD saldo minimal 10 ribu',
-					        textStyle: { textAlign: 'center' },
-					        duration: 3000
-					    })
-					}else{
-						setState(state => ({
-							...state,
-							loading: false,
-							mount: true,
-							shouldCod: true
-						}))
-					}
-				})
-				.catch(err => {
-					console.log(err);
+		(async () => {
+			if (session.norek !== '-') {
+				const value = await AsyncStorage.getItem('isCodBaru'); //define user was syncronize 
+				if (value === null) {
+					setVisibleSync(true);
 					setState(state => ({
 						...state,
-						loading: false,
 						mount: true
 					}))
-				})
-		}else{
-			setState(state => ({
-				...state,
-				mount: true
-			}))
-		}
+				}else{
+					setState(state => ({
+						...state,
+						loading: true
+					}))
+
+					api.searchRekeningType(session.norek)
+						.then(responseRek => {
+							const sisaSaldo = parseInt(responseRek[2]);
+							if (sisaSaldo < 10000) {
+								setState(state => ({
+									...state,
+									loading: false,
+									mount: true
+								}));
+								Toast.show({
+							        text: 'Untuk menggunakan layanan COD saldo minimal 10 ribu',
+							        textStyle: { textAlign: 'center' },
+							        duration: 3000
+							    })
+							}else{
+								setState(state => ({
+									...state,
+									loading: false,
+									mount: true,
+									shouldCod: true
+								}))
+							}
+						})
+						.catch(err => {
+							console.log(err);
+							setState(state => ({
+								...state,
+								loading: false,
+								mount: true
+							}))
+						})
+
+				}
+			}else{
+				setState(state => ({
+					...state,
+					mount: true
+				}))
+			}
+
+		})();
 	}, [session.norek]);
 
 	useEffect(() => {
@@ -238,6 +248,7 @@ const OrderView = props => {
 			}))
 		}
 	}, [state.listTarif, state.mount])
+
 
 	const handleSaveBerat = (berat) => {
 		setState(state => ({
@@ -405,6 +416,124 @@ const OrderView = props => {
 		}, 10);
 	}
 
+	const validateRekening = () => {
+		setState(state => ({
+			...state,
+			loading: true
+		}));
+
+		api.searchRekeningType(session.norek)
+			.then(responseRek => {
+				const sisaSaldo = parseInt(responseRek[2]);
+				if (sisaSaldo < 10000) {
+					setState(state => ({
+						...state,
+						loading: false
+					}));
+
+					Toast.show({
+				        text: 'Untuk menggunakan layanan COD saldo minimal 10 ribu',
+				        textStyle: { textAlign: 'center' },
+				        duration: 3000
+				    })
+				}else{
+					setState(state => ({
+						...state,
+						loading: false,
+						shouldCod: true
+					}))
+				}
+			})
+			.catch(err => {
+				Toast.show({
+			        text: `Terdapat kesalahan! ${err.global}`,
+			        textStyle: { textAlign: 'center' },
+			        duration: 3000
+			    })
+				setState(state => ({
+					...state,
+					loading: false
+				}))
+			})
+	}
+
+	const onPressSyncCard = () => {
+		setState(state => ({
+			...state,
+			loading: true
+		}))
+
+		api.generateToken(local.userid)
+			.then(pin => {
+				const payload = {
+					email: local.email,
+					pin: pin.response_data1
+				}
+
+				api.syncronizeUserPwd(payload)
+					.then(res => {
+						if (res.respcode === '21' || res.respcode === '00') { //was sync and first time sync we keep send
+							const payloadSyncGiro = {
+								email: local.email,
+								norek: session.norek
+							}
+							api.syncronizeCod(payloadSyncGiro)
+								.then(async lastResponse => {
+									setState(prevState => ({
+										...prevState,
+										loading: false
+									}));
+									setVisibleSync(false);
+
+									try{
+										await AsyncStorage.setItem('isCodBaru', JSON.stringify(true));
+										validateRekening();
+									}catch(err){
+										console.log(err);
+									}
+								})
+								//falied sync web giro
+								.catch(err2 => {
+									setState(prevState => ({
+										...prevState,
+										loading: false
+									}))
+									Toast.show({
+								        text: 'Sinkronisasi gagal, silahkan cobalagi!',
+								        textStyle: { textAlign: 'center' },
+								        duration: 2000
+								    })
+								})
+						}
+					})
+					//failed sync user
+					.catch(err3 => {
+						setState(prevState => ({
+							...prevState,
+							loading: false
+						}))
+
+						Toast.show({
+					        text: 'Sinkronisasi gagal, silahkan cobalagi!',
+					        textStyle: { textAlign: 'center' },
+					        duration: 2000
+					    })
+					})
+			})
+			//get pin gagal
+			.catch(() => {
+				Toast.show({
+			        text: 'Sinkronisasi gagal, silahkan cobalagi!',
+			        textStyle: { textAlign: 'center' },
+			        duration: 2000
+			    })
+			    setState(prevState => ({
+					...prevState,
+					loading: false
+				}))
+			})
+	} 
+
 	return(
 		<ImageBackground 
 			source={require('../../assets/images/background.png')} 
@@ -424,7 +553,6 @@ const OrderView = props => {
 		    		onSubmit={handleSubmitUpdate}
 		    	/> }
 		    { state.loading &&  <StatusBar backgroundColor="rgba(0,0,0,0.6)"/> }
-
 
 			<View style={styles.header}>
 				<View style={styles.subHeader}>
@@ -459,6 +587,7 @@ const OrderView = props => {
 			<View style={{flex: 1, backgroundColor: '#f5f7f6'}}>
 				{ state.mount && 
 					<ScrollView keyboardShouldPersistTaps={'handled'}>
+		    			{ visibleSync && <SyncCard onPress={onPressSyncCard} />}
 						<List>
 							<Pengirim 
 								onPress={handlePress} 
@@ -654,13 +783,15 @@ const styles = StyleSheet.create({
 
 OrderView.propTypes = {
 	order: PropTypes.object.isRequired,
-	resetOrder: PropTypes.func.isRequired
+	resetOrder: PropTypes.func.isRequired,
+	local: PropTypes.object.isRequired
 }
 
 function mapStateToProps(state) {
 	return{
 		order: state.order,
-		session: state.auth.session
+		session: state.auth.session,
+		local: state.auth.localUser
 	}
 }
 

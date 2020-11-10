@@ -309,7 +309,6 @@ const MenuView = props => {
 							}
 							api.syncronizeCod(payloadSyncGiro)
 								.then(async lastResponse => {
-									console.log(lastResponse);
 									try{
 										await AsyncStorage.setItem('isCodBaru', JSON.stringify(true));
 										Toast.show({

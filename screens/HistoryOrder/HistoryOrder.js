@@ -81,7 +81,7 @@ const HistoryOrder = props => {
 	const handlePickup = (pickupNumber, extid) => props.onPickuped(pickupNumber, extid)
 
 	const handleGetNewDataQob = () => {
-		console.log(offestQob);
+		// console.log(offestQob);
 		if (offestQob !== 0) {
 			const payload = {
 				email,

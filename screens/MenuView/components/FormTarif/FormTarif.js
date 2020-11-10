@@ -94,11 +94,9 @@ const FormTarif = props => {
 	}
 
 	const ViewScaleValue = props.animatedValue.interpolate({
-	  inputRange: [0, 25, 50, 100],
-	  outputRange: [0, .5, 0.75, 1]
+	  inputRange: [0, 5, 10],
+	  outputRange: [20, 10, 0]
 	});
-
-	console.log(state);
 
 	return(
 		<Animated.View 
