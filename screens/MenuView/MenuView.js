@@ -36,6 +36,7 @@ import * as Notifications from 'expo-notifications';
 import * as Linking from 'expo-linking';
 import { Ionicons } from '@expo/vector-icons';
 
+import {Collapse,CollapseHeader, CollapseBody, AccordionList} from 'accordion-collapse-react-native';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -394,35 +395,47 @@ const MenuView = props => {
 						<SliderImage />
 					</View>
 					<View style={[styles.hr, { marginTop: 0}]} />
-
-					<TouchableOpacity 
-						style={{
-							height: hp('5.2%'),
-							alignItems: 'center',
-							flexDirection: 'row',
-							justifyContent: 'space-between',
-							width: wp('95%'),
-							paddingTop: 5
-						}}
-						activeOpacity={0.7}
-						onPress={() => setState(state => ({
-							...state,
-							tarifVisible: !state.tarifVisible
-						}))}
-					>
-						<Text style={styles.subTitle}>Mau Kirim Kemana?</Text>
-						{ state.tarifVisible ? 
-							<Ionicons name="ios-arrow-down" size={24} color="black" /> : 
-							<Ionicons name="ios-arrow-forward" size={24} color="black" />}
-					</TouchableOpacity>
 					
-
-					{ state.tarifVisible && <FormTarif 
-						animatedValue={state.positionTarif}
-						navigate={props.navigation.navigate}
-						values={order}
-						onSubmit={handleCekTarif}
-					/> }
+					<Collapse
+						onToggle={(isCollapsed) => setState(state => ({
+							...state,
+							tarifVisible: isCollapsed
+						}))}
+						isCollapsed={state.tarifVisible}
+					>
+					    <CollapseHeader>
+					      <View 
+							style={{
+								height: hp('5.2%'),
+								alignItems: 'center',
+								flexDirection: 'row',
+								justifyContent: 'space-between',
+								width: wp('95%'),
+								paddingTop: 5
+							}}
+							// activeOpacity={0.7}
+							// onPress={() => setState(state => ({
+							// 	...state,
+							// 	tarifVisible: !state.tarifVisible
+							// }))}
+						>
+							<Text style={styles.subTitle}>Mau kirim kemana?</Text>
+							{ state.tarifVisible ? 
+								<Ionicons name="ios-arrow-down" size={24} color="black" /> : 
+								<Ionicons name="ios-arrow-forward" size={24} color="black" />
+							}
+						</View>
+					    </CollapseHeader>
+					    <CollapseBody>
+					      	<FormTarif 
+								// animatedValue={state.positionTarif}
+								navigate={props.navigation.navigate}
+								values={order}
+								onSubmit={handleCekTarif}
+							/>
+					    </CollapseBody>
+					</Collapse>
+				
 
 					<View style={styles.hr} />
 					
@@ -634,7 +647,7 @@ const styles = StyleSheet.create({
 		fontFamily: 'Nunito'
 	},
 	subTitle: {
-		fontFamily: 'Nunito',
+		fontFamily: 'Nunito-semi',
 		marginLeft: 6
 	},
 	elevationImage: {

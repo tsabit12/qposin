@@ -5,7 +5,6 @@ import {
 	StyleSheet, 
 	Text as TextDefault, 
 	TouchableOpacity,
-	Animated,
 	Modal
 } from 'react-native';
 import { ListItem, Text, Left, Body, Right, Switch, List, Thumbnail } from 'native-base';
@@ -93,15 +92,8 @@ const FormTarif = props => {
 		}))
 	}
 
-	const ViewScaleValue = props.animatedValue.interpolate({
-	  inputRange: [0, 5, 10],
-	  outputRange: [20, 10, 0]
-	});
-
 	return(
-		<Animated.View 
-			style={{transform: [{  scaleY: ViewScaleValue }]}}
-		>
+		<View>
 			{ showJenis && 
 				<PilihJenis  
 					handleClose={() => setState(state => ({
@@ -224,7 +216,7 @@ const FormTarif = props => {
 		            </TouchableOpacity>
 	            </View>
           	</List>
-		</Animated.View>
+		</View>
 	);
 }
 
