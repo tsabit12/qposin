@@ -6,7 +6,8 @@ import {
 	TouchableOpacity,
 	StyleSheet,
 	AsyncStorage,
-	StatusBar
+	StatusBar,
+	Image
 } from 'react-native';
 import { connect } from 'react-redux';
 import { Icon, Toast } from 'native-base';
@@ -263,6 +264,11 @@ const ConnectGiroView = props => {
 				</Text>
 			</View>
 			<View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+				<Image
+			        style={styles.tinyLogo}
+			        resizeMode='contain'
+			        source={require('../../assets/images/hubrek.png')}
+			    />
 				{ !data.isConfirm ? 
 					<RequestForm onSubmit={handleRequest} /> : 
 					<View>
@@ -322,6 +328,11 @@ const styles = StyleSheet.create({
 	message: {
 		textAlign: 'center',
 		fontFamily: 'Nunito-Bold'
+	},
+	tinyLogo: {
+		width: wp('80%'),
+		height: hp('30%'),
+		marginBottom: 30
 	}
 })
 

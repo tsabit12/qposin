@@ -252,7 +252,9 @@ const ProfileView = props => {
 								<View style={{marginLeft: 8}}>
 									<Text style={[styles.text, {color: '#ffa200', fontSize: 16.9}]}>Apakah anda pebisnis online</Text>
 									<Text style={[styles.text, {color: '#ffa200', fontSize: 14}]}>
-										{ userid.substring(0, 3) === '440' ? 'Ya' : 'Bukan'}
+										{ props.user.namaOl === '-' ? 'Bukan': 'Ya'}
+
+										{ /* userid.substring(0, 3) === '440' ? 'Ya' : 'Bukan' */}
 									</Text>
 								</View>
 							</View>

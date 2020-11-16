@@ -134,6 +134,7 @@ const CompleteRegistrasi = props => {
 		}else{
 			payload.param1 = `00|${data.nama}|${data.phone}|${data.email}|${Constants.deviceId}`;
 			payload.param2 = `-|-|-|-|-|-`;
+			payload.param3 = `-|-|-|-|-|-`; 
 		}
 
 		if (Object.keys(payload).length > 0) {

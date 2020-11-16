@@ -140,6 +140,7 @@ const ListQob = props => {
 								.catch(() => stopLoadingPickup(`Update status failed`));
 						})
 						.catch(err => {
+							console.log(err);
 							if (err.msg) {
 								stopLoadingPickup(err.msg);	
 							}else{

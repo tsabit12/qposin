@@ -471,7 +471,7 @@ const MenuView = props => {
 											resizeMode='contain'
 										/>
 									</View>
-									<Text style={styles.textLabel}>Kiriman E-Commerce</Text>
+									<Text style={styles.textLabel}>Kiriman{'\n'}E-Commerce</Text>
 								</TouchableOpacity>
 
 								<TouchableOpacity 

@@ -110,7 +110,7 @@ const OrderView = props => {
 
 	// useEffect(() => {
 	// 	(async () => {
-	// 		await AsyncStorage.removeItem('isCodBaru');
+	// 		await AsyncStorage.removeItem('isCodBaru2');
 	// 	})();
 	// }, [])
 
@@ -184,7 +184,7 @@ const OrderView = props => {
 	useEffect(() => {
 		(async () => {
 			if (session.norek !== '-') {
-				const value = await AsyncStorage.getItem('isCodBaru'); //define user was syncronize 
+				const value = await AsyncStorage.getItem('isCodBaru2'); //define user was syncronize 
 				if (value === null) {
 					setVisibleSync(true);
 					setState(state => ({
@@ -469,9 +469,11 @@ const OrderView = props => {
 					email: local.email,
 					pin: pin.response_data1
 				}
+				console.log('succes generate pin');
 
 				api.syncronizeUserPwd(payload)
 					.then(res => {
+						console.log("succes sync user");
 						if (res.respcode === '21' || res.respcode === '00') { //was sync and first time sync we keep send
 							const payloadSyncGiro = {
 								email: local.email,
@@ -479,6 +481,7 @@ const OrderView = props => {
 							}
 							api.syncronizeCod(payloadSyncGiro)
 								.then(async lastResponse => {
+									console.log("succes sync giro web");
 									setState(prevState => ({
 										...prevState,
 										loading: false
@@ -486,8 +489,9 @@ const OrderView = props => {
 									setVisibleSync(false);
 
 									try{
-										await AsyncStorage.setItem('isCodBaru', JSON.stringify(true));
+										await AsyncStorage.setItem('isCodBaru2', JSON.stringify(true));
 										validateRekening();
+										console.log("succes save storage");
 									}catch(err){
 										console.log(err);
 									}

@@ -413,9 +413,22 @@ export default {
 			return Promise.reject(errors);
 		}
 	}),
-	addPickup: (payload) => axios.post('https://fasterv2.fastkurir.com/api/customer/bidding_v2', {
+	// addPickup: (payload) => axios.post('https://fasterv2.fastkurir.com/api/customer/bidding_v2', {
+	// 	...payload
+	// }, configFast).then(res => {
+	// 	if (res.data.status === true) {
+	// 		return res.data;
+	// 	}else{
+	// 		const errors = {
+	// 			msg: 'Duplicate extid'
+	// 		}
+	// 		return Promise.reject(errors);
+	// 	}
+	// }),
+	addPickup: (payload) => axios.post('https://meterai.posindonesia.co.id/dev/bidding/Api/bidding_process', {
 		...payload
 	}, configFast).then(res => {
+		console.log(res);
 		if (res.data.status === true) {
 			return res.data;
 		}else{
