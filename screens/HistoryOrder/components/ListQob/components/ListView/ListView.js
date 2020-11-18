@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	View,
 	Text,
@@ -10,7 +10,8 @@ import {
 	TouchableOpacity,
 	Clipboard,
 	ToastAndroid,
-	RefreshControl
+	RefreshControl,
+	Alert
 } from 'react-native';
 import {
 	widthPercentageToDP as wp, 
@@ -25,6 +26,7 @@ import {
 } from 'react-native-popup-menu';
 import { Ionicons } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
+import rgba from 'hex-to-rgba';
 
 const capitalize = (string) => {
 	if (string) {
@@ -36,6 +38,7 @@ const capitalize = (string) => {
 
 
 const Item  = props => {
+	const { col } = props;
 	const handleCopy = (extid) => {
 		Clipboard.setString(props.id);
 		ToastAndroid.showWithGravity(
@@ -48,42 +51,59 @@ const Item  = props => {
 	return(
 		<React.Fragment>
 			{ props.index === 0 && <View style={{height: hp('11%')}} />}
-			<View style={[styles.list]}>
+			<TouchableOpacity 
+				style={
+					[styles.list, col.choosed ? 
+						{backgroundColor: '#d0d6d3', elevation: 1} : 
+						{
+							backgroundColor: 'white', 
+							elevation: 3
+						}
+				]} 
+				activeOpacity={props.toDisabled ? 0.8 : 2 } 
+				onLongPress={() => props.onLongPress()}
+				onPress={props.onPressItem}
+				// disabled={props.toDisabled}
+			>
 				<View style={styles.header}>
 					<Text 
 						style={styles.status}
 						onPress={()=> handleCopy(props.id)}
-					>{props.id}</Text>
+					>{col.extid}</Text>
 					<Icon name='ios-checkmark-circle' style={styles.icon} />
-					<Menu>
-						<MenuTrigger>
-							<Icon name="ios-more" style={{fontSize: 20, marginRight: 5}}/>
-						</MenuTrigger>
-						<MenuOptions>
-							{ props.pickupnumber === null && <MenuOption onSelect={() => props.onPress(props.id, '1')}>
-					          	<View style={styles.textMenu}>
-					          		<Text>Pickup</Text>
-					          	</View>
-					        </MenuOption> }
-					        
-					        {/* <MenuOption>
-					          	<View style={styles.textMenu}>
-					          		<Text>Order ulang</Text>
-					          	</View>
-					        </MenuOption> */}
+					{ !col.choosed && <React.Fragment>
+						<Menu>
+							<MenuTrigger>
+								<Icon name="ios-more" style={{fontSize: 20, marginRight: 5}}/>
+							</MenuTrigger>
+							<MenuOptions>
+								{ col.pickupnumber === null && <MenuOption 
+										onSelect={() => props.onPressMenu(col.extid, '1')}
+									>
+						          	<View style={styles.textMenu}>
+						          		<Text>Pickup</Text>
+						          	</View>
+						        </MenuOption> }
+						        
+						        {/* <MenuOption>
+						          	<View style={styles.textMenu}>
+						          		<Text>Order ulang</Text>
+						          	</View>
+						        </MenuOption> */}
 
-					        <MenuOption onSelect={() => props.onPress(props.id, '3')}>
-					          	<View style={styles.textMenu}>
-					          		<Text>Lacak kiriman</Text>
-					          	</View>
-					        </MenuOption>
-							<MenuOption onSelect={() => props.onPress(props.id, '4')}>
-					        	<View style={styles.textMenu}>
-					          		<Text>Lihat detail</Text>
-					          	</View>
-					        </MenuOption>
-						</MenuOptions>
-					</Menu> 
+						        <MenuOption onSelect={() => props.onPressMenu(col.extid, '3')}>
+						          	<View style={styles.textMenu}>
+						          		<Text>Lacak kiriman</Text>
+						          	</View>
+						        </MenuOption>
+								<MenuOption onSelect={() => props.onPressMenu(col.extid, '4')}>
+						        	<View style={styles.textMenu}>
+						          		<Text>Lihat detail</Text>
+						          	</View>
+						        </MenuOption>
+							</MenuOptions>
+						</Menu> 
+					</React.Fragment> }
 					
 				</View>
 				<View style={styles.box}>
@@ -102,7 +122,7 @@ const Item  = props => {
 									style={[styles.textItem, {color: '#a3a3a2'}]}
 									numberOfLines={2}
 								>
-									{ props.shippercity }
+									{ capitalize(col.shippercity) }
 								</Text>
 							</View>
 						</View>
@@ -122,7 +142,7 @@ const Item  = props => {
 									style={[styles.textItem, {color: '#a3a3a2'}]}
 									numberOfLines={2}
 								>
-									{ props.kiriman }
+									{capitalize(col.desctrans)}
 								</Text>
 							</View>
 						</View>
@@ -150,7 +170,7 @@ const Item  = props => {
 									style={[styles.textItem, {color: '#a3a3a2'}]}
 									numberOfLines={2}
 								>
-									{ props.receivercity }
+									{ capitalize(col.receivercity) }
 								</Text>
 							</View>
 						</View>
@@ -170,7 +190,7 @@ const Item  = props => {
 									style={[styles.textItem, {color: '#a3a3a2'}]}
 									numberOfLines={2}
 								>
-									{ props.receivername }
+									{ capitalize(col.receivername) }
 								</Text>
 							</View>
 						</View>
@@ -178,7 +198,9 @@ const Item  = props => {
 				</View>
 
 				<View style={styles.footer}>
-					<Text style={[styles.textItem, {color: '#a3a3a2', flex: 1, marginLeft: 5}]}>Dikirim : {props.date.substring(0, 10)}</Text>
+					<Text style={[styles.textItem, {color: '#a3a3a2', flex: 1, marginLeft: 5}]}>
+						Dikirim : {col.insert_date.substring(0, 10)}
+					</Text>
 					<View style={{flex: 1, alignItems: 'flex-end', marginRight: 5}}>
 						<Text 
 							//ellipsizeMode='tail'
@@ -187,11 +209,11 @@ const Item  = props => {
 									color: '#a3a3a2'
 								}]
 							} 
-							numberOfLines={1}>Status : {props.status}
+							numberOfLines={1}>Status : {col.laststatus}
 						</Text>
 					</View>
 				</View>
-			</View>
+			</TouchableOpacity>
 		</React.Fragment>
 	);
 } 
@@ -201,8 +223,18 @@ const Item  = props => {
 const ListView = props => {
 	const { data: DATA } = props;
 	const [loading, setLoading] = useState(false);
+	const [itemPressed, setItemPressed] = useState(false);
 
-	const handlePress = (value, type) => {
+	useEffect(() => {
+		if (DATA.length > 0) {
+			const findChoosed = DATA.filter(row => row.choosed === true);
+			if (findChoosed.length === 0 && itemPressed) {
+				setItemPressed(false);
+			}
+		}
+	}, [DATA, itemPressed])
+
+	const handlePressMenu = (value, type) => {
 		const detail = DATA.find(order => order.extid === value);
 		if (type === '4') {
 			props.onViewDetail(detail);
@@ -224,46 +256,118 @@ const ListView = props => {
 			});
 	}
 
+	const handleLongPress = (col) => {
+		const isValidItem = validate(col);
+		if (isValidItem.success) {
+			props.setChoosed(col.extid);
+			setItemPressed(true);
+		}else{
+			alert(isValidItem.message);	
+		}
+	}
+
+	const handlePressItem = (item) => {
+		if (itemPressed) { //work after long press
+			const isValidItem = validate(item);
+			if (isValidItem.success) {
+				props.setChoosed(item.extid);
+			}else{
+				alert(isValidItem.message);	
+			}
+		}
+	}
+
+	const validate = (choosedItem) => {
+		const isValid = {};
+		if (choosedItem.pickupnumber === null) {
+			const firstChoosedItem = DATA.find(row => row.choosed === true);
+			if (firstChoosedItem) {
+				const { shippersubdistrict } = firstChoosedItem;
+				if (shippersubdistrict.toLowerCase() !== choosedItem.shippersubdistrict.toLowerCase()) {
+					isValid.success = false;
+					isValid.message = "Harap pilih alamat pengirim yang sama";
+				}else{
+					isValid.success = true;
+					isValid.message = null;
+				}
+			}else{
+				isValid.success = true;
+				isValid.message = null;
+			}
+		}else{
+			isValid.success = false;
+			isValid.message = `ID ORDER ${choosedItem.extid} sebelumnya sudah dipickup, silahkan pilih ID ORDER lain`;
+		}
+
+		return isValid;
+	}
+
 	const renderItem = ({ item, index }) => (
 		<Item 
-			status={item.laststatus}
-			shippercity={capitalize(item.shippercity)}
-			receivercity={capitalize(item.receivercity)}
-			kiriman={capitalize(item.desctrans)}
-			receivername={capitalize(item.receivername)}
-			date={item.insert_date}
-			pickupnumber={item.pickupnumber}
-			id={item.extid}
-			onPress={handlePress}
+			col={item}
+			onPressMenu={handlePressMenu}
 			index={index}
+			onLongPress={() => handleLongPress(item)}
+			onPressItem={() => handlePressItem(item)}
+			toDisabled={itemPressed}
 		/>
 	);
 
+	const onPressbtnpickup = () => {
+		Alert.alert(
+	      "Konfirmasi",
+	      `Apakah anda yakin untuk melakukan pickup?`,
+	      [
+	        {
+	          text: "Cancel",
+	          // onPress: () => console.log("Cancel Pressed"),
+	          style: "cancel"
+	        },
+	        { 
+	        	text: "OK", 
+	        	onPress: () => props.onMultiplePickup()
+	        }
+	      ],
+	      { cancelable: false }
+	    );
+	}
+
 	return(
-		<FlatList
-	        data={DATA}
-	        renderItem={renderItem}
-	        onEndReached={() => props.getNewData()}
-	        refreshControl={
-                <RefreshControl
-                    refreshing={loading}
-                    progressViewOffset={90}
-                    onRefresh={handleRefresh}
-                />
-            }
-	        onEndReachedThreshold={0.5}
-	        onScroll={(e) => props.onScroll(e.nativeEvent.contentOffset.y)}
-	        keyExtractor={item => item.id.toString()}
-	    />
+		<View style={itemPressed ? styles.choosedMode : null}>
+			<FlatList
+		        data={DATA}
+		        renderItem={renderItem}
+		        onEndReached={() => props.getNewData()}
+		        refreshControl={
+	                <RefreshControl
+	                    refreshing={loading}
+	                    progressViewOffset={90}
+	                    onRefresh={handleRefresh}
+	                />
+	            }
+		        onEndReachedThreshold={0.5}
+		        onScroll={(e) => props.onScroll(e.nativeEvent.contentOffset.y)}
+		        keyExtractor={item => item.id.toString()}
+		    />
+		    { DATA.filter(row => row.choosed === true).length > 0 && 
+			    <TouchableOpacity 
+			    	style={styles.btn_pickup} 
+			    	activeOpacity={0.7}
+			    	onPress={onPressbtnpickup}
+			    >
+			    	<Text style={{color: 'white', textAlign: 'center'}}>
+			    		Pickup{'\n'}{DATA.filter(row => row.choosed === true).length} item
+			    	</Text>
+			    </TouchableOpacity> }
+	    </View>
 	);
 }
 
 const styles = StyleSheet.create({
 	list: {
-		backgroundColor: 'white',
+		// backgroundColor: 'white',
 		height: hp('26%'),
 		borderRadius: 6,
-		elevation: 3,
 		margin: 7
 	},
 	footer: {
@@ -327,6 +431,23 @@ const styles = StyleSheet.create({
 		paddingLeft: 10, 
 		paddingBottom: 6, 
 		paddingTop: 6
+	},
+	choosedMode: {
+		backgroundColor: 'white'
+	},
+	btn_pickup: {
+		position: 'absolute',
+		bottom: 0,
+		right: 0,
+		backgroundColor: '#C51C16',
+		margin: 10,
+		height: hp('9%'),
+		width: hp('9%'),
+		borderRadius: hp('9%') / 2,
+		alignItems: 'center',
+		justifyContent: 'center',
+		elevation: 3,
+		padding: 5
 	}
 })
 
@@ -337,7 +458,9 @@ ListView.propTypes = {
 	onPickup: PropTypes.func.isRequired,
 	getNewData: PropTypes.func.isRequired,
 	onRefresh: PropTypes.func.isRequired,
-	onScroll: PropTypes.func.isRequired
+	onScroll: PropTypes.func.isRequired,
+	setChoosed: PropTypes.func.isRequired,
+	onMultiplePickup: PropTypes.func.isRequired
 }
 
 export default ListView;

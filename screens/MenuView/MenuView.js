@@ -296,7 +296,7 @@ const MenuView = props => {
 		api.generateToken(local.userid)
 			.then(pin => {
 				const payload = {
-					email: local.email,
+					email: session.email,
 					pin: pin.response_data1
 				}
 
@@ -305,7 +305,7 @@ const MenuView = props => {
 						//keep send
 						if (res.respcode === '21' || res.respcode === '00') {
 							const payloadSyncGiro = {
-								email: local.email,
+								email: session.email,
 								norek: session.norek
 							}
 							api.syncronizeCod(payloadSyncGiro)

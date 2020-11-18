@@ -14,3 +14,18 @@ export const onPickuped = (noPickup, extid) => dispatch => dispatch({
 	noPickup,
 	extid
 })
+
+export const setChoosed = (extid) => dispatch => dispatch({
+	type: 'SET_CHOOSED',
+	extid
+})
+
+export const removeAllChoosed = () => dispatch => dispatch({
+	type: 'REMOVE_ALL_CHOOSED'
+})
+
+export const mutltipletPickuped = (noPickup, groupExtid) => dispatch => dispatch({
+	type: 'MULTIPLE_ORDER_WAS_PICKUP',
+	noPickup,
+	groupExtid
+})

@@ -184,7 +184,7 @@ const OrderView = props => {
 	useEffect(() => {
 		(async () => {
 			if (session.norek !== '-') {
-				const value = await AsyncStorage.getItem('isCodBaru2'); //define user was syncronize 
+				const value = await AsyncStorage.getItem('isCodBaru'); //define user was syncronize 
 				if (value === null) {
 					setVisibleSync(true);
 					setState(state => ({
@@ -466,7 +466,7 @@ const OrderView = props => {
 		api.generateToken(local.userid)
 			.then(pin => {
 				const payload = {
-					email: local.email,
+					email: props.session.email,
 					pin: pin.response_data1
 				}
 				console.log('succes generate pin');
@@ -476,7 +476,7 @@ const OrderView = props => {
 						console.log("succes sync user");
 						if (res.respcode === '21' || res.respcode === '00') { //was sync and first time sync we keep send
 							const payloadSyncGiro = {
-								email: local.email,
+								email: props.session.email,
 								norek: session.norek
 							}
 							api.syncronizeCod(payloadSyncGiro)
@@ -489,7 +489,7 @@ const OrderView = props => {
 									setVisibleSync(false);
 
 									try{
-										await AsyncStorage.setItem('isCodBaru2', JSON.stringify(true));
+										await AsyncStorage.setItem('isCodBaru', JSON.stringify(true));
 										validateRekening();
 										console.log("succes save storage");
 									}catch(err){

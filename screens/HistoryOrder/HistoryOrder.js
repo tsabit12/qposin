@@ -21,7 +21,13 @@ import {
 } from './components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { getQob, onPickuped } from '../../redux/actions/history';
+import { 
+	getQob, 
+	onPickuped, 
+	setChoosed,
+	removeAllChoosed,
+	mutltipletPickuped
+} from '../../redux/actions/history';
 import AnimatedLoader from "react-native-animated-loader";
 
 const daysInMonth = (iMonth, iYear) => {
@@ -47,7 +53,14 @@ const HistoryOrder = props => {
 		extrapolateLeft: 'clamp'
 	})
 
+	//unmount component
 	useEffect(() => {
+		return () => {
+			props.removeAllChoosed();
+		};
+	}, [])
+
+	useEffect(() => { 
 		if (activePage === 1) {
 			const payload = {
 				email: email,
@@ -70,13 +83,6 @@ const HistoryOrder = props => {
 				})
 		}
 	}, [activePage]);
-
-	// useEffect(() => {
-	// 		Animated.spring(animateContent, {
-	// 			toValue: 0,
-	// 			useNativeDriver: true
-	// 		}).start();
-	// }, [searchQob])
 
 	const handlePickup = (pickupNumber, extid) => props.onPickuped(pickupNumber, extid)
 
@@ -124,11 +130,6 @@ const HistoryOrder = props => {
 		scrollY.setValue(yOffset);
 	}
 
-	// const scaleY = animateContent.interpolate({
-	// 	inputRange: [0, 20, 40, 60],
- //  		outputRange: [100, 80, 60, 0]
-	// })
-
 	return(
 		<View style={StyleSheet.absoluteFillObject}> 
 			<AnimatedLoader
@@ -165,6 +166,8 @@ const HistoryOrder = props => {
 					getNewData={handleGetNewDataQob}
 					handleRefresh={onRefreshQob}
 					onScroll={handleHideHeader}
+					setChoosed={props.setChoosed}
+					onMultiplePickup={props.mutltipletPickuped}
 				/> }
 
 			{ activePage === 2 && <ListQ9 /> }
@@ -221,7 +224,10 @@ const styles = StyleSheet.create({
 HistoryOrder.propTypes = {
 	qob: PropTypes.array.isRequired,
 	getQob: PropTypes.func.isRequired,
-	onPickuped: PropTypes.func.isRequired
+	onPickuped: PropTypes.func.isRequired,
+	setChoosed: PropTypes.func.isRequired,
+	removeAllChoosed: PropTypes.func.isRequired,
+	mutltipletPickuped: PropTypes.func.isRequired
 }
 
 function mapStateToProps(state) {
@@ -233,5 +239,8 @@ function mapStateToProps(state) {
 
 export default connect(mapStateToProps, {
 	getQob,
-	onPickuped
+	onPickuped,
+	setChoosed,
+	removeAllChoosed,
+	mutltipletPickuped
 })(HistoryOrder);
