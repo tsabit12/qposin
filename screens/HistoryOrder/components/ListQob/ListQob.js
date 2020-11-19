@@ -6,7 +6,8 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	TextInput,
-	Image
+	Image,
+	StatusBar
 } from 'react-native';
 import {
 	widthPercentageToDP as wp, 
@@ -21,7 +22,6 @@ import {
 } from './components';
 import rgba from 'hex-to-rgba';
 import api from '../../../../api';
-import AnimatedLoader from "react-native-animated-loader";
 import * as Location from 'expo-location';
 import Loader from "../../../Loader";
 
@@ -46,7 +46,6 @@ const ListQob = props => {
 	const { error } = props;
 	const [bounceValue] = useState(new Animated.Value(400));
 	const [dataLacak, setDataLacak] = useState({
-		loading: false,
 		data: [],
 		extid: ''
 	});
@@ -66,30 +65,26 @@ const ListQob = props => {
 	}, []);
 
 	const handleLacak = (extid) => {
-		setDataLacak(lacak => ({
-			...lacak,
+		setPickupLoading({
+			text: 'Loading...',
 			loading: true
-		}))
+		});
 
 		api.lacakKiriman(extid)
 			.then(traces => {
 				setDataLacak(lacak => ({
 					...lacak,
-					loading: false,
 					data: traces,
 					extid
 				}))
-			})
-			.catch(err => {
-				setDataLacak(lacak => ({
-					...lacak,
+
+				setPickupLoading(x => ({
+					...x,
 					loading: false
 				}))
-				Toast.show({
-		            text: 'Data kiriman tidak ditemukan',
-		            textStyle: { textAlign: 'center' },
-		            duration: 3000
-		        })
+			})
+			.catch(err => {
+				stopLoadingPickup('Data kiriman tidak ditemukan')
 			});
 	}
 
@@ -105,6 +100,10 @@ const ListQob = props => {
 		}else{
 			await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.High})
 				.then(location => {
+					setPickupLoading(x => ({
+						...x,
+						text: 'Mencari driver...'
+					}));
 					const { latitude, longitude } = location.coords;
 
 					const payload = {
@@ -186,6 +185,10 @@ const ListQob = props => {
 		}else{
 			await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.High})
 				.then(location => {
+					setPickupLoading(x => ({
+						...x,
+						text: 'Mencari driver...'
+					}));
 					const { latitude, longitude } = location.coords;
 					const choosed 		= props.list.filter(row => row.choosed === true);
 					const item 			= [];
@@ -238,10 +241,9 @@ const ListQob = props => {
 								extid: groupExtid
 							}
 							props.onMultiplePickup(pickup_number, groupExtid);
-
 							api.updateStatusPickup(payloadUpdate)
-								.then(() => stopLoadingPickup(`Pickup sukses`))
-								.catch(() => stopLoadingPickup(`Update status failed`));
+								.then(() => stopLoadingPickup(`Sukses pickup dengan nomor pickup ${pickup_number}`))
+								.catch(() => stopLoadingPickup(`Update status  failed`));
 						})
 						.catch(err => {
 							if (err.msg) {
@@ -259,29 +261,15 @@ const ListQob = props => {
 	}
 
 	const stopLoadingPickup = (msg) => {
-		setPickupLoading(x => ({
-			...x,
-			text: msg
-		}))
-
-		setTimeout(function() {
-			setPickupLoading({
-				text: '',
-				loading: false
-			})
-		}, 100);
+		setPickupLoading({
+			text: '',
+			loading: false
+		})
+		props.showToast(msg);
 	}
 
 	return(
 		<View style={{flex: 1}}>
-			<AnimatedLoader
-		        visible={dataLacak.loading}
-		        overlayColor="rgba(0,0,0,0.6)"
-		        source={require("../../../../assets/images/loader/3098.json")}
-		        animationStyle={styles.lottie}
-		        speed={1}
-		    />
-
 			{ error ? <EmptyMessage 
 					onOrder={() => props.navigation.navigate('Order', { type: 2 })} 
 				/> : <React.Fragment>
@@ -308,6 +296,8 @@ const ListQob = props => {
 				text={pickupLoading.text} 
 			/>
 
+			{ pickupLoading.loading ? <StatusBar backgroundColor="rgba(0,0,0,0.5)"/> : <StatusBar backgroundColor="#C51C16"/> }
+
 			{ dataLacak.data.length > 0 && 
 				<LacakView 
 					data={dataLacak.data} 
@@ -318,9 +308,6 @@ const ListQob = props => {
 					}))}
 					extid={dataLacak.extid}
 				/> }
-
-			{ /* pickupLoading.loading && <PickupLoading text={pickupLoading.text} /> */ }
-
 		</View>
 	);
 }
@@ -385,7 +372,8 @@ ListQob.propTypes = {
 	getNewData: PropTypes.func.isRequired,
 	handleRefresh: PropTypes.func.isRequired,
 	setChoosed: PropTypes.func.isRequired,
-	onMultiplePickup: PropTypes.func.isRequired
+	onMultiplePickup: PropTypes.func.isRequired,
+	showToast: PropTypes.func.isRequired
 }
 
 export default ListQob;

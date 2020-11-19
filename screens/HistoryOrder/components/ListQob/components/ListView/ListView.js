@@ -11,7 +11,8 @@ import {
 	Clipboard,
 	ToastAndroid,
 	RefreshControl,
-	Alert
+	Alert,
+	Animated
 } from 'react-native';
 import {
 	widthPercentageToDP as wp, 
@@ -34,6 +35,35 @@ const capitalize = (string) => {
 	}else{
 		return '-';
 	}
+}
+
+const PickupIntro = () => {
+	const [fadeAnim, setFadeAnim] = useState(new Animated.Value(0));
+
+	useEffect(() => {
+		Animated.timing(fadeAnim, {
+			toValue: 1,
+			duration: 700,
+			useNativeDriver: true
+		}).start();
+	}, [])
+
+	return(
+		<Animated.View style={{opacity: fadeAnim}}>
+			<View style={styles.arrowBorder}/>
+			<View style={styles.introContainer}>
+				<Text 
+					style={{ 
+						color: '#FFF',
+						fontFamily: 'Nunito-Bold',
+						textAlign: 'center'
+					}}
+				>
+					Tekan lama untuk memilih beberapa item order
+				</Text>
+			</View>
+		</Animated.View>
+	);
 }
 
 
@@ -214,16 +244,16 @@ const Item  = props => {
 					</View>
 				</View>
 			</TouchableOpacity>
+			{ props.index === 0 && props.showIntro && <PickupIntro /> }
 		</React.Fragment>
 	);
 } 
-
-
 
 const ListView = props => {
 	const { data: DATA } = props;
 	const [loading, setLoading] = useState(false);
 	const [itemPressed, setItemPressed] = useState(false);
+	const [showIntro, setShowIntro] = useState(true);
 
 	useEffect(() => {
 		if (DATA.length > 0) {
@@ -233,6 +263,14 @@ const ListView = props => {
 			}
 		}
 	}, [DATA, itemPressed])
+
+	useEffect(() => {
+		if (showIntro) {
+			setTimeout(function() {
+				setShowIntro(false);
+			}, 3000);
+		}
+	}, [showIntro])
 
 	const handlePressMenu = (value, type) => {
 		const detail = DATA.find(order => order.extid === value);
@@ -261,6 +299,7 @@ const ListView = props => {
 		if (isValidItem.success) {
 			props.setChoosed(col.extid);
 			setItemPressed(true);
+			setShowIntro(false);
 		}else{
 			alert(isValidItem.message);	
 		}
@@ -310,6 +349,7 @@ const ListView = props => {
 			onLongPress={() => handleLongPress(item)}
 			onPressItem={() => handlePressItem(item)}
 			toDisabled={itemPressed}
+			showIntro={showIntro}
 		/>
 	);
 
@@ -448,6 +488,24 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		elevation: 3,
 		padding: 5
+	},
+	introContainer: {
+		backgroundColor: '#C51C16',
+		position: 'relative',
+		marginLeft: 7,
+		marginRight: 7,
+		height: hp('6%'),
+		padding: 10,
+		alignItems: 'center',
+		justifyContent: 'center'
+	},
+	arrowBorder: {
+		backgroundColor: 'transparent',
+		borderWidth: 10,
+		borderColor: 'transparent',
+		borderBottomColor: '#C51C16',
+		alignSelf: 'center',
+		marginTop: -15
 	}
 })
 

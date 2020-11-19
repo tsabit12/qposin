@@ -6,8 +6,7 @@ import {
 	TouchableOpacity,
 	ImageBackground,
 	ToastAndroid,
-	Animated,
-	StatusBar
+	Animated
 } from 'react-native';
 import { Icon, Footer, FooterTab, Button, Content } from 'native-base';
 import {
@@ -28,7 +27,7 @@ import {
 	removeAllChoosed,
 	mutltipletPickuped
 } from '../../redux/actions/history';
-import AnimatedLoader from "react-native-animated-loader";
+import CustomToast from "../CustomToast";
 
 const daysInMonth = (iMonth, iYear) => {
 	return 32 - new Date(iYear, iMonth, 32).getDate();
@@ -44,6 +43,10 @@ const HistoryOrder = props => {
 	const [offestQob, setOffsetQob] = useState(0);
 	const [searchQob, setSeacrhQob] = useState(false);
 	const [qobIsDone, setQobDone] = useState(false); //notif once
+	const [toastVisible, setToastVisible] = useState({
+		open: false,
+		message: 'Loading....'
+	});
 	const { email } = props.user;
 
 	const diffClamp =  Animated.diffClamp(scrollY, 0, hp('10%'));
@@ -131,15 +134,7 @@ const HistoryOrder = props => {
 	}
 
 	return(
-		<View style={StyleSheet.absoluteFillObject}> 
-			<AnimatedLoader
-		        visible={loading}
-		        overlayColor="rgba(0,0,0,0.1)"
-		        source={require("../../assets/images/loader/3098.json")}
-		        animationStyle={styles.lottie}
-		        speed={1}
-		    />
-		    <StatusBar backgroundColor="#C51C16"/>
+		<View style={StyleSheet.absoluteFillObject}>
 		    <Animated.View style={[styles.header, { transform: [{ translateY }]}]}>
 		    	<View style={{flexDirection: 'row', marginLeft: 20,  marginTop: 20}}>
 					<TouchableOpacity 
@@ -160,7 +155,6 @@ const HistoryOrder = props => {
 					error={errors.qob}
 					list={props.qob}
 					navigation={props.navigation}
-					setLoading={(bool) => setLoading(bool)}
 					userid={props.user.userid}
 					onPickup={handlePickup}
 					getNewData={handleGetNewDataQob}
@@ -168,10 +162,16 @@ const HistoryOrder = props => {
 					onScroll={handleHideHeader}
 					setChoosed={props.setChoosed}
 					onMultiplePickup={props.mutltipletPickuped}
+					showToast={(message) => setToastVisible({ message, open: true})}
 				/> }
 
 			{ activePage === 2 && <ListQ9 /> }
-	
+			
+			<CustomToast 
+				open={toastVisible.open} 
+				message={toastVisible.message}
+				onClose={() => setToastVisible({message: '', open: false})}
+			/>
 		</View>
 	);
 }

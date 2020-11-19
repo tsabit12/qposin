@@ -15,18 +15,22 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Constants from 'expo-constants';
 import api from '../../api';
-import { Toast } from 'native-base';
 import { setLoggedIn } from '../../redux/actions/auth';
 import {
 	widthPercentageToDP as wp, 
 	heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
+import CustomToast from '../CustomToast';
 
 const LoginView = props => {
 	const refPinView = useRef();
 	const [pin, setPin] = useState('');
 	const [showRemoveButton, setShowRemoveButton] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [openToast, setOpenToast] = useState({
+		text: '',
+		open: false
+	})
 
 	useEffect(() => {
 		if (pin.length > 0) {
@@ -79,23 +83,14 @@ const LoginView = props => {
 					refPinView.current.clearAll();
 
 				}else{
-					Toast.show({
-		                text: res.desk_mess,
-		                textStyle: { textAlign: 'center' },
-		                duration: 3000
-		            })
+		            setOpenToast({ text: res.desk_mess, open: true })
 		            setLoading(false);
 		            refPinView.current.clearAll();
 				}
 			})
 			.catch(err => {
-				console.log(err);
 				setLoading(false);
-				Toast.show({
-	              text: err.global,
-	              duration: 3000,
-	              textStyle: { textAlign: "center", fontSize: 14 }
-	            });
+	            setOpenToast({ text: err.global, open: true })
 	            refPinView.current.clearAll();
 			});
 	} 
@@ -162,6 +157,12 @@ const LoginView = props => {
 	        >
 	        	<Text style={styles.text}>Lupa PIN</Text>
 	        </TouchableOpacity>
+
+	        <CustomToast 
+	        	open={openToast.open}
+	        	message={openToast.text}
+	        	onClose={() => setOpenToast({message: '', open: false})}
+	        />
 		</ImageBackground>
 	);
 }
