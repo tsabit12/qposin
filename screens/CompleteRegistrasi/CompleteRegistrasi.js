@@ -8,7 +8,9 @@ import {
 	TextInput,
 	TouchableOpacity,
 	Animated,
-	AsyncStorage
+	AsyncStorage,
+	KeyboardAvoidingView,
+	Platform
 } from 'react-native';
 import {
 	widthPercentageToDP as wp, 
@@ -227,95 +229,100 @@ const CompleteRegistrasi = props => {
 		        animationStyle={styles.lottie}
 		        speed={1}
 		    />
-			<View style={styles.content}>
-				<Image 
-					source={require('../../assets/images/icon/smile.png')}
-					style={styles.image}
-					resizeMode='contain'
-				/>
-				<Animated.View style={[{ transform: [{translateX: bouncValue }] }]}>
-					{ activePage === 1 && 
-						<React.Fragment>
-							<View style={[styles.btnView]}>
-							<TextInput 
-								placeholder='Masukkan nama lengkap kamu'
-								style={styles.input}
-								textAlign='center'
-								autoCapitalize='words'
-								value={data.nama}
-								onChangeText={(text) => handleChange(text, 'nama')}
-							/>
-							<TextInput 
-								placeholder='Masukkan alamat email'
-								style={styles.input}
-								textAlign='center'
-								autoCapitalize='words'
-								value={data.email}
-								keyboardType='email-address'
-								onChangeText={(text) => handleChange(text, 'email')}
-							/>
-						</View>
+			<KeyboardAvoidingView 
+				behavior='position'
+				enabled={Platform.OS === 'ios' ? true : false}
+			>
+				<View style={styles.content}>
+					<Image 
+						source={require('../../assets/images/icon/smile.png')}
+						style={styles.image}
+						resizeMode='contain'
+					/>
+					<Animated.View style={[{ transform: [{translateX: bouncValue }] }]}>
+						{ activePage === 1 && 
+							<React.Fragment>
+								<View style={[styles.btnView]}>
+								<TextInput 
+									placeholder='Masukkan nama lengkap kamu'
+									style={styles.input}
+									textAlign='center'
+									autoCapitalize='words'
+									value={data.nama}
+									onChangeText={(text) => handleChange(text, 'nama')}
+								/>
+								<TextInput 
+									placeholder='Masukkan alamat email'
+									style={styles.input}
+									textAlign='center'
+									autoCapitalize='words'
+									value={data.email}
+									keyboardType='email-address'
+									onChangeText={(text) => handleChange(text, 'email')}
+								/>
+							</View>
 
-						<TouchableOpacity 
-							style={[styles.btn, {marginTop: 7}]}
-							activeOpacity={0.7}
-							onPress={() => handleSubmit(2)}
-						>
-							<Text style={styles.text}>Selanjutnya</Text>
-						</TouchableOpacity> 
-					</React.Fragment> }
-
-					{ activePage === 2 && 
-						<View style={[styles.btnView, {height: wp('40%')}]}>
-							<Text style={styles.text}>Apakah kamu pebisol?</Text>
 							<TouchableOpacity 
-								style={[styles.btn2]}
+								style={[styles.btn, {marginTop: 7}]}
 								activeOpacity={0.7}
-								onPress={() => onPressPebisol(1)}
+								onPress={() => handleSubmit(2)}
 							>
-								<Text style={styles.text}>Ya</Text>
+								<Text style={styles.text}>Selanjutnya</Text>
 							</TouchableOpacity> 
+						</React.Fragment> }
+
+						{ activePage === 2 && 
+							<View style={[styles.btnView, {height: wp('40%')}]}>
+								<Text style={styles.text}>Apakah kamu pebisol?</Text>
+								<TouchableOpacity 
+									style={[styles.btn2]}
+									activeOpacity={0.7}
+									onPress={() => onPressPebisol(1)}
+								>
+									<Text style={styles.text}>Ya</Text>
+								</TouchableOpacity> 
+								<TouchableOpacity 
+									style={[styles.btn2]}
+									activeOpacity={0.7}
+									onPress={() => onPressPebisol(2)}
+								>
+									<Text style={styles.text}>Bukan</Text>
+								</TouchableOpacity> 
+							</View> }
+
+						{ activePage === 3 && 
+							<React.Fragment>
+								<View style={[styles.btnView]}>
+								<TextInput 
+									placeholder='Masukkan nama usaha'
+									style={styles.input}
+									textAlign='center'
+									autoCapitalize='words'
+									value={data.namaUsaha}
+									onChangeText={(text) => handleChange(text, 'namaUsaha')}
+								/>
+								<TextInput 
+									placeholder='Jenis usaha kamu'
+									style={styles.input}
+									textAlign='center'
+									autoCapitalize='words'
+									value={data.jenisUsaha}
+									autoCapitalize='words'
+									onChangeText={(text) => handleChange(text, 'jenisUsaha')}
+								/>
+							</View>
+
 							<TouchableOpacity 
-								style={[styles.btn2]}
+								style={[styles.btn, {marginTop: 7}]}
 								activeOpacity={0.7}
-								onPress={() => onPressPebisol(2)}
+								onPress={handleRegistrasi}
 							>
-								<Text style={styles.text}>Bukan</Text>
+								<Text style={styles.text}>Selanjutnya</Text>
 							</TouchableOpacity> 
-						</View> }
-
-					{ activePage === 3 && 
-						<React.Fragment>
-							<View style={[styles.btnView]}>
-							<TextInput 
-								placeholder='Masukkan nama usaha'
-								style={styles.input}
-								textAlign='center'
-								autoCapitalize='words'
-								value={data.namaUsaha}
-								onChangeText={(text) => handleChange(text, 'namaUsaha')}
-							/>
-							<TextInput 
-								placeholder='Jenis usaha kamu'
-								style={styles.input}
-								textAlign='center'
-								autoCapitalize='words'
-								value={data.jenisUsaha}
-								autoCapitalize='words'
-								onChangeText={(text) => handleChange(text, 'jenisUsaha')}
-							/>
-						</View>
-
-						<TouchableOpacity 
-							style={[styles.btn, {marginTop: 7}]}
-							activeOpacity={0.7}
-							onPress={handleRegistrasi}
-						>
-							<Text style={styles.text}>Selanjutnya</Text>
-						</TouchableOpacity> 
-					</React.Fragment> }
-				</Animated.View>
-			</View>
+						</React.Fragment> }
+					</Animated.View>
+				</View>
+			</KeyboardAvoidingView>
 		</ImageBackground>
 	);
 }

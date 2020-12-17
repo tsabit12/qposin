@@ -6,7 +6,9 @@ import {
 	StyleSheet, 
 	TouchableOpacity,
 	Animated,
-	StatusBar
+	StatusBar,
+	Keyboard,
+	Platform
 } from 'react-native';
 import { Icon } from 'native-base';
 import rgba from 'hex-to-rgba';
@@ -66,8 +68,12 @@ const VerficationForm = props => {
 
 	return(
 		<Animated.View style={[styles.main, {transform: [{translateX: bounceValue}] }]}>
-			<Text style={[styles.text, {fontSize: 17, marginBottom: 10} ]}>Masukkan Kode Verifikasi</Text>
-			<Text style={[styles.text, {color: rgba('#949494', 0.7)}]}>Kode verifikasi telah dikirim melalui WhatsApp ke {props.phone}</Text>
+			<Text style={[styles.text, {fontSize: 17, marginBottom: 10} ]}>
+				Masukkan Kode Verifikasi
+			</Text>
+			<Text style={[styles.text, {color: rgba('#949494', 0.7)}]}>
+				Kode verifikasi telah dikirim melalui WhatsApp ke {props.phone}
+			</Text>
 			<CodeInput
 		      keyboardType="numeric"
 		      ref={confirmRef}
@@ -108,6 +114,30 @@ const ConfirmView = props => {
 		code: Math.floor(1000 + Math.random() * 9000),
 		activePage: 1
 	})
+	const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+	//in ios code input doesnt show
+	//because keyboard
+	useEffect(() => {
+		if(Platform.OS === 'ios'){
+			const keyboardDidShowListener = Keyboard.addListener(
+				'keyboardDidShow',
+			() => {
+				setKeyboardVisible(true); // or some other action
+			}
+			);
+			const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide',
+				() => {
+					setKeyboardVisible(false); // or some other action
+				}
+			);
+	
+			return () => {
+				keyboardDidHideListener.remove();
+				keyboardDidShowListener.remove();
+			};
+		}
+	}, []);
 
 	useEffect(() => {
 		Animated.spring(bounceValue, {
@@ -117,19 +147,6 @@ const ConfirmView = props => {
 	      friction: 8
 	    }).start();
 	}, [])
-
-	// const handleClose = () => {
-	// 	Animated.spring(bounceValue, {
-	//       toValue: 200,
-	//       useNativeDriver: true,
-	//       tension: 2,
-	//       friction: 8
-	//     }).start();
-
-	//     setTimeout(function() {
-	//     	props.onClose();
-	//     }, 500);
-	// }
 
 	const handleSend = () => {
 		const convertedPhone = convertPhone(props.phone);
@@ -159,9 +176,7 @@ const ConfirmView = props => {
 					success: true
 				}))
 			})
-	}	
-
-	//console.log(state.code);
+	}
 
 	return(
 		<Modal
@@ -171,7 +186,16 @@ const ConfirmView = props => {
 		>
 			<View style={styles.modalBackground}>
 				<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
-				<Animated.View style={[styles.content, {transform: [{translateY: bounceValue }] }]}>
+				<Animated.View 
+					style={[
+						styles.content, 
+						{
+							transform: [{
+								translateY: bounceValue 
+							}],
+							height: isKeyboardVisible && Platform.OS === 'ios' ? hp('75%') : null
+						}
+					]}>
 					<View style={styles.right}>
 						<TouchableOpacity onPress={props.onClose}>
 							<Icon name='close' style={{color: '#7a7d7b'}}/>
@@ -218,13 +242,13 @@ const styles = StyleSheet.create({
 	content: {
 		backgroundColor: 'white',
 		position: 'absolute',
-		bottom: 0,
 		left: 0,
 		right: 0,
-		justifyContent: 'center',
+		bottom: 0,
+		//justifyContent: 'center',
 		padding: 10,
 		borderTopLeftRadius: 15,
-		borderTopRightRadius: 15,
+		borderTopRightRadius: 15
 	},
 	right: {
 		justifyContent: 'flex-end', 
