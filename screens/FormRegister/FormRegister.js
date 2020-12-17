@@ -70,8 +70,10 @@ const FormRegister = props => {
 	}
 
 	const validate = (phone) => {
-		const errors = {};
+		const errors 	= {};
+		var phoneRegex 	= /^(^\62\s?|^0)(\d{3,4}-?){2}\d{3,4}$/;
 		if (!phone) errors.phone = 'Nomor ponsel belum diisi';
+		if (!phoneRegex.test(phone) && phone) errors.phone = 'Nomor telphone tidak valid';
 		return errors;
 	}
 

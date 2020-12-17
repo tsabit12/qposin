@@ -68,14 +68,14 @@ const PulihkanAkun = props => {
 		loading: false,
 		showVerifyCode: false,
 		verifyCode: null,
-		isChangePin: {
-			open: false,
-			newPin: ''
-		},
+		// isChangePin: {
+		// 	open: false,
+		// 	newPin: ''
+		// },
 		type: '2'
 	})
 
-	const { isChangePin } = state;
+	// const { isChangePin } = state;
 
 	useEffect(() => {
 		(async () => {
@@ -225,23 +225,23 @@ const PulihkanAkun = props => {
 
 				if (savePayloadQobUser) {
 					AsyncStorage.removeItem('HISTORI_REQUST_PEMULIHAN');
-					props.setLocalUser(savePayloadQobUser); //handle login without close app
-					//get number from string
-					var numb 	= response_data1.match(/\d/g);
-					numb 	 	= numb.join("");
-
+					props.setLocalUser(savePayloadQobUser);
+					
 					setState(state => ({
 						...state,
 						loading: false,
 						data: {
 							phone: '',
 							email: ''
-						},
-						isChangePin: {
-							open: true,
-							newPin: numb
 						}
 					}));
+
+					setTimeout(() => {
+						props.navigation.push('CreatePin', {
+							recovery: true
+						});
+					}, 1000);
+					
 				}else{
 					setState(state => ({
 						...state,
@@ -281,10 +281,14 @@ const PulihkanAkun = props => {
 	}
 
 	const validate = (field) => {
-		const errors = {};
+		const errors 	= {};
+		var phoneRegex 	= /^(^\62\s?|^0)(\d{3,4}-?){2}\d{3,4}$/;
+		var emailRegex 	= /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i; //eslint-disable-line
 
 		if (!field.phone) errors.phone = 'Nomor ponsel belum diisi';
+		if (!phoneRegex.test(field.phone) && field.phone) errors.phone = 'Nomor telphone tidak valid';
 		if (!field.email) errors.email = 'Alamat email belum diisi';
+		if (!emailRegex.test(field.email) && field.email) errors.email = 'Alamat email tidak valid';
 
 		return errors;
 	}
@@ -307,18 +311,6 @@ const PulihkanAkun = props => {
 		}
 	}
 
-	const navigateToHome = () => {
-		setState(state => ({
-			...state,
-			isChangePin: {
-				open: false,
-				newPin: ''
-			}
-		}))
-
-		props.navigation.replace('Home');
-	}
-
 	return(
 		<ImageBackground 
 			source={require('../../assets/images/background.png')} 
@@ -338,11 +330,7 @@ const PulihkanAkun = props => {
 		    		phone={data.phone}
 		    		verifyCode={state.verifyCode}
 		    	/> }
-		    { isChangePin.open && 
-		    	<ChangePinView 
-		    		pin={isChangePin.newPin} 
-		    		goDoneConfirm={navigateToHome}
-		    	/>}
+		    
 			<View style={styles.header}>
 				<TouchableOpacity 
 					style={styles.btn} 

@@ -28,6 +28,7 @@ const CreatePinView = props => {
 	const [loading, setLoading] = useState(false);
 	const [errors, setErrors] = useState({});
 	const [success, setSuccess] = useState(false);
+	const [isRegistrasi, setIsRegistrasi] = useState(true);
 
 	useEffect(() => {
 		BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
@@ -37,9 +38,15 @@ const CreatePinView = props => {
 	    };
 	}, [handleBackButtonClick]);
 
+	useEffect(() => {
+		if(props.route.params.recovery){
+			setIsRegistrasi(false);
+		}
+	}, [props.route]);
+
 	const handleBackButtonClick = () => {
 		Toast.show({
-            text: 'Registrasi belum selesai, harap masukan kode keamanan terlebih dahulu',
+            text: isRegistrasi ? 'Registrasi belum selesai, harap masukan kode keamanan terlebih dahulu' : 'Silahkan ubah PIN kamu terlebih dahulu',
             textStyle: { textAlign: 'center' },
             duration: 3000
         })
@@ -146,7 +153,10 @@ const CreatePinView = props => {
 				{ !success ? <React.Fragment>
 					<View style={[styles.btnView]}>
 						<Text style={[styles.text, { textAlign: 'center', marginLeft: 10, marginRight: 10}]}>
-							Tambahkan keamanan ekstra dengan PIN (6 digit) sesuai keinginanmu
+							{
+								isRegistrasi ? 'Tambahkan keamanan ekstra dengan PIN (6 digit) sesuai keinginanmu' : 
+								'Pemulihan akun berhasil, silahkan masukkan \nPIN baru (6 digit) sesuai keinginanmu'
+							}	
 						</Text>
 						<TextInput 
 							placeholder='Masukkan 6 digit pin disini'

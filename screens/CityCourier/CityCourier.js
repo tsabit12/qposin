@@ -328,7 +328,7 @@ const CityCourier = props => {
 			loading: true
 		}))
 
-		await Location.getCurrentPositionAsync({})
+		await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.High})
 			.then(location => {
 				const newCoordinate = {
 			      latitude: location.coords.latitude,
