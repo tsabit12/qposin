@@ -271,7 +271,11 @@ const styles = StyleSheet.create({
 		height: hp('13%'),
 		backgroundColor: 'white',
 		justifyContent: 'center',
-		alignItems: 'center'
+		alignItems: 'center',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 0.2 },
+		shadowOpacity: 0.4,
+		shadowRadius: 1
 	},
 	input: {
 		width: wp('70%'),
@@ -286,7 +290,11 @@ const styles = StyleSheet.create({
 		paddingLeft: 10,
 		paddingRight: 10,
 		flexDirection: 'row',
-		justifyContent: 'space-between'
+		justifyContent: 'space-between',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 1 },
+		shadowOpacity: 0.4,
+		shadowRadius: 1
 	},
 	iconSearch: {
 		//backgroundColor: 'red', 

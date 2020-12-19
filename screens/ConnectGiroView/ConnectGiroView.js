@@ -7,7 +7,11 @@ import {
 	StyleSheet,
 	AsyncStorage,
 	StatusBar,
-	Image
+	Image,
+	KeyboardAvoidingView,
+	Platform,
+	TouchableWithoutFeedback,
+	Keyboard
 } from 'react-native';
 import { connect } from 'react-redux';
 import { Icon, Toast } from 'native-base';
@@ -221,14 +225,6 @@ const ConnectGiroView = props => {
 			})
 	}	
 
-	// const checkRekening = async (norek) => {
-	// 	const result = {};
-
-	// 	await 
-
-	// 	return result;
-	// }
-
 	const saveSession = async (payload) => {
 		try {
 			await AsyncStorage.setItem('CONFIRMATION_GIRO', JSON.stringify(payload));
@@ -263,36 +259,48 @@ const ConnectGiroView = props => {
 					{ data.isConfirm ? 'Vertifikasi akun giro' : 'Hubungkan dengan akun giro'}
 				</Text>
 			</View>
-			<View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-				<Image
-			        style={styles.tinyLogo}
-			        resizeMode='contain'
-			        source={require('../../assets/images/hubrek.png')}
-			    />
-				{ !data.isConfirm ? 
-					<RequestForm onSubmit={handleRequest} /> : 
-					<View>
-						<View style={styles.card}>
-							<Text style={styles.message}>{data.message}</Text>
-						</View>
-						<CodeInput
-					      keyboardType="numeric"
-					      ref={confirmRef}
-					      codeLength={6}
-					      space={20}
-					      size={50}
-					      className={'border-b'}
-					      autoFocus={false}
-					      codeInputStyle={{ fontWeight: '700' }}
-					      onFulfill={(code) => handleSubmitCode(code)}
-					      //containerStyle={{backgroundColor: 'black'}}
-					      codeInputStyle={{color: '#FFF'}}
-					      cellBorderWidth={2.0}
-					      inactiveColor='#FFF'
-					      activeColor='#db1a04'
-					    />
-					</View> }
-			</View>
+			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+				<View style={{
+					justifyContent: 'center', 
+					alignItems: 'center',
+					flex: 1
+				}}>
+					<KeyboardAvoidingView 
+						behavior='position'
+						enabled={Platform.OS === 'ios' && !data.isConfirm ? true : false}
+					>
+						{ !data.isConfirm ? <React.Fragment>
+								<Image
+									style={styles.tinyLogo}
+									resizeMode='contain'
+									source={require('../../assets/images/hubrek.png')}
+								/>
+								<RequestForm onSubmit={handleRequest} />
+							</React.Fragment> : 
+							<View style={styles.verificationContent}>
+								<View style={styles.card}>
+									<Text style={styles.message}>{data.message}</Text>
+								</View>
+								<CodeInput
+									keyboardType="numeric"
+									ref={confirmRef}
+									codeLength={6}
+									space={20}
+									size={40}
+									className={'border-b'}
+									autoFocus={false}
+									codeInputStyle={{ fontWeight: '700' }}
+									onFulfill={(code) => handleSubmitCode(code)}
+									//containerStyle={{backgroundColor: 'black'}}
+									codeInputStyle={{color: '#FFF'}}
+									cellBorderWidth={2.0}
+									inactiveColor='#FFF'
+									activeColor='black'
+								/>
+							</View> }
+					</KeyboardAvoidingView>
+				</View>
+			</TouchableWithoutFeedback>
 		</ImageBackground>
 	);
 }
@@ -321,7 +329,7 @@ const styles = StyleSheet.create({
 		height: hp('10%'),
 		justifyContent: 'center',
 		alignItems: 'center',
-		margin: 10,
+		margin: 5,
 		borderRadius: 5,
 		elevation: 2
 	},
@@ -333,6 +341,10 @@ const styles = StyleSheet.create({
 		width: wp('80%'),
 		height: hp('30%'),
 		marginBottom: 30
+	},
+	verificationContent: {
+		flex: 1,
+		margin: 15
 	}
 })
 

@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { Modal, View, StyleSheet, Text, Animated, TouchableOpacity, StatusBar } from 'react-native';
+import { Modal, View, StyleSheet, Text, Animated, TouchableOpacity, StatusBar, Platform, Keyboard } from 'react-native';
 import {
 	widthPercentageToDP as wp, 
 	heightPercentageToDP as hp
@@ -17,6 +17,7 @@ const VerificationView = props => {
 	})
 	
 	const { bounceValue } = state;
+	const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
 	useEffect(() => {
 		Animated.spring(bounceValue, {
@@ -25,6 +26,27 @@ const VerificationView = props => {
 	      tension: 2,
 	      friction: 8
 	    }).start();
+	}, []);
+
+	useEffect(() => {
+		if(Platform.OS === 'ios'){
+			const keyboardDidShowListener = Keyboard.addListener(
+				'keyboardDidShow',
+			() => {
+				setKeyboardVisible(true); // or some other action
+			}
+			);
+			const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide',
+				() => {
+					setKeyboardVisible(false); // or some other action
+				}
+			);
+	
+			return () => {
+				keyboardDidHideListener.remove();
+				keyboardDidShowListener.remove();
+			};
+		}
 	}, []);
 
 	useEffect(() => {
@@ -70,7 +92,13 @@ const VerificationView = props => {
 		>
 			<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
 			<View style={styles.backgroundModal}>
-				<Animated.View style={[styles.modalContainer, {transform: [{translateY: bounceValue }] }]}>
+				<Animated.View style={[
+					styles.modalContainer, 
+					{
+						transform: [{translateY: bounceValue }],
+						height: isKeyboardVisible && Platform.OS === 'ios' ? hp('65%') : hp('25%')
+					}
+				]}>
 					<Text style={[styles.text, { textAlign: 'center', margin: 5}]}>
 						Kode verifikasi telah dikirim melalui WhatsApp ke {props.phone} dan email kamu
 					</Text>
@@ -127,8 +155,7 @@ const styles = StyleSheet.create({
 		right: 0,
 		padding: 10,
 		borderTopLeftRadius: 15,
-		borderTopRightRadius: 15,
-		height: hp('24%')
+		borderTopRightRadius: 15
 	},
 	text: {
 		fontFamily: 'Nunito-Bold',
@@ -137,7 +164,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#cc1e06',
 		alignItems: 'center',
 		justifyContent: 'center',
-		height: hp('6%'),
+		height: hp('5.5%'),
 		borderRadius: 30
 	}
 })

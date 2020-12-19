@@ -6,7 +6,8 @@ import {
 	TouchableOpacity,
 	ImageBackground,
 	ToastAndroid,
-	Animated
+	Animated,
+	Platform
 } from 'react-native';
 import { Icon, Footer, FooterTab, Button, Content } from 'native-base';
 import {
@@ -103,11 +104,15 @@ const HistoryOrder = props => {
 				.catch(() => {
 					if (!qobIsDone) {
 						setQobDone(true);
-						 ToastAndroid.showWithGravity(
-					      "Kamu sudah melihat semua history kiriman",
-					      ToastAndroid.LONG,
-					      ToastAndroid.BOTTOM
-					    );
+						if(Platform.OS === 'android'){
+							ToastAndroid.showWithGravity(
+								"Kamu sudah melihat semua history kiriman",
+								ToastAndroid.LONG,
+								ToastAndroid.BOTTOM
+							);
+						}else{
+							alert('Kamu sudah melihat semua history kiriman');
+						}
 					}
 				})
 		}

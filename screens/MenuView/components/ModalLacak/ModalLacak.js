@@ -8,7 +8,8 @@ import {
 	Modal,
 	TextInput,
 	Dimensions,
-	Text as TextDefault
+	Text as TextDefault,
+	TouchableWithoutFeedback
 } from 'react-native';
 import { Text } from 'native-base';
 import { Ionicons, Feather } from '@expo/vector-icons'; 
@@ -207,48 +208,50 @@ const ModalLacak = props => {
 		        speed={1}
 		    />
 			<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
-			<View style={[styles.backgroundModal, { height: state.active ? null : hp('23%')}]}>
-				<Animated.View style={[styles.modalContainer, {transform: [{translateY: bounceValue }] }]}>					
-					{ state.active === 1 ?  <React.Fragment>
-						<View style={styles.inputGroup}>
-							<TextInput 
-								style={styles.input}
-								placeholder='Masukkan kode barcode'
-								returnKeyType='done'
-								onChangeText={(text) => setBarcode(text)}
-								value={barcode}
-								onSubmitEditing={handleSubmit}
+			<TouchableWithoutFeedback onPress={() => props.onClose()}>
+				<View style={[styles.backgroundModal, { height: state.active ? null : hp('23%')}]}>
+					<Animated.View style={[styles.modalContainer, {transform: [{translateY: bounceValue }] }]}>					
+						{ state.active === 1 ?  <React.Fragment>
+							<View style={styles.inputGroup}>
+								<TextInput 
+									style={styles.input}
+									placeholder='Masukkan kode barcode/resi'
+									returnKeyType='done'
+									onChangeText={(text) => setBarcode(text)}
+									value={barcode}
+									onSubmitEditing={handleSubmit}
+								/>
+								<TouchableOpacity 
+									style={styles.btn}
+									onPress={handleSubmit}
+								>
+									<Feather name="search" size={24} color="black" />
+								</TouchableOpacity>
+							</View>
+							<Hr 
+								lineColor={rgba('#737272', 0.4)}
+								width={1} 
+								textPadding={10} 
+								text="atau" 
+								textStyles={styles.hr} 
+								hrPadding={10}
 							/>
 							<TouchableOpacity 
-								style={styles.btn}
-								onPress={handleSubmit}
+								style={styles.btnDefault}
+								activeOpacity={0.7}
+								onPress={handleNavigate}
 							>
-								<Feather name="search" size={24} color="black" />
+								<Text style={[styles.text, { color: '#FFF'}]}>Scan barcode</Text>
 							</TouchableOpacity>
-						</View>
-						<Hr 
-					    	lineColor={rgba('#737272', 0.4)}
-					    	width={1} 
-					    	textPadding={10} 
-					    	text="atau" 
-					    	textStyles={styles.hr} 
-					    	hrPadding={10}
-					    />
-					    <TouchableOpacity 
-							style={styles.btnDefault}
-							activeOpacity={0.7}
-							onPress={handleNavigate}
-						>
-							<Text style={[styles.text, { color: '#FFF'}]}>Scan barcode</Text>
-						</TouchableOpacity>
-					</React.Fragment> : 
-					<ListLacak 
-						data={state.data} 
-						noresi={barcode} 
-						onClose={props.onClose}
-					/> }
-				</Animated.View>
-			</View>
+						</React.Fragment> : 
+						<ListLacak 
+							data={state.data} 
+							noresi={barcode} 
+							onClose={props.onClose}
+						/> }
+					</Animated.View>
+				</View>
+			</TouchableWithoutFeedback>
 		</Modal>
 	);
 }

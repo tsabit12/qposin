@@ -349,7 +349,8 @@ const CityCourier = props => {
 
 			    region.timing(newCoordinate).start();
 			})
-			.catch(() => {
+			.catch(err => {
+				console.log(err);
 				props.navigation.goBack();
 			})
 	}

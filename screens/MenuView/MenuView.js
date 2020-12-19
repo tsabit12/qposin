@@ -10,7 +10,8 @@ import {
 	Platform, 
 	TouchableOpacity,
 	Animated,
-	AsyncStorage
+	AsyncStorage,
+	KeyboardAvoidingView
 } from 'react-native';
 import { connect } from 'react-redux';
 import {
@@ -61,10 +62,10 @@ async function registerForPushNotificationsAsync() {
     
     let finalStatus = existingStatus;
     if (existingStatus !== 'granted') {
-      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+	  const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
       finalStatus = status;
-    }
-    
+	}
+	
     if (finalStatus !== 'granted') {
       //alert('Failed to get push token for push notification!');
       	Toast.show({
@@ -327,6 +328,18 @@ const MenuView = props => {
 			})
 		//console.log({ local, session });
 	}
+
+	const handleCallHaloPos = () => {
+		const url = `tel:161`;
+		Linking.canOpenURL(url)
+			.then((supported) => {
+				if(supported){
+					return Linking.openURL(url);
+				}else{
+					alert('Silahkan hubungi call center kami di 161')
+				}
+			})
+	}
 	
 	return(
 		<ImageBackground 
@@ -385,189 +398,193 @@ const MenuView = props => {
 				</TouchableOpacity>
 			</View>
 			<View style={styles.content}>
-				<ScrollView
-					showsVerticalScrollIndicator={false}
-					keyboardShouldPersistTaps={'handled'}
-					ref={scrollRef}
-					//onContentSizeChange={() => scrollRef.current.scrollToEnd({animated: true})}
+				<KeyboardAvoidingView 
+					behavior='padding'
+					keyboardVerticalOffset={70}
+					enabled={Platform.OS === 'ios' ? true : false}
 				>
-					<View style={styles.slider}>
-						<SliderImage />
-					</View>
-					<View style={[styles.hr, { marginTop: 0}]} />
-					
-					<Collapse
-						onToggle={(isCollapsed) => setState(state => ({
-							...state,
-							tarifVisible: isCollapsed
-						}))}
-						isCollapsed={state.tarifVisible}
+					<ScrollView
+						showsVerticalScrollIndicator={false}
+						keyboardShouldPersistTaps={'handled'}
+						ref={scrollRef}
+						//onContentSizeChange={() => scrollRef.current.scrollToEnd({animated: true})}
 					>
-					    <CollapseHeader>
-					      <View 
-							style={{
-								height: hp('5.2%'),
-								alignItems: 'center',
-								flexDirection: 'row',
-								justifyContent: 'space-between',
-								width: wp('95%'),
-								paddingTop: 5
-							}}
-							// activeOpacity={0.7}
-							// onPress={() => setState(state => ({
-							// 	...state,
-							// 	tarifVisible: !state.tarifVisible
-							// }))}
-						>
-							<Text style={styles.subTitle}>Mau kirim kemana?</Text>
-							{ state.tarifVisible ? 
-								<Ionicons name="ios-arrow-down" size={24} color="black" /> : 
-								<Ionicons name="ios-arrow-forward" size={24} color="black" />
-							}
+						<View style={styles.slider}>
+							<SliderImage />
 						</View>
-					    </CollapseHeader>
-					    <CollapseBody>
-					      	<FormTarif 
-								// animatedValue={state.positionTarif}
-								navigate={props.navigation.navigate}
-								values={order}
-								onSubmit={handleCekTarif}
-							/>
-					    </CollapseBody>
-					</Collapse>
-				
+						<View style={[styles.hr, { marginTop: 0}]} />
+						
+							<Collapse
+								onToggle={(isCollapsed) => setState(state => ({
+									...state,
+									tarifVisible: isCollapsed
+								}))}
+								isCollapsed={state.tarifVisible}
+							>
+								<CollapseHeader>
+								<View 
+									style={{
+										height: hp('5.2%'),
+										alignItems: 'center',
+										flexDirection: 'row',
+										justifyContent: 'space-between',
+										width: wp('97%'),
+										paddingTop: 5
+									}}
+									// activeOpacity={0.7}
+									// onPress={() => setState(state => ({
+									// 	...state,
+									// 	tarifVisible: !state.tarifVisible
+									// }))}
+								>
+									<Text style={styles.subTitle}>Mau kirim kemana?</Text>
+									{ state.tarifVisible ? 
+										<Ionicons name="ios-arrow-down" size={20} color="black" /> : 
+										<Ionicons name="ios-arrow-forward" size={20} color="black" />
+									}
+								</View>
+								</CollapseHeader>
+								<CollapseBody>
+									<FormTarif 
+										// animatedValue={state.positionTarif}
+										navigate={props.navigation.navigate}
+										values={order}
+										onSubmit={handleCekTarif}
+									/>
+								</CollapseBody>
+							</Collapse>
+						<View style={styles.hr} />
+						
+						<Text style={styles.subTitle}>Layanan yang kamu butuhkan</Text>
+						<View style={{alignItems: 'center', flex: 1}}>
+							<View style={{marginTop: 5}}>
+								<View style={[styles.menu]}>
 
-					<View style={styles.hr} />
-					
-					<Text style={styles.subTitle}>Layanan yang kamu butuhkan</Text>
-					<View style={{alignItems: 'center', flex: 1}}>
-						<View style={{marginTop: 5}}>
+									<TouchableOpacity 
+										style={styles.icon}
+										activeOpacity={1}
+										onPress={() => props.navigation.navigate('CityCourier')}
+									>
+										<View style={[styles.image, styles.elevationImage]}>
+											<Image 
+												style={styles.image}
+												source={require('../../assets/images/icon/q9plus.png')} 
+												resizeMode='contain'
+											/>
+										</View>
+										<Text style={styles.textLabel}>City{'\n'}Courier</Text>
+									</TouchableOpacity>
+
+									<TouchableOpacity 
+										style={[styles.icon]}
+										activeOpacity={1}
+										onPress={() => handlePressOrder(1)}
+									>
+										<View style={[styles.image, styles.elevationImage]}>
+											<Image 
+												style={styles.image}
+												source={require('../../assets/images/icon/qcom.png')} 
+												resizeMode='contain'
+											/>
+										</View>
+										<Text style={styles.textLabel}>Kiriman{'\n'}E-Commerce</Text>
+									</TouchableOpacity>
+
+									<TouchableOpacity 
+										style={styles.icon}
+										activeOpacity={1}
+										onPress={() => handlePressOrder(2)}
+									>
+										<View style={[styles.image, styles.elevationImage]}>
+											<Image 
+												style={styles.image}
+												source={require('../../assets/images/icon/qob.png')} 
+												resizeMode='contain'
+											/>
+										</View>
+										<Text style={styles.textLabel}>Online{'\n'}Booking</Text>
+									</TouchableOpacity>
+								</View>
+							</View>
+
+							<View style={styles.menu}>
+
+								<TouchableOpacity 
+									style={styles.icon}
+									activeOpacity={1}
+									onPress={() => setLacak(lacak => ({
+										...lacak,
+										visible: true
+									}))}
+								>
+									<View style={[styles.image, styles.elevationImage]}>
+										<Image 
+											style={styles.image}
+											source={require('../../assets/images/icon/lacak.png')} 
+											resizeMode='contain'
+										/>
+									</View>
+									<Text style={styles.textLabel}>Lacak{'\n'}Kiriman</Text>
+								</TouchableOpacity>
+
+								<TouchableOpacity 
+										style={styles.icon}
+										activeOpacity={1}
+										onPress={() => props.navigation.navigate('History')}
+									>
+									<View style={[styles.image, styles.elevationImage]}>
+										<Image 
+											style={styles.image}
+											source={require('../../assets/images/icon/history.png')} 
+											resizeMode='contain'
+										/>
+									</View>
+									<Text style={styles.textLabel}>History{'\n'}Kiriman</Text>
+								</TouchableOpacity>
+
+								<TouchableOpacity 
+									style={styles.icon}
+									activeOpacity={1}
+									onPress={onGenerateToken}
+								>
+									<View style={[styles.image, styles.elevationImage]}>
+										<Image 
+											style={styles.image}
+											source={require('../../assets/images/icon/token.png')} 
+											resizeMode='contain'
+										/>
+									</View>
+									<Text style={styles.textLabel}>Generate{'\n'}Password Web</Text>
+								</TouchableOpacity>
+								
+							</View>
+
 							<View style={[styles.menu]}>
-
 								<TouchableOpacity 
 									style={styles.icon}
 									activeOpacity={1}
-									onPress={() => props.navigation.navigate('CityCourier')}
+									onPress={handleCallHaloPos}
 								>
 									<View style={[styles.image, styles.elevationImage]}>
 										<Image 
 											style={styles.image}
-											source={require('../../assets/images/icon/q9plus.png')} 
+											source={require('../../assets/images/icon/call.png')} 
 											resizeMode='contain'
 										/>
 									</View>
-									<Text style={styles.textLabel}>City{'\n'}Courier</Text>
+									<Text style={styles.textLabel}>Halo POS</Text>
 								</TouchableOpacity>
 
-								<TouchableOpacity 
-									style={[styles.icon]}
-									activeOpacity={1}
-									onPress={() => handlePressOrder(1)}
-								>
-									<View style={[styles.image, styles.elevationImage]}>
-										<Image 
-											style={styles.image}
-											source={require('../../assets/images/icon/qcom.png')} 
-											resizeMode='contain'
-										/>
-									</View>
-									<Text style={styles.textLabel}>Kiriman{'\n'}E-Commerce</Text>
-								</TouchableOpacity>
-
-								<TouchableOpacity 
-									style={styles.icon}
-									activeOpacity={1}
-									onPress={() => handlePressOrder(2)}
-								>
-									<View style={[styles.image, styles.elevationImage]}>
-										<Image 
-											style={styles.image}
-											source={require('../../assets/images/icon/qob.png')} 
-											resizeMode='contain'
-										/>
-									</View>
-									<Text style={styles.textLabel}>Online{'\n'}Booking</Text>
-								</TouchableOpacity>
 							</View>
 						</View>
-
-						<View style={styles.menu}>
-
-							<TouchableOpacity 
-								style={styles.icon}
-								activeOpacity={1}
-								onPress={() => setLacak(lacak => ({
-									...lacak,
-									visible: true
-								}))}
-							>
-								<View style={[styles.image, styles.elevationImage]}>
-									<Image 
-										style={styles.image}
-										source={require('../../assets/images/icon/lacak.png')} 
-										resizeMode='contain'
-									/>
-								</View>
-								<Text style={styles.textLabel}>Lacak{'\n'}Kiriman</Text>
-							</TouchableOpacity>
-
-							<TouchableOpacity 
-									style={styles.icon}
-									activeOpacity={1}
-									onPress={() => props.navigation.navigate('History')}
-								>
-								<View style={[styles.image, styles.elevationImage]}>
-									<Image 
-										style={styles.image}
-										source={require('../../assets/images/icon/history.png')} 
-										resizeMode='contain'
-									/>
-								</View>
-								<Text style={styles.textLabel}>History{'\n'}Kiriman</Text>
-							</TouchableOpacity>
-
-							<TouchableOpacity 
-								style={styles.icon}
-								activeOpacity={1}
-								onPress={onGenerateToken}
-							>
-								<View style={[styles.image, styles.elevationImage]}>
-									<Image 
-										style={styles.image}
-										source={require('../../assets/images/icon/token.png')} 
-										resizeMode='contain'
-									/>
-								</View>
-								<Text style={styles.textLabel}>Generate{'\n'}Password Web</Text>
-							</TouchableOpacity>
-							
+						<View style={styles.footer}>
+							<Text style={{
+								fontFamily: 'Nunito',
+								fontSize: 13
+							}}>Version {Constants.manifest.version}</Text>
 						</View>
-
-						<View style={[styles.menu]}>
-							<TouchableOpacity 
-								style={styles.icon}
-								activeOpacity={1}
-								onPress={() => Linking.openURL('tel:' + '161')}
-							>
-								<View style={[styles.image, styles.elevationImage]}>
-									<Image 
-										style={styles.image}
-										source={require('../../assets/images/icon/call.png')} 
-										resizeMode='contain'
-									/>
-								</View>
-								<Text style={styles.textLabel}>Halo POS</Text>
-							</TouchableOpacity>
-
-						</View>
-					</View>
-					<View style={styles.footer}>
-						<Text style={{
-							fontFamily: 'Nunito',
-							fontSize: 13
-						}}>Version {Constants.manifest.version}</Text>
-					</View>
-				</ScrollView>
+					</ScrollView>
+				</KeyboardAvoidingView>
 			</View>
 		</ImageBackground>
 	);
@@ -605,11 +622,12 @@ const styles = StyleSheet.create({
 		width: wp('28%'),
 		borderRadius: 20,
 		margin: 5,
-		//justifyContent: 'center',
 		alignItems: 'center',
-		// borderWidth: 0.2,
-		//backgroundColor: 'green',
-		// elevation: 1,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 1 },
+		shadowOpacity: 0.4,
+		shadowRadius: 1, 
+		
 	},
 	menu: {
 		height: hp('16%'),

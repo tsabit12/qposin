@@ -19,7 +19,12 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.posindonesia.cob",
+      "buildNumber": "1.0.0",
+      "config": {
+        "googleMapsApiKey": "AIzaSyA7czY728UVajvsFfYCGLq67OPIjVpqFPc"
+      }
     },
     "android": {
       "package": "com.posindonesia.cob",
@@ -32,7 +37,7 @@
         }
       }
     },
-    "githubUrl": "https://github.com/tsabit12/Qob2/",
+    "githubUrl": "https://github.com/tsabit12/qposin/",
     "notification": {
       "icon": "./assets/notification.png",
       "color": "#f68527",

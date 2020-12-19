@@ -9,7 +9,8 @@ import {
 	ScrollView,
 	BackHandler,
 	AsyncStorage,
-	StatusBar
+	StatusBar,
+	Keyboard
 } from 'react-native';
 import {
 	widthPercentageToDP as wp, 
@@ -56,6 +57,10 @@ const ProfileView = props => {
 	const [emailVisible, setEmailVisible] = useState(false);
 	const [namaVisible, setNamaVisible] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [isKeyboardVisible, setKeyboardVisible] = useState({
+		open: false,
+		height: 0
+	});
 
 	useEffect(() => {
 		BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
@@ -64,6 +69,33 @@ const ProfileView = props => {
 	      BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
 	    };
 	}, [handleBackButtonClick, state]);
+
+	useEffect(() => {
+		if(Platform.OS === 'ios'){
+			const keyboardDidShowListener = Keyboard.addListener(
+				'keyboardDidShow',
+			(e) => {
+				setKeyboardVisible({
+					open: true,
+					height: e.endCoordinates.height
+				}); // or some other action
+			}
+			);
+			const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide',
+				() => {
+					setKeyboardVisible(prevState => ({
+						...prevState,
+						open: false
+					}))
+				}
+			);
+	
+			return () => {
+				keyboardDidHideListener.remove();
+				keyboardDidShowListener.remove();
+			};
+		}
+	}, []);
 
 	//if email is update then must reset storage
 	useEffect(() => {
@@ -195,6 +227,7 @@ const ProfileView = props => {
 					handleClose={() => setNamaVisible(false)} 
 					values={state.nama}
 					onUpdate={handleUpdateNama}
+					isKeyboardVisible={isKeyboardVisible}
 				/> }
 			<View style={styles.header}>
 				<TouchableOpacity 

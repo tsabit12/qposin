@@ -141,6 +141,7 @@ const PulihkanAkun = props => {
 			api.bantuan(param1)
 				.then(res => {
 					//handle if verify code is empty 
+					console.log(res);
 					const { response_data2, response_data5 } = res;
 
 					const payload = {

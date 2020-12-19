@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
 	View, 
 	TextInput, 
 	StyleSheet, 
 	Text as TextDefault, 
 	TouchableOpacity,
-	Modal
+	Modal,
+	Platform,
+	Keyboard
 } from 'react-native';
 import { ListItem, Text, Left, Body, Right, Switch, List, Thumbnail } from 'native-base';
 import { Entypo, FontAwesome, Feather } from '@expo/vector-icons'; 
@@ -34,8 +36,39 @@ const FormTarif = props => {
 		showJenis: false,
 		showBerat: false
 	})
+	const [isKeyboardVisible, setKeyboardVisible] = useState({
+		open: false,
+		height: 0
+	});
 
 	const { data, showJenis, showBerat } = state;
+
+	useEffect(() => {
+		if(Platform.OS === 'ios'){
+			const keyboardDidShowListener = Keyboard.addListener(
+				'keyboardDidShow',
+			(e) => {
+				setKeyboardVisible({
+					open: true,
+					height: e.endCoordinates.height
+				}); // or some other action
+			}
+			);
+			const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide',
+				() => {
+					setKeyboardVisible(prevState => ({
+						...prevState,
+						open: false
+					}))
+				}
+			);
+	
+			return () => {
+				keyboardDidHideListener.remove();
+				keyboardDidShowListener.remove();
+			};
+		}
+	}, []);
   
 	const handlePressItem = (type) => {
 		props.navigate('Kota', {
@@ -93,7 +126,7 @@ const FormTarif = props => {
 	}
 
 	return(
-		<View>
+		<React.Fragment>
 			{ showJenis && 
 				<PilihJenis  
 					handleClose={() => setState(state => ({
@@ -117,62 +150,63 @@ const FormTarif = props => {
 						},
 						showBerat: false
 					}))}
+					isKeyboardVisible={isKeyboardVisible}
 				/> }
 			<List>
 	            <ListItem avatar onPress={() => handlePressItem('sender')}>
 	              <Left>
-	                <Entypo name="location-pin" size={24} color="black" />
+	                <Entypo name="location-pin" size={20} color="black" />
 	              </Left>
 	              <Body>
-	                <Text>Dari</Text>
+	                <Text style={styles.label}>Dari</Text>
 	                <Text note numberOfLines={1}>
 	                	{ values.kotaA ? `${values.kotaA}, ${values.kecamatanA}, ${values.kodeposA}` : '-' }
 	                </Text>
 	              </Body>
 	              <Right style={{justifyContent: 'center'}}>
-	                <Ionicons name="ios-arrow-forward" size={24} color="black" />
+				  	<Ionicons name="ios-arrow-forward" size={18} color="black" />
 	              </Right>
 	            </ListItem>
 	            <ListItem avatar onPress={() => handlePressItem('receiver')}>
 	              <Left>
-	                <Entypo name="location-pin" size={24} color="black" />
+	                <Entypo name="location-pin" size={20} color="black" />
 	              </Left>
 	              <Body>
-	                <Text>Ke</Text>
+				  <Text style={styles.label}>Ke</Text>
 	                <Text note numberOfLines={1}>
 	                	{ values.kotaB ? `${values.kotaB}, ${values.kecamatanB}, ${values.kodeposB}` : '-' }
 	                </Text>
 	              </Body>
 	              <Right style={{justifyContent: 'center'}}>
-	                <Ionicons name="ios-arrow-forward" size={24} color="black" />
+				  	<Ionicons name="ios-arrow-forward" size={18} color="black" />
 	              </Right>
 	            </ListItem>
 
 
 	            <ListItem avatar onPress={handlePressJenis}>
 	              <Left>
-	                <Feather name="box" size={23} color="black" />
+	                <Feather name="box" size={20} color="black" />
 	              </Left>
 	              <Body>
-	                <Text>Jenis Kiriman</Text>
-	                <Text note>{data.jenis === '1' ? 'Paket' : 'Surat'}</Text>
+				  	<Text style={styles.label}>Jenis Kiriman</Text>
+	                <Text note style={{fontSize: 14}}>{data.jenis === '1' ? 'Paket' : 'Surat'}</Text>
 	              </Body>
 	              <Right style={{justifyContent: 'center'}}>
-	                <Ionicons name="ios-arrow-forward" size={24} color="black" />
+				  	<Ionicons name="ios-arrow-forward" size={18} color="black" />
 	              </Right>
 	            </ListItem>
 
 
 	            <ListItem avatar onPress={handlePressBerat}>
 	              <Left>
-	                <FontAwesome name="balance-scale" size={20} color="black" />
+	                <FontAwesome name="balance-scale" size={17} color="black" />
 	              </Left>
 	              <Body>
-	                <Text>Berat</Text>
-	                <Text note>{data.berat} gram</Text>
+				  	<Text style={styles.label}>Berat</Text>
+	                <Text note style={{fontSize: 14}}>{data.berat} gram</Text>
 	              </Body>
 	              <Right style={{justifyContent: 'center'}}>
-	                <Ionicons name="ios-arrow-forward" size={24} color="black" />
+	                <Ionicons name="ios-arrow-forward" size={18} color="black" />
 	              </Right>
 	            </ListItem>
 	            <View style={{alignItems: 'center'}}>
@@ -216,7 +250,7 @@ const FormTarif = props => {
 		            </TouchableOpacity>
 	            </View>
           	</List>
-		</View>
+		</React.Fragment>
 	);
 }
 
@@ -234,7 +268,11 @@ const styles = StyleSheet.create({
 		// borderWidth: 0.3,
 		borderRadius: 30,
 		backgroundColor: 'white',
-		elevation: 3
+		elevation: 3,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 0.2 },
+		shadowOpacity: 0.3,
+		shadowRadius: 1
 	},
 	field: {
 		flex: 1,
@@ -254,6 +292,10 @@ const styles = StyleSheet.create({
 		height: hp('5.9%'),
 		borderRadius: 30,
 		marginTop: 10
+	},
+	label: {
+		fontSize: 14,
+		fontFamily: 'Nunito-semi'
 	}
 })
 

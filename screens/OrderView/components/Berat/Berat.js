@@ -6,7 +6,8 @@ import {
 	Animated,
 	StyleSheet,
 	TextInput,
-	TouchableOpacity
+	TouchableOpacity,
+	Platform
 } from 'react-native';
 import { ListItem, Body, Left, Right, Text } from 'native-base';
 import { FontAwesome, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
@@ -27,6 +28,7 @@ const Berat = props => {
 		bounceValue: new Animated.Value(200),
 		berat: ''
 	})
+	const { isKeyboardVisible } = props;
 
 	const { bounceValue } = state;
 
@@ -105,7 +107,14 @@ const Berat = props => {
 				>
 					<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
 					<View style={styles.backgroundModal}>
-						<Animated.View style={[styles.modalContainer, {transform: [{translateY: bounceValue }] }]}>
+						<Animated.View 
+							style={[
+								styles.modalContainer, 
+								{
+									transform: [{translateY: bounceValue }],
+									height: Platform.OS === 'ios' && isKeyboardVisible.open ? isKeyboardVisible.height + hp('15%') : hp('14%') 
+								}
+							]}>
 							<Text style={[styles.text, {marginBottom: 2}]}>Berat kiriman (gram)</Text>
 							<View style={styles.inputGroup}>
 							<TextInput 
@@ -134,7 +143,8 @@ const Berat = props => {
 Berat.propTypes = {
 	value: PropTypes.string.isRequired,
 	onPress: PropTypes.func.isRequired,
-	error: PropTypes.bool.isRequired
+	error: PropTypes.bool.isRequired,
+	isKeyboardVisible: PropTypes.object.isRequired
 }
 
 const styles = StyleSheet.create({
@@ -150,8 +160,7 @@ const styles = StyleSheet.create({
 		right: 0,
 		padding: 10,
 		borderTopLeftRadius: 15,
-		borderTopRightRadius: 15,
-		height: hp('13%')
+		borderTopRightRadius: 15
 	},
 	text: {
 		fontFamily: 'Nunito-Bold',

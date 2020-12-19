@@ -20,6 +20,8 @@ const EntriBetay = props => {
 	const bounceValue = new Animated.Value(200);
 	const refInput = React.useRef();
 	const [value, setValue] = React.useState('');
+	
+	const { isKeyboardVisible } = props;
 
 	useEffect(() => {
 		Animated.spring(bounceValue, {
@@ -61,7 +63,14 @@ const EntriBetay = props => {
 		>
 			<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
 			<View style={styles.backgroundModal}>
-				<Animated.View style={[styles.modalContainer, {transform: [{translateY: bounceValue }] }]}>
+				<Animated.View 
+					style={[
+						styles.modalContainer, 
+						{
+							transform: [{translateY: bounceValue }],
+							height: isKeyboardVisible.open ? hp('13%') + isKeyboardVisible.height : hp('13%')
+						}
+					]}>
 					<Text style={styles.text}>Berat (gram)</Text>
 					<View style={styles.inputGroup}>
 						<TextInput 
@@ -69,7 +78,7 @@ const EntriBetay = props => {
 							ref={refInput}
 							placeholder='Masukkan berat'
 							returnKeyType='done'
-							keyboardType='numeric'
+							keyboardType='number-pad'
 							onChangeText={(text) => setValue(text)}
 							value={value}
 							onSubmitEditing={handleSubmit}
@@ -100,8 +109,7 @@ const styles = StyleSheet.create({
 		right: 0,
 		padding: 10,
 		borderTopLeftRadius: 15,
-		borderTopRightRadius: 15,
-		height: hp('13%')
+		borderTopRightRadius: 15
 	},
 	text: {
 		fontFamily: 'Nunito-Bold',
@@ -135,7 +143,8 @@ const styles = StyleSheet.create({
 
 EntriBetay.propTypes = {
 	handleClose: PropTypes.func.isRequired,
-	onChoosed: PropTypes.func.isRequired
+	onChoosed: PropTypes.func.isRequired,
+	isKeyboardVisible: PropTypes.object.isRequired	
 }
 
 export default EntriBetay;

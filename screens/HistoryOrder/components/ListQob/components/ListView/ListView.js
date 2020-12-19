@@ -12,7 +12,8 @@ import {
 	ToastAndroid,
 	RefreshControl,
 	Alert,
-	Animated
+	Animated,
+	Platform
 } from 'react-native';
 import {
 	widthPercentageToDP as wp, 
@@ -71,15 +72,19 @@ const Item  = props => {
 	const { col } = props;
 	const handleCopy = (extid) => {
 		Clipboard.setString(props.id);
-		ToastAndroid.showWithGravity(
-	      "Extid copied to clipboard",
-	      ToastAndroid.SHORT,
-	      ToastAndroid.BOTTOM
-	    );
+		if(Platform.OS === 'android'){
+			ToastAndroid.showWithGravity(
+				"Extid copied to clipboard",
+				ToastAndroid.SHORT,
+				ToastAndroid.BOTTOM
+			);
+		}else{
+			alert('Extid copied to clipboard')
+		}
 	}
 
 	return(
-		<React.Fragment>
+		<View style={styles.shadow}>
 			{ props.index === 0 && <View style={{height: hp('11%')}} />}
 			<TouchableOpacity 
 				style={
@@ -245,7 +250,7 @@ const Item  = props => {
 				</View>
 			</TouchableOpacity>
 			{ props.index === 0 && props.showIntro && <PickupIntro /> }
-		</React.Fragment>
+		</View>
 	);
 } 
 
@@ -473,7 +478,8 @@ const styles = StyleSheet.create({
 		paddingTop: 6
 	},
 	choosedMode: {
-		backgroundColor: 'white'
+		backgroundColor: 'white',
+		flex: 1
 	},
 	btn_pickup: {
 		position: 'absolute',
@@ -506,6 +512,12 @@ const styles = StyleSheet.create({
 		borderBottomColor: '#C51C16',
 		alignSelf: 'center',
 		marginTop: -15
+	},
+	shadow: {
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 1 },
+		shadowOpacity: 0.4,
+		shadowRadius: 1
 	}
 })
 

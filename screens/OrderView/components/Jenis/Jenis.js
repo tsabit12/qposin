@@ -6,7 +6,8 @@ import {
 	StyleSheet,
 	StatusBar,
 	TouchableOpacity,
-	TextInput
+	TextInput,
+	Platform
 } from 'react-native';
 import { ListItem, Body, Left, Right, Text } from 'native-base';
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
@@ -18,6 +19,7 @@ import {
 
 const Jenis = props => {
 	const { error } = props;
+	const { isKeyboardVisible } = props;
 	const [state, setState] = useState({
 		modalVisible: false,
 		bounceValue: new Animated.Value(200),
@@ -52,16 +54,23 @@ const Jenis = props => {
 	}
 
 	const handleChoosed = (type) => {
-		// handleCloseModal();
-		// setTimeout(function() {
-		// 	props.onChoosed(type);
-		// }, 10);
-		handleAnimated();
-		setState(state => ({
-			...state,
-			jenis: type,
-			active: 2
-		}))
+		if(type === '1'){
+			handleAnimated();
+			setState(state => ({
+				...state,
+				jenis: type,
+				active: 2
+			}))
+		}else{
+			const payload = {
+				isikiriman: ' ',
+				jenis: type
+			}			
+			props.onPress(payload);
+			setTimeout(() => {
+				handleCloseModal();
+			}, 200);
+		}
 	}
 
 	const handleCloseModal = () => setState(state => ({
@@ -80,10 +89,9 @@ const Jenis = props => {
 				jenis: state.jenis
 			}			
 
-			props.onPress(payload);
-
 			setTimeout(function() {
 				handleCloseModal();
+				props.onPress(payload);
 			}, 10);
 		}
 	}
@@ -121,7 +129,14 @@ const Jenis = props => {
 				>
 					<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
 					<View style={styles.backgroundModal}>
-						<Animated.View style={[styles.modalContainer, {transform: [{translateY: bounceValue }] }]}>
+						<Animated.View 
+							style={[
+								styles.modalContainer, 
+								{
+									transform: [{translateY: bounceValue }],
+									height: Platform.OS === 'ios' && isKeyboardVisible.open ? isKeyboardVisible.height + hp('15%') : hp('14%') 
+								}
+							]}>
 							{ active === 1 ? <Text style={{fontFamily: 'Nunito-Bold', textAlign: 'center'}}>
 									Pilih jenis kiriman
 								</Text> : <Text style={styles.label}>
@@ -145,7 +160,7 @@ const Jenis = props => {
 								</TouchableOpacity>
 							</View> }
 
-							{ active === 2 && <View style={styles.inputGroup}>
+							{ active === 2 && state.jenis === '1' && <View style={styles.inputGroup}>
 								<TextInput 
 									style={styles.input}
 									placeholder='Masukkan isi kiriman'
@@ -190,8 +205,7 @@ const styles = StyleSheet.create({
 		right: 0,
 		padding: 10,
 		borderTopLeftRadius: 15,
-		borderTopRightRadius: 15,
-		height: hp('14%')
+		borderTopRightRadius: 15
 	},
 	text: {
 		fontFamily: 'Nunito-Bold',
@@ -246,5 +260,9 @@ const styles = StyleSheet.create({
 		fontSize: 15
 	}
 })
+
+Jenis.propTypes = {
+	isKeyboardVisible: PropTypes.object.isRequired
+}
 
 export default Jenis;

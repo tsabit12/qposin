@@ -218,6 +218,7 @@ export default {
 			}
 		}).then(res => {
 			const { results } = res.data;
+			console.log(results);
 			if (results.length > 0) {
 				const response = [];
 				results.forEach(places => {

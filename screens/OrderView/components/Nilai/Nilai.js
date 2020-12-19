@@ -7,7 +7,8 @@ import {
 	StyleSheet,
 	TextInput,
 	TouchableOpacity,
-	Image
+	Image,
+	Platform
 } from 'react-native';
 import { ListItem, Body, Left, Right, Text } from 'native-base';
 import { MaterialIcons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
@@ -28,6 +29,7 @@ const Nilai = props => {
 		bounceValue: new Animated.Value(200),
 		nilai: ''
 	})
+	const { isKeyboardVisible } = props;
 
 	const { bounceValue } = state;
 
@@ -116,7 +118,14 @@ const Nilai = props => {
 				>
 					<StatusBar backgroundColor="rgba(0,0,0,0.5)"/>
 					<View style={styles.backgroundModal}>
-						<Animated.View style={[styles.modalContainer, {transform: [{translateY: bounceValue }] }]}>
+						<Animated.View 
+							style={[
+								styles.modalContainer, 
+								{
+									transform: [{translateY: bounceValue }],
+									height: Platform.OS === 'ios' && isKeyboardVisible.open ? isKeyboardVisible.height + hp('15%') : hp('14%') 
+								}
+							]}>
 							<Text style={{fontFamily:'Nunito-Bold', textAlign: 'center'}}>
 								Nilai barang
 							</Text>
@@ -147,7 +156,7 @@ const Nilai = props => {
 Nilai.propTypes = {
 	value: PropTypes.string.isRequired,
 	onPress: PropTypes.func.isRequired,
-	// error: PropTypes.bool.isRequired
+	isKeyboardVisible: PropTypes.object.isRequired
 }
 
 const styles = StyleSheet.create({
@@ -163,8 +172,7 @@ const styles = StyleSheet.create({
 		right: 0,
 		padding: 10,
 		borderTopLeftRadius: 15,
-		borderTopRightRadius: 15,
-		height: hp('14%')
+		borderTopRightRadius: 15
 	},
 	text: {
 		fontFamily: 'Nunito-Bold',

@@ -20,6 +20,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 const KelurahanView = props => {
 	const inputRef = useRef();
 	const [street, setStreet] = useState(props.value !== '0' ? props.value : '');
+	const { isKeyboardVisible } = props;
 
 	useEffect(() => {	
 		setTimeout(function() {
@@ -46,7 +47,11 @@ const KelurahanView = props => {
     			style={{flex: 1}}
     		>
     			<TouchableWithoutFeedback>
-					<View style={[styles.root]}>
+					<View style={[
+						styles.root, {
+							height: isKeyboardVisible.open ? isKeyboardVisible.height + hp('10%') : null
+						}
+					]}>
 						<View style={styles.inputGroup}>
 							<TextInput 
 								style={styles.input}
@@ -114,7 +119,8 @@ const styles = StyleSheet.create({
 KelurahanView.propTypes = {
 	handleClose: PropTypes.func.isRequired,
 	onUpdate: PropTypes.func.isRequired,
-	value: PropTypes.string.isRequired
+	value: PropTypes.string.isRequired,
+	isKeyboardVisible: PropTypes.object.isRequired
 }
 
 export default KelurahanView;

@@ -6,7 +6,9 @@ import {
 	StyleSheet,
 	TextInput,
 	TouchableOpacity,
-	Animated
+	Animated,
+	KeyboardAvoidingView,
+	Platform
 } from 'react-native';
 import {
 	widthPercentageToDP as wp, 
@@ -102,75 +104,79 @@ const FormRegister = props => {
 					<Icon name='ios-arrow-back' style={styles.iconBack} />
 					<Text 
 						style={{
-							fontFamily: 'Nunito-semi', 
+							fontFamily: 'Nunito-Bold', 
 							color: '#FFF', 
-							fontSize: 16
+							fontSize: 17
 						}}>Registrasi</Text>
 				</TouchableOpacity>
-			</View>
+			</View>			
 			<View style={styles.container}>
-				{ state.modalVisible && 
-					<ConfirmView 
-						phone={state.phone} 
-						onClose={() => setState(state => ({
-							...state,
-							modalVisible: false
-						}))}
-						//sendWa={(payload, url) => api.sendWhatsApp(payload, url)}
-						getLinkWa={(payload) => api.getLinkWa(payload)}
-						onDone={handleDone}
-					/> }
-				<View style={styles.form}>
-					<Text style={styles.label}>Nomor Ponsel</Text>
-					<TextInput 
-						style={styles.input}
-						textAlign='center'
-						placeholder='Masukan nomor ponsel'
-						keyboardType='phone-pad'
-						value={state.phone}
-						onChangeText={(value) => setState(state => ({
-							...state,
-							phone: value,
-							errors: {
-								...state.errors,
-								phone: undefined
-							}
-						}))}
-					/>
-					{ errors.phone ? 
-						<ErrorLabel text={errors.phone} /> : 
-						<Text style={[styles.label, {marginTop: 7, color: rgba('#FFF', 0.6)}]}>
-							Contoh: 08XXXXXXXXXX
-						</Text> }
-				</View>
-				<View style={{justifyContent: 'space-around', height: hp('20%')}}>
-					<View  style={{height: hp('6.8%')}}>
-						<TouchableOpacity 
-							style={[styles.btn, {backgroundColor: '#ffac30'}]}
-							activeOpacity={0.6}
-							onPress={handleSubmit}
-						>
-							<Text style={styles.text}>Daftar</Text>
-						</TouchableOpacity>
+				<KeyboardAvoidingView 
+					behavior={Platform.OS === 'ios' ? 'position' : 'height'}
+				>
+					{ state.modalVisible && 
+						<ConfirmView 
+							phone={state.phone} 
+							onClose={() => setState(state => ({
+								...state,
+								modalVisible: false
+							}))}
+							//sendWa={(payload, url) => api.sendWhatsApp(payload, url)}
+							getLinkWa={(payload) => api.getLinkWa(payload)}
+							onDone={handleDone}
+						/> }
+					<View style={styles.form}>
+						<Text style={styles.label}>Nomor Ponsel</Text>
+						<TextInput 
+							style={styles.input}
+							textAlign='center'
+							placeholder='Masukan nomor ponsel'
+							keyboardType='phone-pad'
+							value={state.phone}
+							onChangeText={(value) => setState(state => ({
+								...state,
+								phone: value,
+								errors: {
+									...state.errors,
+									phone: undefined
+								}
+							}))}
+						/>
+						{ errors.phone ? 
+							<ErrorLabel text={errors.phone} /> : 
+							<Text style={[styles.label, {marginTop: 7, color: rgba('#FFF', 0.6)}]}>
+								Contoh: 08XXXXXXXXXX
+							</Text> }
 					</View>
-					<Hr 
-						lineColor={rgba('#FFF', 0.7)} 
-						width={1} 
-						textPadding={10} 
-						text="atau" 
-						textStyles={styles.hr} 
-						hrPadding={10}
-					/>
-					<View  style={{height: hp('6.8%')}}>
-						<TouchableOpacity 
-							style={[styles.btn, {borderWidth: 0.6, borderColor: '#FFF'}]}
-							activeOpacity={0.6}
-							onPress={() => props.navigation.push('Restore')}
-						>
-							<Text style={styles.text}>Pulihkan akun</Text>
-						</TouchableOpacity>
+					<View style={{justifyContent: 'space-around', height: hp('20%'), alignItems: 'center'}}>
+						<View  style={{height: hp('6.8%')}}>
+							<TouchableOpacity 
+								style={[styles.btn, {backgroundColor: '#ffac30'}]}
+								activeOpacity={0.6}
+								onPress={handleSubmit}
+							>
+								<Text style={styles.text}>Daftar</Text>
+							</TouchableOpacity>
+						</View>
+						<Hr 
+							lineColor={rgba('#FFF', 0.7)} 
+							width={1} 
+							textPadding={10} 
+							text="atau" 
+							textStyles={styles.hr} 
+							hrPadding={25}
+						/>
+						<View  style={{height: hp('6.8%')}}>
+							<TouchableOpacity 
+								style={[styles.btn, {borderWidth: 0.6, borderColor: '#FFF'}]}
+								activeOpacity={0.6}
+								onPress={() => props.navigation.push('Restore')}
+							>
+								<Text style={styles.text}>Pulihkan akun</Text>
+							</TouchableOpacity>
+						</View>
 					</View>
-				</View>
+				</KeyboardAvoidingView>
 			</View>
 		</ImageBackground>
 	);
@@ -181,7 +187,7 @@ const styles = StyleSheet.create({
 		flex: 1
 	},
 	backBtn: {
-		width: wp('25%'), 
+		width: wp('27%'), 
 		flexDirection: 'row', 
 		alignItems: 'center', 
 		justifyContent: 'space-between',
@@ -195,7 +201,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'center', 
 		alignItems: 'center', 
 		flex: 1
-		//marginTop: -hp('10.5%')
 	},
 	text: {
 		fontFamily: 'Nunito-Bold',

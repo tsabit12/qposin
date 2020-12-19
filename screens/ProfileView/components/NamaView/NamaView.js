@@ -7,7 +7,8 @@ import {
 	Animated,
 	TextInput,
 	TouchableOpacity,
-	TouchableWithoutFeedback 
+	TouchableWithoutFeedback, 
+	Platform
 } from 'react-native';
 import PropTypes from 'prop-types';
 import {
@@ -20,6 +21,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 const NamaView = props => {
 	const inputRef = useRef();
 	const [nama, setNama] = useState(props.values ? props.values : '');
+	const { isKeyboardVisible } = props;
 
 	useEffect(() => {	
 		setTimeout(function() {
@@ -46,7 +48,10 @@ const NamaView = props => {
     			style={{flex: 1}}
     		>
     			<TouchableWithoutFeedback>
-					<View style={[styles.root]}>
+					<View style={[styles.root, {
+						//height of keyboard + text recomend
+						height: Platform.OS === 'ios' && isKeyboardVisible.height + hp('9%') //
+					}]}>
 						<View style={styles.inputGroup}>
 							<TextInput 
 								style={styles.input}
@@ -110,7 +115,8 @@ const styles = StyleSheet.create({
 
 NamaView.propTypes = {
 	handleClose: PropTypes.func.isRequired,
-	onUpdate: PropTypes.func.isRequired
+	onUpdate: PropTypes.func.isRequired,
+	isKeyboardVisible: PropTypes.object.isRequired
 }
 
 export default NamaView;

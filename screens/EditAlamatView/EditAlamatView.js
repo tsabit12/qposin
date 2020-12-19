@@ -5,7 +5,9 @@ import {
 	StyleSheet,
 	ImageBackground,
 	TouchableOpacity,
-	BackHandler
+	BackHandler,
+	Platform,
+	Keyboard
 } from 'react-native';
 import { Icon, Text as TextNote } from 'native-base';
 import {
@@ -35,6 +37,10 @@ const EditAlamatView = props => {
 	const [state, setState] = useState({});
 	const [alamatVisible, setAlamatVisible] = useState(false);
 	const [kelurahanVisible, setKelurahanVisible] = useState(false);
+	const [isKeyboardVisible, setKeyboardVisible] = useState({
+		open: false,
+		height: 0
+	});
 
 	useEffect(() => {
 		BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
@@ -43,6 +49,33 @@ const EditAlamatView = props => {
 	      BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
 	    };
 	}, [handleBackButtonClick, state]);
+
+	useEffect(() => {
+		if(Platform.OS === 'ios'){
+			const keyboardDidShowListener = Keyboard.addListener(
+				'keyboardDidShow',
+			(e) => {
+				setKeyboardVisible({
+					open: true,
+					height: e.endCoordinates.height
+				}); // or some other action
+			}
+			);
+			const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide',
+				() => {
+					setKeyboardVisible(prevState => ({
+						...prevState,
+						open: false
+					}))
+				}
+			);
+	
+			return () => {
+				keyboardDidHideListener.remove();
+				keyboardDidShowListener.remove();
+			};
+		}
+	}, []);
 
 	useEffect(() => {
 		if (params.newPayload) {
@@ -125,6 +158,7 @@ const EditAlamatView = props => {
 						handleClose={() => setAlamatVisible(false)}
 						value={state.alamatOl}
 						onUpdate={handleUpdateAlamat}
+						isKeyboardVisible={isKeyboardVisible}
 					/> }
 
 				{ kelurahanVisible && 
@@ -132,6 +166,7 @@ const EditAlamatView = props => {
 						onUpdate={handleUpdateKelurahan}
 						handleClose={() => setKelurahanVisible(false)}
 						value={state.kelurahan}
+						isKeyboardVisible={isKeyboardVisible}
 					/> }
 
 				<View style={styles.header}>

@@ -8,7 +8,10 @@ import {
 	TextInput,
 	ScrollView,
 	StatusBar,
-	AsyncStorage
+	AsyncStorage,
+	Platform,
+	Keyboard,
+	KeyboardAvoidingView
 } from 'react-native';
 import { connect } from 'react-redux';
 import { resetOrder } from '../../redux/actions/order';
@@ -95,11 +98,42 @@ const OrderView = props => {
 	})
 
 	const [shouldUpdateAddres, setShouldUpdateAddres] = useState(false);
+	const [isKeyboardVisible, setKeyboardVisible] = useState({
+		open: false,
+		height: 0
+	});
 
 	const { data, errors } = state;
 
 	const { params } = props.route;
 	const { session, order, local }  = props;
+
+	useEffect(() => {
+		if(Platform.OS === 'ios'){
+			const keyboardDidShowListener = Keyboard.addListener(
+				'keyboardDidShow',
+			(e) => {
+				setKeyboardVisible({
+					open: true,
+					height: e.endCoordinates.height
+				}); // or some other action
+			}
+			);
+			const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide',
+				() => {
+					setKeyboardVisible(prevState => ({
+						...prevState,
+						open: false
+					}))
+				}
+			);
+	
+			return () => {
+				keyboardDidHideListener.remove();
+				keyboardDidShowListener.remove();
+			};
+		}
+	}, []);
 
 	const handlePress = (type) => {
 		props.navigation.navigate('Kota', {
@@ -107,12 +141,6 @@ const OrderView = props => {
 			fromRoute: 'order' 
 		});
 	} 
-
-	// useEffect(() => {
-	// 	(async () => {
-	// 		await AsyncStorage.removeItem('isCodBaru2');
-	// 	})();
-	// }, [])
 
 	useEffect(() => {
 		if (state.mount) {
@@ -588,132 +616,142 @@ const OrderView = props => {
 					/>
 				</TouchableOpacity> }
 			</View>
-			<View style={{flex: 1, backgroundColor: '#f5f7f6'}}>
-				{ state.mount && 
-					<ScrollView keyboardShouldPersistTaps={'handled'}>
-		    			{ visibleSync && <SyncCard onPress={onPressSyncCard} />}
-						<List>
-							<Pengirim 
-								onPress={handlePress} 
-								values={senderValues}
-								error={!!errors.pengirim}
-								disabled={state.disabled}
-							/>
-							<Penerima 
-								onPress={handlePress} 
-								values={receiverValue}
-								disabled={state.disabled}
-								error={!!errors.penerima}
-							/>
-							<Jenis 
-								onPress={(payload) => setState(state => ({
-									...state,
-									data: {
-										...state.data,
-										...payload
-									},
-									errors: {
-										...state.errors,
-										jenis: undefined
-									}
-								}))}
-								values={data.jenis}
-								isi={data.isikiriman}
-								error={!!errors.jenis}
-								disabled={state.disabled}
-							/>
-							<Berat 
-								value={data.berat}
-								onPress={handleSaveBerat}
-								error={!!errors.berat}
-								disabled={state.disabled}
-							/>
+			<KeyboardAvoidingView 
+				behavior='padding' 
+				style={{flex: 1}}
+				enabled={Platform.OS === 'ios' ? true : false }
+			>
+				<View style={{flex: 1, backgroundColor: '#f5f7f6'}}>
+					{ 
+						state.mount && <ScrollView keyboardShouldPersistTaps={'handled'}>
+							{ visibleSync && <SyncCard onPress={onPressSyncCard} />}
+								<List>
+									<Pengirim 
+										onPress={handlePress} 
+										values={senderValues}
+										error={!!errors.pengirim}
+										disabled={state.disabled}
+									/>
+									<Penerima 
+										onPress={handlePress} 
+										values={receiverValue}
+										disabled={state.disabled}
+										error={!!errors.penerima}
+									/>
+									<Jenis 
+										onPress={(payload) => setState(state => ({
+											...state,
+											data: {
+												...state.data,
+												...payload
+											},
+											errors: {
+												...state.errors,
+												jenis: undefined
+											}
+										}))}
+										values={data.jenis}
+										isi={data.isikiriman}
+										error={!!errors.jenis}
+										disabled={state.disabled}
+										isKeyboardVisible={isKeyboardVisible}
+									/>
+									<Berat 
+										value={data.berat}
+										onPress={handleSaveBerat}
+										error={!!errors.berat}
+										disabled={state.disabled}
+										isKeyboardVisible={isKeyboardVisible}
+									/>
 
-							{ state.shouldCod &&  <Cod 
-								value={data.isCod}
-								onSimpan={(val) => setState(state => ({
-									...state,
-									data: {
-										...state.data,
-										isCod: val
-									}
-								}))}
-								disabled={state.disabled}
-							/> }
+									{ state.shouldCod &&  <Cod 
+										value={data.isCod}
+										onSimpan={(val) => setState(state => ({
+											...state,
+											data: {
+												...state.data,
+												isCod: val
+											}
+										}))}
+										disabled={state.disabled}
+									/> }
 
-							<Nilai 
-								value={data.nilai}
-								onPress={(value) => setState(state => ({
-									...state,
-									data: {
-										...state.data,
-										nilai: value
-									},
-									errors: {
-										...state.errors,
-										nilai: undefined
-									}
-								}))}
-								error={errors.nilai}
-								disabled={state.disabled}
-								cod={data.isCod}
-							/>
-						</List>
-						<View style={{alignItems: 'center'}}>
-				            <View style={styles.group}>
-				            	<View style={styles.field}>
-				            		<Text style={styles.textInput}>Panjang</Text>
-					            	<TextInput 
-					            		style={styles.input}
-					            		placeholder='cm'
-					            		textAlign='center'
-					            		value={data.panjang}
-					            		onChangeText={(text) => handleChange(text, 'panjang')}
-					            		keyboardType='number-pad'
-					            		editable={!state.disabled}
-					            	/>
-				            	</View>
-				            	<View style={styles.field}>
-				            		<Text style={styles.textInput}>Lebar</Text>
-					            	<TextInput 
-					            		style={styles.input}
-					            		placeholder='cm'
-					            		textAlign='center'
-					            		value={data.lebar}
-					            		onChangeText={(text) => handleChange(text, 'lebar')}
-					            		keyboardType='number-pad'
-					            		editable={!state.disabled}
-					            	/>
-				            	</View>
-				            	<View style={styles.field}>
-				            		<Text style={styles.textInput}>Tinggi</Text>
-					            	<TextInput 
-					            		style={styles.input}
-					            		placeholder='cm'
-					            		textAlign='center'
-					            		value={data.tinggi}
-					            		onChangeText={(text) => handleChange(text, 'tinggi')}
-					            		keyboardType='number-pad'
-					            		editable={!state.disabled}
-					            	/>
-				            	</View>
-				            </View>
-				            { !state.disabled && <TouchableOpacity 
-				            	style={styles.button} 
-				            	activeOpacity={0.7} 
-				            	onPress={searchTarif}
-				            >
-				            	<Text style={[styles.text, {color: '#FFF'}]}>Cek Tarif</Text>
-				            </TouchableOpacity>}
-			            </View>
+									<Nilai 
+										value={data.nilai}
+										onPress={(value) => setState(state => ({
+											...state,
+											data: {
+												...state.data,
+												nilai: value
+											},
+											errors: {
+												...state.errors,
+												nilai: undefined
+											}
+										}))}
+										error={errors.nilai}
+										disabled={state.disabled}
+										cod={data.isCod}
+										isKeyboardVisible={isKeyboardVisible}
+									/>
+								</List>
+								<View style={{alignItems: 'center'}}>
+									<View style={styles.group}>
+										<View style={styles.field}>
+											<Text style={styles.textInput}>Panjang</Text>
+											<TextInput 
+												style={styles.input}
+												placeholder='cm'
+												textAlign='center'
+												value={data.panjang}
+												onChangeText={(text) => handleChange(text, 'panjang')}
+												keyboardType='number-pad'
+												editable={!state.disabled}
+											/>
+										</View>
+										<View style={styles.field}>
+											<Text style={styles.textInput}>Lebar</Text>
+											<TextInput 
+												style={styles.input}
+												placeholder='cm'
+												textAlign='center'
+												value={data.lebar}
+												onChangeText={(text) => handleChange(text, 'lebar')}
+												keyboardType='number-pad'
+												editable={!state.disabled}
+											/>
+										</View>
+										<View style={styles.field}>
+											<Text style={styles.textInput}>Tinggi</Text>
+											<TextInput 
+												style={styles.input}
+												placeholder='cm'
+												textAlign='center'
+												value={data.tinggi}
+												onChangeText={(text) => handleChange(text, 'tinggi')}
+												keyboardType='number-pad'
+												editable={!state.disabled}
+											/>
+										</View>
+									</View>
+									{ !state.disabled && <TouchableOpacity 
+										style={styles.button} 
+										activeOpacity={0.7} 
+										onPress={searchTarif}
+									>
+										<Text style={[styles.text, {color: '#FFF'}]}>Cek Tarif</Text>
+									</TouchableOpacity>}
+								</View>
 
-			            { state.listTarif.length > 0 && 
-			            	<ListTarif 
-			            		data={state.listTarif} 
-			            		onChoose={handleChooseTarif}
-			            	/> }
-	            </ScrollView>}
-			</View>
+								{ state.listTarif.length > 0 && 
+									<ListTarif 
+										data={state.listTarif} 
+										onChoose={handleChooseTarif}
+									/> }
+						</ScrollView>
+					}
+				</View>
+			</KeyboardAvoidingView>
 		</ImageBackground>
 	);
 }
@@ -766,7 +804,11 @@ const styles = StyleSheet.create({
 		// borderWidth: 0.3,
 		borderRadius: 30,
 		backgroundColor: 'white',
-		elevation: 3
+		elevation: 3,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 0.2 },
+		shadowOpacity: 0.3,
+		shadowRadius: 1
 	},
 	field: {
 		flex: 1,

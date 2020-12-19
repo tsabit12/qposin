@@ -8,7 +8,11 @@ import {
 	TextInput,
 	BackHandler,
 	TouchableOpacity,
-	AsyncStorage
+	AsyncStorage,
+	Keyboard,
+	KeyboardAvoidingView,
+	Platform,
+	TouchableWithoutFeedback
 } from 'react-native';
 import md5 from "react-native-md5";
 import Constants from 'expo-constants';
@@ -109,27 +113,16 @@ const CreatePinView = props => {
 	}
 
 	const handleLogin = () => {
-		// props.navigation.dispatch(state => {
-		//   // Remove ubahpin route from the stack
-		//   const routes = state.routes.filter(r => r.name !== 'CreatePin');
-
-		//   return CommonActions.reset({
-		//     ...state,
-		//     routes,
-		//     index: routes.length - 3,
-		//   });
-		// });
-
-			props.navigation.dispatch(
-			  CommonActions.reset({
-			    index: 0,
-			    routes: [
-			      {
-			        name: 'Home'
-			      },
-			    ],
-			  })
-			);
+		props.navigation.dispatch(
+			CommonActions.reset({
+			index: 0,
+			routes: [
+				{
+				name: 'Home'
+				},
+			],
+			})
+		);
 	}
 
 	return(
@@ -144,54 +137,61 @@ const CreatePinView = props => {
 		        animationStyle={styles.lottie}
 		        speed={1}
 		    />
-			<View style={styles.content}>
-				<Image 
-					source={require('../../assets/images/icon/security.png')}
-					style={styles.image}
-					resizeMode='contain'
-				/>
-				{ !success ? <React.Fragment>
-					<View style={[styles.btnView]}>
-						<Text style={[styles.text, { textAlign: 'center', marginLeft: 10, marginRight: 10}]}>
-							{
-								isRegistrasi ? 'Tambahkan keamanan ekstra dengan PIN (6 digit) sesuai keinginanmu' : 
-								'Pemulihan akun berhasil, silahkan masukkan \nPIN baru (6 digit) sesuai keinginanmu'
-							}	
-						</Text>
-						<TextInput 
-							placeholder='Masukkan 6 digit pin disini'
-							style={styles.input}
-							textAlign='center'
-							autoCapitalize='words'
-							keyboardType='number-pad'
-							value={pin}
-							onChangeText={(text) => {
-								setErrors({pin: undefined});
-								setPin(text);
-							}}
+			<KeyboardAvoidingView 
+				behavior='position'
+				enabled={Platform.OS === 'ios' ? true : false}
+			>
+				<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+					<View style={styles.content}>
+						<Image 
+							source={require('../../assets/images/icon/security.png')}
+							style={styles.image}
+							resizeMode='contain'
 						/>
-						{ errors.pin && <Text style={{color: '#FFF'}}>{errors.pin}</Text> }
+						{ !success ? <React.Fragment>
+							<View style={[styles.btnView]}>
+								<Text style={[styles.text, { textAlign: 'center', marginLeft: 10, marginRight: 10}]}>
+									{
+										isRegistrasi ? 'Tambahkan keamanan ekstra dengan PIN (6 digit) sesuai keinginanmu' : 
+										'Pemulihan akun berhasil, silahkan masukkan \nPIN baru (6 digit) sesuai keinginanmu'
+									}	
+								</Text>
+								<TextInput 
+									placeholder='Masukkan 6 digit pin disini'
+									style={styles.input}
+									textAlign='center'
+									autoCapitalize='words'
+									keyboardType='number-pad'
+									value={pin}
+									onChangeText={(text) => {
+										setErrors({pin: undefined});
+										setPin(text);
+									}}
+								/>
+								{ errors.pin && <Text style={{color: '#FFF'}}>{errors.pin}</Text> }
+							</View>
+							<TouchableOpacity 
+								style={[styles.btn, {marginTop: 7, zIndex: 1}]}
+								activeOpacity={0.7}
+								onPress={handleSubmit}
+							>
+								<Text style={styles.text}>Selesai</Text>
+							</TouchableOpacity> 
+						</React.Fragment> : <View style={[styles.btnView]}>
+								<Text style={[styles.text, { textAlign: 'center', marginLeft: 10, marginRight: 10}]}>
+									{ isRegistrasi ? 'Registrasi sukses,' : 'Sukses!'} PIN login kamu adalah ({pin})
+								</Text>
+								<TouchableOpacity 
+									style={[styles.btn, {marginTop: 7}]}
+									activeOpacity={0.7}
+									onPress={handleLogin}
+								>
+									<Text style={styles.text}>Menu utama</Text>
+								</TouchableOpacity> 
+						</View> }
 					</View>
-					<TouchableOpacity 
-						style={[styles.btn, {marginTop: 7}]}
-						activeOpacity={0.7}
-						onPress={handleSubmit}
-					>
-						<Text style={styles.text}>Selesai</Text>
-					</TouchableOpacity> 
-				</React.Fragment> : <View style={[styles.btnView]}>
-						<Text style={[styles.text, { textAlign: 'center', marginLeft: 10, marginRight: 10}]}>
-							Registrasi sukses, PIN login kamu adalah ({pin})
-						</Text>
-						<TouchableOpacity 
-							style={[styles.btn, {marginTop: 7}]}
-							activeOpacity={0.7}
-							onPress={handleLogin}
-						>
-							<Text style={styles.text}>Menu utama</Text>
-						</TouchableOpacity> 
-				</View> }
-			</View>
+				</TouchableWithoutFeedback>
+				</KeyboardAvoidingView>
 		</ImageBackground>
 	);
 }
