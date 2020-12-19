@@ -8,7 +8,9 @@ import {
 	TouchableOpacity,
 	BackHandler,
 	Modal,
-	StatusBar
+	StatusBar,
+	Platform,
+	Keyboard
 } from 'react-native';
 import MapView from 'react-native-maps';
 import { Marker, AnimatedRegion, Polyline } from 'react-native-maps';
@@ -18,6 +20,10 @@ import { Toast, Icon, Text, Button } from 'native-base';
 import { connect } from 'react-redux';
 import Constants from 'expo-constants';
 import { calculateSaldo } from '../../redux/actions/auth';
+import {
+	widthPercentageToDP as wp, 
+	heightPercentageToDP as hp
+} from 'react-native-responsive-screen';
 
 import {
 	InputView,
@@ -92,6 +98,26 @@ const CityCourier = props => {
 
 	const { location, addres, positionInput } = state;
 
+	React.useEffect(() => {
+		if(Platform.OS === 'ios'){
+			const keyboardDidShowListener = Keyboard.addListener(
+				'keyboardDidShow',
+			() => {
+				positionInput.setValue(-210);
+			});
+			
+			const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide',
+				() => {
+					positionInput.setValue(0);
+				}
+			);
+	
+			return () => {
+				keyboardDidHideListener.remove();
+				keyboardDidShowListener.remove();
+			};
+		}
+	}, []);
 
 	React.useEffect(() =>  {
 		(async () => {
@@ -632,6 +658,23 @@ const CityCourier = props => {
 		setPositionInput();
 	}
 
+	const handleBackIcon = () => {
+		if(state.moveMarker === 'sender'){
+			props.navigation.goBack();
+		}else if(state.moveMarker === 'receiver'){
+			setState(state => ({
+				...state,
+				moveMarker: 'sender'
+			}))
+		}else{
+			setState(state => ({
+				...state,
+				moveMarker: 'receiver',
+				routeForMap: []
+			}))
+		}
+	}
+
 	return(
 		<KeyboardAvoidingView
 			style={{flex:1}} 
@@ -639,9 +682,29 @@ const CityCourier = props => {
 			enabled={false}
 		>
 
-			{ !state.cart && !state.update && <TouchableOpacity style={styles.chart} onPress={goToCart}>
-				<Icon name="md-cart" iconStyle={{color: "blue"}} />
-			</TouchableOpacity> }
+			{ !state.cart && !state.update && <React.Fragment>
+				<TouchableOpacity style={styles.chart} onPress={goToCart}>
+					<Icon name="md-cart" iconStyle={{color: "blue"}} />
+				</TouchableOpacity> 
+				<TouchableOpacity
+					style={{
+						position: 'absolute',
+						left: 0,
+						top: 10,
+						zIndex: 1,
+						margin: 20,
+						width: 50,
+						height: 50,
+						backgroundColor: '#FFF',
+						alignItems: 'center',
+						justifyContent: 'center',
+						borderRadius: 50 / 2
+					}}
+					onPress={handleBackIcon}
+				>
+					<Icon name='ios-arrow-back' style={{color: 'black', fontSize: 25}} />
+				</TouchableOpacity>
+			</React.Fragment>}
 
 			{ state.modalVisible && 
 				<ResultOrder 
@@ -666,6 +729,7 @@ const CityCourier = props => {
 					            latitudeDelta: location.latitudeDelta,
 					            longitudeDelta: location.longitudeDelta,
 							}} 
+							onPress={() => Keyboard.dismiss()}
 							style={styles.map}
 							// showsUserLocation={true}
 							onRegionChangeComplete={handleCompleteRegion}
