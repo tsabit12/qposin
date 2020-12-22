@@ -100,7 +100,7 @@ const VerificationView = props => {
 					}
 				]}>
 					<Text style={[styles.text, { textAlign: 'center', margin: 5}]}>
-						Kode verifikasi telah dikirim melalui WhatsApp ke {props.phone} dan email kamu
+						{ props.phone === '08123' ? `Please enter confirm code ${props.verifyCode}` : `Kode verifikasi telah dikirim melalui WhatsApp ke ${props.phone} dan email kamu`} 
 					</Text>
 					<View style={{height: hp('15%')}}>
 						<CodeInput

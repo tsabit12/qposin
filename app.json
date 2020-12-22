@@ -21,7 +21,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.posindonesia.cob",
-      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to scan barcodes to track history order",
+        "NSLocationWhenInUseUsageDescription": "This permission is not needed by the app, but it is required by an underlying API. If you see this dialog, contact us."
+      },
+      "buildNumber": "1.0.1",
       "config": {
         "googleMapsApiKey": "AIzaSyA7czY728UVajvsFfYCGLq67OPIjVpqFPc"
       }

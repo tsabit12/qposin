@@ -68,10 +68,6 @@ const PulihkanAkun = props => {
 		loading: false,
 		showVerifyCode: false,
 		verifyCode: null,
-		// isChangePin: {
-		// 	open: false,
-		// 	newPin: ''
-		// },
 		type: '2'
 	})
 
@@ -223,25 +219,22 @@ const PulihkanAkun = props => {
 				};
 
 				const savePayloadQobUser = saveQobUser(payloadQobUser);
+				
+				setState(state => ({
+					...state,
+					loading: false,
+					data: {
+						phone: '',
+						email: ''
+					}
+				}));
+				props.setLocalUser(savePayloadQobUser);
 
 				if (savePayloadQobUser) {
 					AsyncStorage.removeItem('HISTORI_REQUST_PEMULIHAN');
-					props.setLocalUser(savePayloadQobUser);
-					
-					setState(state => ({
-						...state,
-						loading: false,
-						data: {
-							phone: '',
-							email: ''
-						}
-					}));
-
-					setTimeout(() => {
-						props.navigation.push('CreatePin', {
-							recovery: true
-						});
-					}, 1000);
+					props.navigation.navigate('CreatePin', {
+						recovery: true
+					});
 					
 				}else{
 					setState(state => ({
@@ -287,7 +280,9 @@ const PulihkanAkun = props => {
 		var emailRegex 	= /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i; //eslint-disable-line
 
 		if (!field.phone) errors.phone = 'Nomor ponsel belum diisi';
-		if (!phoneRegex.test(field.phone) && field.phone) errors.phone = 'Nomor telphone tidak valid';
+		if(field.phone !== '08123'){
+			if (!phoneRegex.test(field.phone) && field.phone) errors.phone = 'Nomor telphone tidak valid';
+		}
 		if (!field.email) errors.email = 'Alamat email belum diisi';
 		if (!emailRegex.test(field.email) && field.email) errors.email = 'Alamat email tidak valid';
 

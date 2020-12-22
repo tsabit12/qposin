@@ -168,7 +168,9 @@ const CompleteRegistrasi = props => {
 
 					const savePayloadQobUser = saveQobUser(toSave);
 					if (savePayloadQobUser) {
-						props.navigation.navigate('CreatePin');
+						props.navigation.navigate('CreatePin', {
+							recovery: false
+						});
 					}else{
 						Toast.show({
 			                text: 'Unknown error',
