@@ -167,6 +167,7 @@ const CreatePinView = props => {
 										setErrors({pin: undefined});
 										setPin(text);
 									}}
+									maxLength={6}
 								/>
 								{ errors.pin && <Text style={{color: '#FFF'}}>{errors.pin}</Text> }
 							</View>

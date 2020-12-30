@@ -7,7 +7,8 @@ import {
 	TouchableOpacity,
 	TextInput,
 	StatusBar,
-	AsyncStorage
+	AsyncStorage,
+	Platform
 } from 'react-native';
 import PropTypes from 'prop-types';
 import {
@@ -200,8 +201,9 @@ const PulihkanAkun = props => {
 		setState(state => ({
 			...state,
 			showVerifyCode: false,
-			loading: true
+			loading: Platform.OS === 'android' ? true : false
 		}))
+
 		const param1 = `${data.userid}|-|${data.phone}|${data.email}|${Constants.deviceId}|${code}|2`;
 		
 		api.verifikasiBantuan(param1)

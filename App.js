@@ -77,7 +77,7 @@ export default function App() {
   const handleGetReleaseChannel = () => {
     const { channelName } = getReleaseChannel();
     if (channelName !== 'prod-v2') {
-      setNewVersionAvailable(true);
+      //setNewVersionAvailable(true);
     }
   }
 
