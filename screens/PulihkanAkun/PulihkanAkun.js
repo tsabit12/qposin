@@ -25,7 +25,7 @@ import {
 import api from '../../api';
 import Constants from 'expo-constants';
 import { connect } from 'react-redux';
-import { setLocalUser } from '../../redux/actions/auth';
+import { setLocalUser, setLoggedIn } from '../../redux/actions/auth';
 
 const getCurdate = () => {
 	var now     = new Date(); 
@@ -58,7 +58,6 @@ const getCurdate = () => {
 const PulihkanAkun = props => {
 	const phoneRef = useRef();
 	const emailRef = useRef();
-
 	const [state, setState] = useState({
 		data: {
 			phone: '',
@@ -119,7 +118,7 @@ const PulihkanAkun = props => {
 		}
 	}))
 
-	const onSubmit = () => {
+	const onSubmit = async () => {
 		const errors = validate(data);
 		setState(state => ({
 			...state,
@@ -127,73 +126,108 @@ const PulihkanAkun = props => {
 		}))
 
 		if (Object.keys(errors).length === 0) {
-			setState(state => ({
-				...state,
-				loading: true
-			}))
+			if(data.phone === '08123' && data.email === 'myposApp@email.com'){ //demo akun
+ 				const session = {
+					"alamatOl": "GRAHA POS INDO LT 4",
+					"email": "myposApp@email.com",
+					"jenisOl": "Distro",
+					"kecamatan": "BANDUNG WETAN",
+					"kelurahan": "CITARUM",
+					"kodepos": "40115",
+					"kota": "KOTA BANDUNG",
+					"nama": "Tsabit Abdul Aziz",
+					"namaOl": "Liberbreed",
+					"nohp": "08123",
+					"nopend": "40000",
+					"norek": '-',
+					"pin": "555666",
+					"provinsi": "JAWA BARAT",
+					"saldo": "-",
+				}
 
-			// const param1 = `${data.userid}|-|${data.phone}|${data.email}|${Constants.deviceId}|${state.type}`;
-			const param1 = `-|-|${data.phone}|${data.email}|${Constants.deviceId}|2`;
-			
-			api.bantuan(param1)
-				.then(res => {
-					//handle if verify code is empty 
-					console.log(res);
-					const { response_data2, response_data5 } = res;
+				await props.setLoggedIn(session);
 
-					const payload = {
-						...state.data,
-						userid: response_data5,
-						curdate: getCurdate(),
-						verifyCode: response_data2
-					};
+				const localUser = {
+					"email": "myposApp@email.com",
+					"nama": "-",
+					"nohp": "08123",
+					"pinMd5": "2dbce291beb4dd75e6d462206ce26769",
+					"userid": "440002426",
+					"username": "-",
+				}
 
-					const savedCodeVerify = saveRequestValueToStorage(payload);
-					
-					if (savedCodeVerify) {
-						setState(state => ({
-							...state,
-							data: {
-								...state.data,
-								userid: response_data5
-							},
-							loading: false,
-							verifyCode: response_data2,
-							showVerifyCode: true
-						}))
-					}else{
+				props.setLocalUser(localUser);
+
+				setTimeout(() => {
+					props.navigation.replace('Home');
+				}, 100);
+			}else{
+				setState(state => ({
+					...state,
+					loading: true
+				}))
+
+				const param1 = `-|-|${data.phone}|${data.email}|${Constants.deviceId}|2`;
+				api.bantuan(param1)
+					.then(res => {
+						//handle if verify code is empty 
+						console.log(res);
+						const { response_data2, response_data5 } = res;
+
+						const payload = {
+							...state.data,
+							userid: response_data5,
+							curdate: getCurdate(),
+							verifyCode: response_data2
+						};
+
+						const savedCodeVerify = saveRequestValueToStorage(payload);
+						
+						if (savedCodeVerify) {
+							setState(state => ({
+								...state,
+								data: {
+									...state.data,
+									userid: response_data5
+								},
+								loading: false,
+								verifyCode: response_data2,
+								showVerifyCode: true
+							}))
+						}else{
+							setState(state => ({
+								...state,
+								loading: false
+							}))
+
+							Toast.show({
+								text: 'Request gagal 400',
+								textStyle: { textAlign: 'center' },
+								duration: 4000
+							})
+						}
+					})
+					.catch(err => {
 						setState(state => ({
 							...state,
 							loading: false
 						}))
 
-						Toast.show({
-			                text: 'Request gagal 400',
-			                textStyle: { textAlign: 'center' },
-			                duration: 4000
-			            })
-					}
-				})
-				.catch(err => {
-					setState(state => ({
-						...state,
-						loading: false
-					}))
-
-					if (err.global) {
-						Toast.show({
-			                text: err.global,
-			                textStyle: { textAlign: 'center' },
-			                duration: 4000
-			            })
-					}else{
-						Toast.show({
-			                text: 'Tidak dapat memproses permintaan anda, silahkan coba beberapa saat lagi',
-			                textStyle: { textAlign: 'center' },
-			                duration: 4000
-			            })
-					}
-				});
+						if (err.global) {
+							Toast.show({
+								text: err.global,
+								textStyle: { textAlign: 'center' },
+								duration: 4000
+							})
+						}else{
+							Toast.show({
+								text: 'Tidak dapat memproses permintaan anda, silahkan coba beberapa saat lagi',
+								textStyle: { textAlign: 'center' },
+								duration: 4000
+							})
+						}
+					});
+			}
 		}
 	}
 
@@ -441,7 +475,11 @@ const styles = StyleSheet.create({
 })
 
 PulihkanAkun.propTypes = {
-	setLocalUser: PropTypes.func.isRequired
+	setLocalUser: PropTypes.func.isRequired,
+	setLoggedIn: PropTypes.func
 }
 
-export default connect(null, { setLocalUser })(PulihkanAkun);
+export default connect(null, { 
+	setLocalUser, 
+	setLoggedIn 
+})(PulihkanAkun);
