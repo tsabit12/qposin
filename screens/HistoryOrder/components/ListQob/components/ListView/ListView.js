@@ -234,7 +234,7 @@ const Item  = props => {
 
 				<View style={styles.footer}>
 					<Text style={[styles.textItem, {color: '#a3a3a2', flex: 1, marginLeft: 5}]}>
-						Dikirim : {col.insert_date.substring(0, 10)}
+						Dikirim : {col.insertdate.substring(0, 10)}
 					</Text>
 					<View style={{flex: 1, alignItems: 'flex-end', marginRight: 5}}>
 						<Text 

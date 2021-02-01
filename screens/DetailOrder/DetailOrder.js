@@ -68,7 +68,7 @@ const DetailOrder = props => {
 					<View style={styles.list}>
 						<Text style={styles.title}>Kiriman {order.codvalue === 0 ? '' : 'COD'}</Text>
 						<Text style={styles.subtitle}>
-							{order.itemtypeid === 1 ? 'Paket' : 'Surat'} ({capitalize(order.desctrans)})
+							{order.itemtypeid === '1' ? 'Paket' : 'Surat'} ({capitalize(order.desctrans)})
 						</Text>
 					</View>
 					<View style={styles.list}>
@@ -98,7 +98,7 @@ const DetailOrder = props => {
 					<View style={styles.list}>
 						<Text style={styles.title}>Waktu Order</Text>
 						<Text style={styles.subtitle}>
-							{order.insert_date}
+							{order.insertdate}
 						</Text>
 					</View>
 					<View style={styles.list}>

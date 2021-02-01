@@ -357,26 +357,9 @@ export default {
 			return Promise.reject(errors);
 		}
 	}),
-	getDetailOrder: (payload) => axios.post(`${url1}/history/getOrder`, {
+	getDetailOrder: (payload) => axios.post(`${iposUrl}/getorder`, {
 		...payload
-	}, orderPciConfig).then(res => {
-		const { status, result } = res.data;
-		if (status === 200) {
-			if (result.length > 0) {
-				return Promise.resolve(result);
-			}else{
-				const errors = {
-					msg: 'Data kiriman kamu kosong, silahkan melakukan order terlebih dahulu'
-				}
-				return Promise.reject(errors);
-			}
-		}else{
-			const errors = {
-				msg: 'Tidak dapat memproses permintaan anda, mohon coba beberapa saat lagi'
-			}
-			return Promise.reject(errors);
-		}
-	}),
+	}, qobConfig).then(res => res.data.response.data),
 	addPickup: (payload) => axios.post('https://fasterv2.fastkurir.com/api/customer/bidding_v2', {
 		...payload
 	}, fastpostConfig).then(res => {

@@ -4,12 +4,11 @@ import {
 	Text,
 	StyleSheet,
 	TouchableOpacity,
-	ImageBackground,
 	ToastAndroid,
 	Animated,
 	Platform
 } from 'react-native';
-import { Icon, Footer, FooterTab, Button, Content } from 'native-base';
+import { Icon } from 'native-base';
 import {
 	widthPercentageToDP as wp, 
 	heightPercentageToDP as hp
@@ -39,10 +38,8 @@ const HistoryOrder = props => {
 	// const animateContent = new Animated.Value(-100);
 
 	const [activePage, setActivepage] = useState(1);
-	const [loading, setLoading] = useState(false);
 	const [errors, setErrors] = useState({});
 	const [offestQob, setOffsetQob] = useState(0);
-	const [searchQob, setSeacrhQob] = useState(false);
 	const [qobIsDone, setQobDone] = useState(false); //notif once
 	const [toastVisible, setToastVisible] = useState({
 		open: false,
@@ -69,11 +66,14 @@ const HistoryOrder = props => {
 			const payload = {
 				email: email,
 				status: "0",
-				offset: 0
+				offset: 0,
+				extid: "",
+				startdate: "2020-12-01",
+				enddate: "2021-12-01"
 			}
 
 			props.getQob(payload)
-				.then(() => setOffsetQob(offestQob + 10))
+				// .then(() => setOffsetQob(offestQob + 10))
 				.catch(err => {
 					if (err.msg) {
 						setErrors({
@@ -100,7 +100,7 @@ const HistoryOrder = props => {
 			}
 		
 			props.getQob(payload)
-				.then(res => setOffsetQob(offestQob + 10))
+				//.then(res => setOffsetQob(offestQob + 10))
 				.catch(() => {
 					if (!qobIsDone) {
 						setQobDone(true);
@@ -122,12 +122,15 @@ const HistoryOrder = props => {
 		const payload = {
 			email,
 			status: "0",
-			offset: 0
+			offset: 0,
+			extid: "",
+			startdate: "2020-12-01",
+			enddate: "2021-12-01"
 		}
 
 		try{
 			await props.getQob(payload);
-			setOffsetQob(10);
+			// setOffsetQob(10);
 			return Promise.resolve('oke');
 		}catch(err){
 			return Promise.reject('not oke');
