@@ -50,7 +50,7 @@ const NamaView = props => {
     			<TouchableWithoutFeedback>
 					<View style={[styles.root, {
 						//height of keyboard + text recomend
-						height: Platform.OS === 'ios' && isKeyboardVisible.height + hp('9%') //
+						height: Platform.OS === 'ios' ? isKeyboardVisible.height + hp('9%') : null//
 					}]}>
 						<View style={styles.inputGroup}>
 							<TextInput 

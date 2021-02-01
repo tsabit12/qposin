@@ -20,7 +20,7 @@ import {
 } from 'react-native-responsive-screen';
 import rgba from 'hex-to-rgba';
 import Constants from 'expo-constants';
-import { Icon, Toast, List, ListItem, Left, Right } from 'native-base';
+import { Icon, Toast } from 'native-base';
 import {
 	SliderImage,
 	FormTarif,
@@ -31,13 +31,14 @@ import PropTypes from 'prop-types';
 import AnimatedLoader from "react-native-animated-loader";
 import api from '../../api';
 import { resetOrder } from '../../redux/actions/order';
+import { addMessage } from '../../redux/actions/message';
 
 import * as Permissions from 'expo-permissions';
 import * as Notifications from 'expo-notifications';
 import * as Linking from 'expo-linking';
 import { Ionicons } from '@expo/vector-icons';
 
-import {Collapse,CollapseHeader, CollapseBody, AccordionList} from 'accordion-collapse-react-native';
+import {Collapse,CollapseHeader, CollapseBody } from 'accordion-collapse-react-native';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -219,17 +220,9 @@ const MenuView = props => {
 				}))
 
 				if (err.global) {	
-					Toast.show({
-		                text: err.global,
-		                textStyle: { textAlign: 'center' },
-		                duration: 3000
-		            })
+					props.addMessage(`(${err.status}) ${err.global}`, 'error');
 				}else{
-					Toast.show({
-		                text: 'Network Error',
-		                textStyle: { textAlign: 'center' },
-		                duration: 3000
-		            })
+					props.addMessage(`(500) Internal server error`, 'error');
 				}
 			})
 	}
@@ -243,42 +236,89 @@ const MenuView = props => {
 		}, 10);
 	}
 
-	const onGenerateToken = () => {
+	const onGenerateToken = async () => {
 		setState(state => ({
 			...state,
 			loading: true
 		}))
 
 		const { userid } 	= props.local;
+		// const userid 	= '22882';
 		const email 		= props.user.email;
-
-		api.generateToken(userid)
-			.then(res => {
-				const payload = {
-					email: email,
-					pin: res.response_data1
-				};
-				api.syncronizeUserPwd(payload)
-					.then(res2 => {
+		
+		try {
+			const getPin = await api.generateToken(userid);
+			if(getPin.rc_mess === '00'){
+				api.syncronizeUserPwd({ email, pin: getPin.response_data1 })
+					.then(response => {
+						console.log({response});
+						// console.log('oke');
 						setState(state => ({
 							...state,
-							loading: false,
 							showToken: true,
-							tokenValue: res.response_data1
+							loading: false,
+							tokenValue: getPin.response_data1
 						}))
 					})
-					.catch(err => {
-						console.log(err);
-						setError(`(${err.respcode ? err.respcode : '500'})\nTidak dapat memproses permintaan anda, mohon coba beberapa saat lagi`);
+					.catch(error => {
+						console.log(error.response);
+						setState(state => ({ ...state, loading: false }));
+						if (error.response) {
+							console.log("first err");
+							props.addMessage(`Terdapat kesalahan! error code (${error.response.status})`, 'error');
+						} else if (error.request) {
+							console.log("second err");
+							props.addMessage(`Could not connect to server`, 'error');
+						} else {
+							console.log("last err");
+							props.addMessage(`Error ${error.message}`, 'error');
+						}
 					})
-			})
-			.catch(err => {
-				if (err.global) {
-					setError(err.global)
-				}else{
-					setError('Tidak dapat memproses permintaan anda, mohon coba beberapa saat lagi');
-				}
-			})
+			}else{
+				setState(state => ({ ...state, loading: false }));
+				props.addMessage(`(${getPin.rc_mess}) ${getPin.desk_mess}`, 'error');
+			}
+		} catch (error) {
+			setState(state => ({ ...state, loading: false }));
+			if (error.response) {
+				props.addMessage(`Terdapat kesalahan! error code (${error.response.status})`, 'error');
+				// console.log(error.response.data);
+			} else if (error.request) {
+				props.addMessage(`Could not connect to server`, 'error');
+			} else {
+				props.addMessage(`Error ${error.message}`, 'error');
+			}
+		}
+		
+
+		// api.generateToken(userid)
+		// 	.then(res => {
+		// 		const payload = {
+		// 			email: email,
+		// 			pin: res.response_data1
+		// 		};
+
+		// 		api.syncronizeUserPwd(payload)
+		// 			.then(res2 => {
+		// 				setState(state => ({
+		// 					...state,
+		// 					loading: false,
+		// 					showToken: true,
+		// 					tokenValue: res.response_data1
+		// 				}))
+		// 			})
+		// 			.catch(err => {
+						
+		// 				setError(`(${err.respcode ? err.respcode : '500'})\nTidak dapat memproses permintaan anda, mohon coba beberapa saat lagi`);
+		// 			})
+		// 	})
+		// 	.catch(err => {
+		// 		if (err.global) {
+		// 			setError(err.global)
+		// 		}else{
+		// 			setError('Tidak dapat memproses permintaan anda, mohon coba beberapa saat lagi');
+		// 		}
+		// 	})
 	}
 
 	const setError = (msg) => {
@@ -683,7 +723,9 @@ const styles = StyleSheet.create({
 
 MenuView.propTypes = {
 	user: PropTypes.object.isRequired,
-	order: PropTypes.object.isRequired
+	order: PropTypes.object.isRequired,
+	addMessage: PropTypes.func.isRequired,
+	resetOrder: PropTypes.func.isRequired
 }
 
 function mapStateToProps(state) {
@@ -694,4 +736,7 @@ function mapStateToProps(state) {
 	}
 }
 
-export default connect(mapStateToProps, { resetOrder })(MenuView);
+export default connect(mapStateToProps, { 
+	resetOrder,
+	addMessage
+})(MenuView);

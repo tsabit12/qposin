@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { 
 	View, 
 	Text, 
@@ -7,9 +8,10 @@ import {
 	TouchableOpacity,
 	TextInput,
 	ScrollView,
-	StatusBar
+	StatusBar,
+	AsyncStorage
 } from 'react-native';
-import { Icon, Toast } from 'native-base';
+import { Icon } from 'native-base';
 import {
 	widthPercentageToDP as wp, 
 	heightPercentageToDP as hp
@@ -23,6 +25,9 @@ import AnimatedLoader from "react-native-animated-loader";
 import api from '../../api';
 import { CommonActions } from '@react-navigation/native';
 import { resetOrder } from '../../redux/actions/order';
+import { addMessage } from '../../redux/actions/message';
+import * as Location from 'expo-location';
+import { pushUserDataToWeb, setIsSync } from '../../helper';
 
 const DataPenerima = props => {
 	const [ state, setState ] = useState({
@@ -36,11 +41,39 @@ const DataPenerima = props => {
 		errors: {},
 		loading: false
 	})
+	const [loadingSync, setLoadingSync] = useState(true);
 
 	const { data: dataProps } = props.route.params;
 	const { data, errors } = state;
 
-	// console.log(props.route.params);
+	useEffect(() => {
+		(async () => {
+			try {
+				const isSyncWeb = await AsyncStorage.getItem('isSyncWeb');
+				if(isSyncWeb === null){
+					const { email, userid } = props.user.localUser;
+					
+					pushUserDataToWeb(userid, email)
+						.then(() => {
+							setIsSync(true);
+							setLoadingSync(false);
+						})
+						.catch(err => {
+							const { code, errorMsg } = err;
+							props.addMessage(`(${code}) ${errorMsg}`, 'error');
+							setLoadingSync(false);
+						})
+				}else{
+					setLoadingSync(false);
+					//AsyncStorage.removeItem('isSyncWeb');
+				}
+			} catch (error) {
+				setLoadingSync(false);
+				props.addMessage('(112) Error fetching storage', 'error');
+			}
+		})();
+	}, []);
+
 
 	const handleChange = (text, name) => setState(state => ({
 		...state,
@@ -79,9 +112,15 @@ const DataPenerima = props => {
 		return errors;
 	}
 
-	const handleOrder = (payload) => {
-		const { localUser, session } = props.user;
+	const getLocation = async (payload) => {
 
+		setState(state => ({
+			...state,
+			modalVisible: false,
+			loading: true
+		}))
+
+		const { localUser, session } = props.user;
 		const compltedPayload = {
 			...payload,
 			email: localUser.email,
@@ -93,115 +132,49 @@ const DataPenerima = props => {
 			"receiveraddress": data.street,
 			"receiveremail": data.email ? data.email : '-',
 			"receiverphone": data.phone,
-			"shipperaddress": session.alamatOl
+			"shipperaddress": session.alamatOl,
+			latitude: '',
+			longitude: ''
+		}
+
+		let { status } = await Location.requestPermissionsAsync();
+		
+		if(status !== 'granted'){
+			props.addMessage('Permission to access location was denied', 'error');
+		}else{
+			let location = await Location.getCurrentPositionAsync({accuracy: Location.Accuracy.High});
+			compltedPayload.latitude = location.coords.latitude;
+			compltedPayload.longitude = location.coords.longitude;
+		}
+
+		addOrder(compltedPayload);
+	}
+
+	const addOrder = async (payload) => {
+		try {
+			const saveOrder = await api.qob.booking(payload);
+			const { respcode, transref, respmsg } = saveOrder;
+			if(respcode === '000'){
+				props.navigation.replace('ChoosePickup', {
+					...transref
+				})
+			}else{
+				props.addMessage(`(${respcode}) ${respmsg}`, 'error');
+			}
+		} catch (error) {
+			if(error.response){
+				props.addMessage(`(${error.response.status}) Terdapat kesalahan`, 'error');
+			}else if(error.request){
+				props.addMessage('(400) Request error', 'error');
+			}else{
+				props.addMessage('(500) Internal server error', 'error');
+			}
 		}
 
 		setState(state => ({
 			...state,
-			modalVisible: false,
-			loading: true
+			loading: false
 		}))
-
-		api.qob.booking(compltedPayload)
-			.then(res => {
-				setState(state => ({
-					...state,
-					loading: false
-				}))
-				Toast.show({
-	                text: 'Order sukses!',
-	                textStyle: { textAlign: 'center' },
-	                duration: 3000
-	            })
-	            backHome();
-			})
-			.catch(err => {
-				console.log({err, res: 'err order'});
-				if (!err.respmsg) {
-					setState(state => ({
-						...state,
-						loading: false
-					}))
-					Toast.show({
-		                text: 'Tidak dapat memproses permintaan anda, mohon coba beberapa saat lagi',
-		                textStyle: { textAlign: 'center' },
-		                duration: 3000
-		            })
-				}else{
-					const { respmsg } = err;
-					//auto syncronizeuser
-					if (respmsg.replace(/\s+/g, '') === 'CLIENTISNOTFOUND') {
-						autoSync(localUser.userid, localUser.email, compltedPayload);
-					}else{
-						setLoadingFalse();
-						Toast.show({
-			                text: respmsg,
-			                textStyle: { textAlign: 'center' },
-			                duration: 3000
-			            })
-					}
-				}
-			})
-	}
-
-	const saveOrder = (payload) => {
-		setState(state => ({
-			...state,
-			loading: true
-		}));
-
-		api.qob.booking(payload)
-			.then(res => {
-				setLoadingFalse();
-				backHome();
-				//console.log(res);
-				Toast.show({
-	                text: 'Order sukses!',
-	                textStyle: { textAlign: 'center' },
-	                duration: 3000
-	            })
-			})
-			.catch(err => {
-				setLoadingFalse();
-				Toast.show({
-	                text: 'Unknown error',
-	                textStyle: { textAlign: 'center' },
-	                duration: 3000
-	            })
-			})
-	}
-
-	const autoSync = (userid, email, payloadOrder) => {
-		api.generatePwdWeb(userid)
-			.then(res => {
-				const payload = {
-					email: email,
-					pin: res.response_data1
-				}
-				api.qob.syncronizeUser(payload)
-					.then(res => {
-						saveOrder(payloadOrder);
-					})
-					.catch(err => {
-						console.log(err);
-						setLoadingFalse();
-						Toast.show({
-			                text: 'Syncronize failed',
-			                textStyle: { textAlign: 'center' },
-			                duration: 3000
-			            })
-						
-					})
-			})
-			.catch(err => {
-				console.log(err);
-				setLoadingFalse();
-				Toast.show({
-	                text: 'Failed get token',
-	                textStyle: { textAlign: 'center' },
-	                duration: 3000
-	            });
-			})
 	}
 
 	const backHome = () => {
@@ -219,11 +192,6 @@ const DataPenerima = props => {
 			);
 		}, 10);
 	}
-
-	const setLoadingFalse = () => setState(state => ({
-		...state,
-		loading: false
-	}))
  
 	return(
 		<ImageBackground 
@@ -237,7 +205,7 @@ const DataPenerima = props => {
 						...state,
 						modalVisible: false
 					}))}
-					onOrder={handleOrder}
+					onOrder={getLocation}
 				/> }
 
 			<AnimatedLoader
@@ -315,7 +283,7 @@ const DataPenerima = props => {
 							activeOpacity={0.7}
 							onPress={handleSubmitPenerima}
 						>
-							<Text style={styles.text}>Selanjutnya</Text>
+							<Text style={styles.text}>{loadingSync ? 'Synchronizing...' : 'Selanjutnya'}</Text>
 						</TouchableOpacity>
 					</View>
 				</View>
@@ -387,4 +355,7 @@ function mapStateToProps(state) {
 	}
 }
 
-export default connect(mapStateToProps, { resetOrder })(DataPenerima);
+export default connect(mapStateToProps, { 
+	resetOrder,
+	addMessage
+})(DataPenerima);

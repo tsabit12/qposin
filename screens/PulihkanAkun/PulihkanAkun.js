@@ -18,14 +18,12 @@ import {
 import { Icon, Toast } from 'native-base';
 import rgba from 'hex-to-rgba';
 import AnimatedLoader from "react-native-animated-loader";
-import {
-	VerificationView,
-	ChangePinView
-} from './components';
+import { VerificationView } from './components';
 import api from '../../api';
 import Constants from 'expo-constants';
 import { connect } from 'react-redux';
 import { setLocalUser, setLoggedIn } from '../../redux/actions/auth';
+import { addMessage } from '../../redux/actions/message';
 
 const getCurdate = () => {
 	var now     = new Date(); 
@@ -104,7 +102,7 @@ const PulihkanAkun = props => {
 		}
 	}, [props.route])
 
-	const { data, errors, loading, showVerifyCode } = state;
+	const { data, errors, loading } = state;
 
 	const handleChange = (name, value) => setState(state => ({
 		...state,
@@ -214,17 +212,9 @@ const PulihkanAkun = props => {
 						}))
 
 						if (err.global) {
-							Toast.show({
-								text: err.global,
-								textStyle: { textAlign: 'center' },
-								duration: 4000
-							})
+							props.addMessage(`(${err.status}) ${err.global}`, 'error');
 						}else{
-							Toast.show({
-								text: 'Tidak dapat memproses permintaan anda, silahkan coba beberapa saat lagi',
-								textStyle: { textAlign: 'center' },
-								duration: 4000
-							})
+							props.addMessage(`(500) Internal server error`, 'error');
 						}
 					});
 			}
@@ -476,10 +466,12 @@ const styles = StyleSheet.create({
 
 PulihkanAkun.propTypes = {
 	setLocalUser: PropTypes.func.isRequired,
-	setLoggedIn: PropTypes.func
+	setLoggedIn: PropTypes.func,
+	addMessage: PropTypes.func.isRequired
 }
 
 export default connect(null, { 
 	setLocalUser, 
-	setLoggedIn 
+	setLoggedIn,
+	addMessage
 })(PulihkanAkun);

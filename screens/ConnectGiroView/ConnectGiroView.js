@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { 
 	View, 
 	Text,
@@ -26,6 +27,7 @@ import {
 } from './components';
 import api from '../../api';
 import { updateNorek } from '../../redux/actions/auth';
+import { addMessage } from '../../redux/actions/message';
 import { CommonActions } from '@react-navigation/native';
 
 const getCurdate = () => {
@@ -112,14 +114,6 @@ const ConnectGiroView = props => {
 					const { response_data5 } = res;
 					props.updateNorek(data.norek, response_data5); //& saldo
 					setTimeout(function() {
-						// props.navigation.dispatch(state => {
-						//   const routes = state.routes.filter(r => r.name !== 'ConnectGiro');
-						//   return CommonActions.reset({
-						//     ...state,
-						//     routes,
-						//     index: routes.length - 1,
-						//   });
-						// });
 						props.navigation.dispatch(
 						  CommonActions.reset({
 						    index: 1,
@@ -181,46 +175,25 @@ const ConnectGiroView = props => {
 								message: `Kode verifikasi telah dikirim ke nomor ${pgmPhone} melalui WhatsApp. (Berlaku sampai pukul 00:00)`,
 							}))
 						}else{
-							Toast.show({
-				                text: 'FAILED!!',
-				                textStyle: { textAlign: 'center' },
-				                duration: 3000
-				            })
+							props.addMessage(`(000) Gagal menyimpan data`, 'error');
 						}
 
 					})
 					.catch(err => {
-						console.log(err);
 						setLoading(false);
 						if (err.global) {
-							Toast.show({
-				                text: err.global,
-				                textStyle: { textAlign: 'center' },
-				                duration: 3000
-				            })
+							props.addMessage(`(${err.status}) ${err.global}`, 'error');
 						}else{
-							Toast.show({
-				                text: 'Tidak dapat memproses permintaan anda, mohon coba beberapa saat lagi',
-				                textStyle: { textAlign: 'center' },
-				                duration: 3000
-				            })
+							props.addMessage(`(500) Internal server error`, 'error');
 						}
 					})	
 			})
 			.catch(err => {
 				setLoading(false);
 				if (err.global) {
-					Toast.show({
-		                text: err.global,
-		                textStyle: { textAlign: 'center' },
-		                duration: 3000
-		            })
+					props.addMessage(`(${err.status}) ${err.global}`, 'error');
 				}else{
-					Toast.show({
-		                text: 'Tidak dapat memproses permintaan anda, mohon coba beberapa saat lagi',
-		                textStyle: { textAlign: 'center' },
-		                duration: 3000
-		            })
+					props.addMessage(`(500) Internal server error`, 'error');
 				}
 			})
 	}	
@@ -348,10 +321,19 @@ const styles = StyleSheet.create({
 	}
 })
 
+ConnectGiroView.propTypes = {
+	addMessage: PropTypes.func.isRequired,
+	user: PropTypes.object.isRequired,
+	updateNorek: PropTypes.func.isRequired
+}
+
 function mapStateToProps(state) {
 	return{
 		user: state.auth.localUser
 	}
 }
 
-export default connect(mapStateToProps, { updateNorek })(ConnectGiroView);
+export default connect(mapStateToProps, { 
+	updateNorek,
+	addMessage
+})(ConnectGiroView);

@@ -1,0 +1,3 @@
+export const ADD_MESSAGE = 'ADD_MESSAGE';
+export const CLOSE_MESSAGE = 'CLOSE_MESSAGE';
+export const GET_SCHEDULE = 'GET_SCHEDULE';

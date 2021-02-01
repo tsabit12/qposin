@@ -15,12 +15,13 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { resetOrder } from '../../redux/actions/order';
+import { addMessage } from '../../redux/actions/message';
 import PropTypes from 'prop-types';
 import {
 	widthPercentageToDP as wp, 
 	heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
-import { Icon, List, Toast } from 'native-base';
+import { Icon, List } from 'native-base';
 import {
 	Pengirim,
 	Penerima,
@@ -234,11 +235,7 @@ const OrderView = props => {
 									loading: false,
 									mount: true
 								}));
-								Toast.show({
-							        text: 'Untuk menggunakan layanan COD saldo minimal 10 ribu',
-							        textStyle: { textAlign: 'center' },
-							        duration: 3000
-							    })
+								props.addMessage(`(${99}) Untuk menggunakan layanan COD saldo minimal 10 ribu`, 'error')
 							}else{
 								setState(state => ({
 									...state,
@@ -249,14 +246,18 @@ const OrderView = props => {
 							}
 						})
 						.catch(err => {
-							console.log(err);
 							setState(state => ({
 								...state,
 								loading: false,
 								mount: true
 							}))
-						})
 
+							if(err.global){
+								props.addMessage(`(${err.status}) ${err.global}`, 'error');
+							}else{
+								props.addMessage(`(500) Internal server error!! failed fetching rekening type`, 'error');
+							}
+						})
 				}
 			}else{
 				setState(state => ({
@@ -330,39 +331,24 @@ const OrderView = props => {
 							listTarif: convertedTarif
 						}))	
 					}else{
-						Toast.show({
-			                text: 'Tarif tidak ditemukan',
-			                textStyle: { textAlign: 'center' },
-			                duration: 4000
-			            })
-
-			            setState(state => ({
+						setState(state => ({
 							...state,
 							loading: false,
 						}))	
+						props.addMessage(`Tarif tidak ditemukan`, 'error');
 					}
 				})
 				.catch(err => {
-					console.log(err);
 					setState(state => ({
 						...state,
 						loading: false
 					}))	
 					if (err.global) {
-						Toast.show({
-			                text: err.global,
-			                textStyle: { textAlign: 'center' },
-			                duration: 4000
-			            })
+						props.addMessage(`(${err.status}) ${err.global}`, 'error');
 					}else{
-						Toast.show({
-			                text: 'Request gagal',
-			                textStyle: { textAlign: 'center' },
-			                duration: 4000
-			            })
+						props.addMessage(`(500) Internal server error`, 'error');
 					}
 				})
-			// const payload =
 		}
 	}
 
@@ -411,6 +397,9 @@ const OrderView = props => {
 		const payload = {
 			payloadTarif,
 			...state.data,
+			panjang: state.data.panjang.replace(/\s/g, ''),
+			lebar: state.data.lebar.replace(/\s/g, ''),
+			tinggi: state.data.tinggi.replace(/\s/g, ''),
 			pengirim: {
 				kec: senderValues.kec,
 				kota: senderValues.kota,
@@ -459,11 +448,7 @@ const OrderView = props => {
 						loading: false
 					}));
 
-					Toast.show({
-				        text: 'Untuk menggunakan layanan COD saldo minimal 10 ribu',
-				        textStyle: { textAlign: 'center' },
-				        duration: 3000
-				    })
+					props.addMessage(`(${99}) Untuk menggunakan layanan COD saldo minimal 10 ribu`, 'error')
 				}else{
 					setState(state => ({
 						...state,
@@ -473,15 +458,16 @@ const OrderView = props => {
 				}
 			})
 			.catch(err => {
-				Toast.show({
-			        text: `Terdapat kesalahan! ${err.global}`,
-			        textStyle: { textAlign: 'center' },
-			        duration: 3000
-			    })
 				setState(state => ({
 					...state,
 					loading: false
 				}))
+
+				if(err.global){
+					props.addMessage(`(${err.status}) ${err.global}`, 'error');
+				}else{
+					props.addMessage(`(500) Internal server error!! failed fetching rekening type`, 'error');
+				}
 			})
 	}
 
@@ -519,7 +505,6 @@ const OrderView = props => {
 									try{
 										await AsyncStorage.setItem('isCodBaru', JSON.stringify(true));
 										validateRekening();
-										console.log("succes save storage");
 									}catch(err){
 										console.log(err);
 									}
@@ -529,12 +514,13 @@ const OrderView = props => {
 									setState(prevState => ({
 										...prevState,
 										loading: false
-									}))
-									Toast.show({
-								        text: 'Sinkronisasi gagal, silahkan cobalagi!',
-								        textStyle: { textAlign: 'center' },
-								        duration: 2000
-								    })
+									})
+									)
+									if(err2.respcode){
+										props.addMessage(`(${err2.respcode}) Failed sync rekening`, 'error');
+									}else{
+										props.addMessage(`(500) Internal server error! Failed sync rekening`, 'error');
+									}
 								})
 						}
 					})
@@ -545,24 +531,25 @@ const OrderView = props => {
 							loading: false
 						}))
 
-						Toast.show({
-					        text: 'Sinkronisasi gagal, silahkan cobalagi!',
-					        textStyle: { textAlign: 'center' },
-					        duration: 2000
-					    })
+						if(err2.respcode){
+							props.addMessage(`(${err2.respcode}) User sync failed`, 'error');
+						}else{
+							props.addMessage(`(500) Internal server error! User sync failed`, 'error');
+						}
 					})
 			})
 			//get pin gagal
-			.catch(() => {
-				Toast.show({
-			        text: 'Sinkronisasi gagal, silahkan cobalagi!',
-			        textStyle: { textAlign: 'center' },
-			        duration: 2000
-			    })
+			.catch(errPin => {
 			    setState(prevState => ({
 					...prevState,
 					loading: false
 				}))
+
+				if(errPin.global){
+					props.addMessage(`(${errPin.status}) ${errPin.global}`, 'error');
+				}else{
+					props.addMessage(`(500) Internal server error! generate PIN failed`, 'error');
+				}
 			})
 	} 
 
@@ -830,7 +817,8 @@ const styles = StyleSheet.create({
 OrderView.propTypes = {
 	order: PropTypes.object.isRequired,
 	resetOrder: PropTypes.func.isRequired,
-	local: PropTypes.object.isRequired
+	local: PropTypes.object.isRequired,
+	addMessage: PropTypes.func.isRequired
 }
 
 function mapStateToProps(state) {
@@ -841,4 +829,7 @@ function mapStateToProps(state) {
 	}
 }
 
-export default connect(mapStateToProps, { resetOrder })(OrderView);
+export default connect(mapStateToProps, { 
+	resetOrder,
+	addMessage 
+})(OrderView);

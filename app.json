@@ -43,7 +43,7 @@
     },
     "githubUrl": "https://github.com/tsabit12/qposin/",
     "notification": {
-      "icon": "./assets/notification.png",
+      "icon": "./assets/notification_icon.png",
       "color": "#f68527",
       "androidMode": "default",
       "iosDisplayInForeground": true

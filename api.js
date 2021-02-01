@@ -1,20 +1,19 @@
 import axios from 'axios';
 import hashing from './utils/hashing';
+import { 
+	GOOGLE_API_KEY,
+	qqomConfig,
+	orderPciConfig,
+	fastpostConfig,
+	qobConfig
+} from './config';
 
-const urlCityCourier = 'https://qcomm.posindonesia.co.id:10444/a767e8eec95442bda80c4e35e0660dbb';
-
-const getOrderUrl = 'https://qcomm.posindonesia.co.id:10444/getOrder';
-const url 	= 'https://qcomm.posindonesia.co.id:10444/a767e8eec95442bda80c4e35e0660dbb'; //live
-// const url 	= 'https://qcomm.posindonesia.co.id:10555/a767e8eec95442bda80c4e35e0660dbb'; //dev
-const url1 	= 'https://order.posindonesia.co.id/api';
-
-let configFast = {
-	headers: { 
-  		'content-type': 'application/json',
-  		'accept': 'application/json'
-  	}
-}
-
+const urlCityCourier 	= 'https://qcomm.posindonesia.co.id:10444/a767e8eec95442bda80c4e35e0660dbb';
+const getOrderUrl 		= 'https://qcomm.posindonesia.co.id:10444/getOrder';
+const url 				= 'https://qcomm.posindonesia.co.id:10444/a767e8eec95442bda80c4e35e0660dbb'; //live
+// const url 			= 'https://qcomm.posindonesia.co.id:10555/a767e8eec95442bda80c4e35e0660dbb'; //dev
+const url1 				= 'https://order.posindonesia.co.id/api_dev';
+const iposUrl 			= 'https://jembatan.posindonesia.co.id/qposinajadev/1.0.0';
 
 const getLastStringAfterSpace = (words) => {
     var n = words.split(" ");
@@ -22,46 +21,25 @@ const getLastStringAfterSpace = (words) => {
 
 }
 
-// const GOOGLE_API_KEY = 'AIzaSyA8xP2eX_my7NBK-ysRHyg4QP-znaTxAsg';
-const GOOGLE_API_KEY = 'AIzaSyCfveavBzHw8zjByDPonahtt2VzpwUAIBA';
-
-
-const config = {
-	headers: {
-		'Content-Type': 'Application/json'	
-	}
-}
-
-const configYuyus = {	
-	headers: { 
-  		'content-type': 'application/x-www-form-urlencoded',
-  		'accept': 'application/json'
-  	},
-  	auth: {
-		username: 'ecom',
-		password: '05144f4e12aaa402aeb51ef2c7dde527'
-	}
-} 
-
 
 export default {
 	lacakKiriman: (barcode) => axios.post(`${url1}/lacak`, {
 		barcode
-	}).then(res => res.data.result),
+	}, orderPciConfig).then(res => res.data.result),
 	sendWhatsApp: (payload, urlWa) => axios.post(urlWa, {
 		...payload
-	}, config).then(res => res.data),
+	}, orderPciConfig).then(res => res.data),
 	bantuan: (param1, userid) => axios.post(url, {
 		messtype: '220',
 		param1,
 		hashing: hashing('220', param1)
-	}, configYuyus).then(res => {
-		console.log(res);
+	}, qqomConfig).then(res => {
 		if (res.data.rc_mess === '00' || res.data.rc_mess === '02' || res.data.rc_mess === '01') {
 			return res.data;
 		}else{
 			const errors = {
-				global: res.data.desk_mess
+				global: res.data.desk_mess,
+				status: res.data.rc_mess
 			};
 			return Promise.reject(errors);
 		}
@@ -70,7 +48,7 @@ export default {
 		messtype: '221',
 		param1: param1,
 		hashing: hashing('221', param1)
-	}, configYuyus).then(res => {
+	}, qqomConfig).then(res => {
 		if (res.data.rc_mess === '00') {
 			return res.data;
 		}else{
@@ -84,7 +62,7 @@ export default {
 		messtype: '216',
 		param1: payload,
 		hashing: hashing('216', payload)
-	}, configYuyus)
+	}, qqomConfig)
 		.then(res => res.data)
 		.catch(err => {
 			if (err.response) {
@@ -104,7 +82,7 @@ export default {
 	getKota: () => axios.get('https://order.posindonesia.co.id/api/refkota.json').then(res => res.data),
 	getKecamatan: (kota) => axios.post(`${url1}/qposinaja/getPostalCode`, {
 		kota
-	}).then(res => res.data.result),
+	}, orderPciConfig).then(res => res.data.result),
 	getTarif: (param1) => axios.post(url, {
 		messtype: '703',
 		param1,
@@ -113,26 +91,27 @@ export default {
 		param4: '',
 		param5: '',
 		hashing: hashing('703', param1)
-	}, configYuyus)
+	}, qqomConfig)
 	.then(res => {
 		const { rc_mess } = res.data;
 		if (rc_mess === '00') {
 			return res.data.response_data1.substring(2);
 		}else{
 			const errors = {
-				global: 'Tarif tidak ditemukan'
+				global: 'Tarif tidak ditemukan',
+				status: rc_mess
 			};
 			return Promise.reject(errors);
 		}
 	}),
-	pushToken: (payload) => axios.post(`https://order.posindonesia.co.id/api/Qposinaja/pushToken`, {
+	pushToken: (payload) => axios.post(`${url1}/qposinaja/pushToken`, {
 		...payload
-	}).then(res => res.data),
+	}, orderPciConfig).then(res => res.data),
 	updatePin: (param1) => axios.post(url, {
 		messtype: '208',
 		param1,
 		hashing: hashing('208', param1)
-	}, configYuyus).then(res => {
+	}, qqomConfig).then(res => {
 		if (res.data.rc_mess === '00') {
 			return res.data;
 		}else{
@@ -141,12 +120,12 @@ export default {
 	}),
 	getLinkWa: (payload) => axios.post(`${url1}/qposinaja/whatsapp`, {
 		...payload
-	}).then(res => res.data),
+	}, orderPciConfig).then(res => res.data),
 	registrasi: (payload) => axios.post(url, {
 		messtype: '215',
 		...payload,
 		hashing: hashing('215', payload.param1)
-	}, configYuyus).then(res => {
+	}, qqomConfig).then(res => {
 		if (res.data.rc_mess === '00') {
 			return res.data;
 		}else{
@@ -239,22 +218,22 @@ export default {
 			messtype: '401',
 			...payload,
 			hashing: hashing('401', payload.param1)
-		}, configYuyus)
+		}, qqomConfig)
 			.then(res => res.data),
 		order: (payload) => axios.post(urlCityCourier, {
 			messtype: '402',
 			...payload,
 			hashing: hashing('402', payload.param1)
-		}, configYuyus).then(res => res.data),
+		}, qqomConfig).then(res => res.data),
 		getOrder: (userid) => axios.post(getOrderUrl, {
 			userid: userid
-		}, configYuyus).then(res => res.data),
+		}, qqomConfig).then(res => res.data),
 		pembayaran: (userid, param2) => axios.post(urlCityCourier, {
 			messtype: '403',
 			param1: userid,
 			param2,
 			hashing: hashing('403', userid)
-		}, configYuyus)
+		}, qqomConfig)
 			.then(res => {
 				const { rc_mess, desk_mess } = res.data;
 				if (rc_mess === '00') {
@@ -273,7 +252,7 @@ export default {
 			param2: payload,
 			userid: payload.userid,
 			hashing: hashing('405', payload.userid)
-		}, configYuyus).then(res => {
+		}, qqomConfig).then(res => {
 			if (res.data.rc_mess === '00') {
 				return Promise.resolve(res.data);
 			}else{
@@ -287,79 +266,63 @@ export default {
 		}),
 		mapping: (kota) => axios.post(`${url1}/Qposinaja/kotaQcc`, {
 			kota
-		}).then(res => res.data.result)
+		}, orderPciConfig).then(res => res.data.result)
 	},
 	getNotification: (payload) => axios.post(`${url1}/Qposinaja/logNotif`, {
 		...payload
-	}).then(res => res.data.result),
+	}, config).then(res => res.data.result),
 	qob: {
-		booking: (payload) => axios.post(`${url1}/Qposinaja/addorder`, {
+		booking: (payload) => axios.post(`${iposUrl}/addorder`, {
 			...payload
-		}, config).then(res => {
-			if (res.data.respcode === '000') {
-				return res.data;
+		}, qobConfig).then(res => res.data.response),
+		syncronizeUser: (payload) => axios.post(`${url1}/Qposinaja/sync`, {
+			...payload
+		}, orderPciConfig).then(res => {
+			if (res.data.respcode === '00') {
+				return result;
 			}else{
 				return Promise.reject(res.data);
 			}
 		}),
-		syncronizeUser: (payload) => axios.post(`${url1}/Qposinaja/sync`, {
+		getschedulepickup: (payload) => axios.post(`${iposUrl}/getschedulepickup`, {
 			...payload
-		}).then(res => {
-			const { result } = res.data;
-			if (result.respcode === '00') {
-				return result;
-			}else{
-				return Promise.reject(result);
-			}
-		}),
+		}, qobConfig).then(res => res.data.response.data),
+		requestPickup: (payload) => axios.post(`${iposUrl}/requestpickup`, {
+			...payload
+		}, qobConfig).then(res => res.data.response)
 	},
 	generatePwdWeb: (userid) => axios.post(url,{
 		messtype: '213',
 		param1: userid,
 		hashing: hashing('213', userid)
-	},configYuyus).then(res => {
+	},qqomConfig).then(res => {
 		if (res.data.rc_mess === '00') {
 			return res.data;
 		}else{
-			return Promise.reject(res.data);
+			return Promise.reject(res.data.response);
 		}
 	}),
 	generateToken: (userid) => axios.post(url, {
 		userid,
-		messtype: '213',
+		messtype: '213', 
 		param1: userid,
 		hashing: hashing('213', userid)
-	}, configYuyus).then(res => {
-		if (res.data.rc_mess === '00') {
-			return Promise.resolve(res.data);
-		}else{
-			const errors = {
-				global: res.data.desk_mess
-			}
-			return Promise.reject(errors);
-		}
-	}),
-	syncronizeUserPwd: (payload) => axios.post(`${url1}/Qposinaja/sync`, {
+	}, qqomConfig).then(res => res.data),
+	syncronizeUserPwd: (payload) => axios.post(`${iposUrl}/syncronizeuser`, {
 		...payload
-	}).then(res => {
-		const { result } = res.data;
-		if (result.respcode === '00' || result.respcode === '21') {
-			return result;
-		}else{
-			return Promise.reject(result);
-		}
-	}),
+	}, qobConfig).then(res => res.data.response),
 	connectToGiro: (rek, userid) => axios.post(url, {
 		messtype: '217',
 		param1: rek,
 		param2: userid,
 		hashing: hashing('217', rek)
-	}, configYuyus).then(res => {
+	}, qqomConfig).then(res => {
 		if (res.data.rc_mess === '00') {
 			return res.data;
 		}else{
 			const errors = {
-				global: res.data.desk_mess
+				global: res.data.desk_mess,
+				status: res.data.rc_mess
 			};
 			return Promise.reject(errors);
 		}
@@ -368,7 +331,7 @@ export default {
 		messtype: '218',
 		param1,
 		hashing: hashing('218', param1)
-	}, configYuyus).then(res => {
+	}, qqomConfig).then(res => {
 		if (res.data.rc_mess === '00') {
 			return res.data;
 		}else{
@@ -383,7 +346,7 @@ export default {
 		messtype: '224',
 		param1,
 		hashing: hashing('224', param1)
-	}, configYuyus).then(res => {
+	}, qqomConfig).then(res => {
 		console.log(res);
 		if (res.data.rc_mess === '00') {
 			return res.data;
@@ -396,7 +359,7 @@ export default {
 	}),
 	getDetailOrder: (payload) => axios.post(`${url1}/history/getOrder`, {
 		...payload
-	}).then(res => {
+	}, orderPciConfig).then(res => {
 		const { status, result } = res.data;
 		if (status === 200) {
 			if (result.length > 0) {
@@ -416,7 +379,7 @@ export default {
 	}),
 	addPickup: (payload) => axios.post('https://fasterv2.fastkurir.com/api/customer/bidding_v2', {
 		...payload
-	}, configFast).then(res => {
+	}, fastpostConfig).then(res => {
 		if (res.data.status === true) {
 			return res.data;
 		}else{
@@ -426,26 +389,9 @@ export default {
 			return Promise.reject(errors);
 		}
 	}),
-	// addPickup: (payload) => axios.post('https://meterai.posindonesia.co.id/dev/bidding/Api/bidding_process', {
-	// 	...payload
-	// }, configFast).then(res => {
-	// 	console.log(res.data);
-	// 	console.log(payload);
-	// 	if (res.data.code === '00') {
-	// 		return {
-	// 			pickup_number: res.data.pickup_number,
-	// 			...res.data.result
-	// 		}
-	// 	}else{
-	// 		const errors = {
-	// 			msg: `${res.data.message}`
-	// 		}
-	// 		return Promise.reject(errors);
-	// 	}
-	// }),
 	getHistoryStatus: (payload) => axios.post(`${url1}/Qposinaja/history`, {
 		...payload
-	}).then(res => {
+	}, orderPciConfig).then(res => {
 		const { result } = res.data;
 		if (!result.data) {
 			return Promise.reject(result);
@@ -457,37 +403,31 @@ export default {
 		messtype: '226',
 		param1: rekening,
 		hashing: hashing('226', rekening)
-	}, configYuyus).then(res => {
+	}, qqomConfig).then(res => {
 		if (res.data.rc_mess === '99') {
 			const { response_data2 } = res.data;
 			const value = response_data2.split("|");
 			if (value[5] === 'GIROPOS REGULER') {
-				// if (parseInt(value[2]) < 10000) {
-				// 	const errors = {
-				// 		global: 'Fitur COD dinonaktifkan. Saldo rekening minimal adalah 10.000 ribu, silahkan lakukan top up terlebih dahulu'
-				// 	};
-				// 	return Promise.reject(errors);
-				// }else{
-				// 	return Promise.resolve(res.data);
-				// }
 				return Promise.resolve(value);
 			}else{//invalid rekening type
 				const errors = {
-					global: 'Fitur COD dinonaktifkan. Harap hubungi CS untuk mengubah tipe rekening menjadi reguler'
+					global: 'Fitur COD dinonaktifkan. Harap hubungi CS untuk mengubah tipe rekening menjadi reguler',
+					status: res.data.rc_mess
 				};
 				return Promise.reject(errors);
 			}
 		}else{
 			const { desk_mess } = res.data;
 			const errors = {
-				global: desk_mess
+				global: desk_mess,
+				status: res.data.rc_mess
 			};
 			return Promise.reject(errors);
 		}
 	}),
-	syncronizeCod: (payload) => axios.post(`${url1}/Qposinaja/syncGiro`, {
+	syncronizeCod: (payload) => axios.post(`${iposUrl}/syncronizeaccount`, {
 		...payload
-	}).then(res => {
+	}, qobConfig).then(res => {
 		const { result } = res.data;
 		if (result.respcode === '00' || result.respcode === '21') {
 			return result;
@@ -496,9 +436,9 @@ export default {
 		}
 	}),
 	testApi: () => axios.post(`${url1}/test`).then(res => res.data),
-	updateStatusPickup: (payload) => axios.post(`${url1}/qposinaja/confirmPickup`, {
+	updateStatusPickup: (payload) => axios.post(`${iposUrl}/setpickup`, {
 		...payload
-	}).then(res => {
+	}, iposUrl).then(res => {
 		if (!res.data) {
 			return Promise.reject(res);
 		}else{

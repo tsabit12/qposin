@@ -22,17 +22,19 @@ import {
   ConnectGiroView,
   HitoryOrderView,
   EditAlamatView,
-  History,
   UpdatePlaystoreView,
   FindDriverView,
-  DetailOrder as DetailOrderView
+  DetailOrder as DetailOrderView,
+  ChoosePickup
 } from './screens';
+import Notification from './Notification';
+import { closeMessage } from './redux/actions/message';
 
 
 const Stack = createStackNavigator();
 
 const Routes = props => {
-	const { isLoggedin, updateAvailable } = props; 
+	const { isLoggedin, updateAvailable, flashMessage } = props; 
 	return(
 		<React.Fragment>
 			<NavigationContainer>
@@ -59,6 +61,7 @@ const Routes = props => {
 			        		<Stack.Screen name="UpdateAlamat" component={EditAlamatView} />
 			        		<Stack.Screen name="Bidding" component={FindDriverView} />
 			        		<Stack.Screen name="DetailOrder" component={DetailOrderView} />
+			        		<Stack.Screen name="ChoosePickup" component={ChoosePickup} />
 			        	</React.Fragment> : <React.Fragment>
 							<Stack.Screen name="Home" component={HomeScreen} />
 							<Stack.Screen name="FormRegister" component={FormRegisterScreen} />
@@ -79,19 +82,29 @@ const Routes = props => {
 		        	</Stack.Navigator>
 		       	}
 		    </NavigationContainer>
+			<Notification 
+				variant={flashMessage.variant}
+				message={flashMessage.msg}
+				open={flashMessage.open}
+				onClose={props.closeMessage}
+			/>
 	    </React.Fragment>
 	);
 }
 
+
 Routes.propTypes = {
 	isLoggedin: PropTypes.bool.isRequired,
-	updateAvailable: PropTypes.bool.isRequired
+	updateAvailable: PropTypes.bool.isRequired,
+	flashMessage: PropTypes.object.isRequired,
+	closeMessage: PropTypes.func
 }
 
 function mapStateToProps(state) {
 	return{
-		isLoggedin: state.auth.logged
+		isLoggedin: state.auth.logged,
+		flashMessage: state.message 
 	}
 }
 
-export default connect(mapStateToProps, null)(Routes);
+export default connect(mapStateToProps, { closeMessage })(Routes);

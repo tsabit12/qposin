@@ -16,21 +16,17 @@ import { connect } from 'react-redux';
 import Constants from 'expo-constants';
 import api from '../../api';
 import { setLoggedIn } from '../../redux/actions/auth';
+import { addMessage } from '../../redux/actions/message';
 import {
 	widthPercentageToDP as wp, 
 	heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
-import CustomToast from '../CustomToast';
 
 const LoginView = props => {
 	const refPinView = useRef();
 	const [pin, setPin] = useState('');
 	const [showRemoveButton, setShowRemoveButton] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [openToast, setOpenToast] = useState({
-		text: '',
-		open: false
-	})
 
 	useEffect(() => {
 		if (pin.length > 0) {
@@ -54,7 +50,6 @@ const LoginView = props => {
 
 		api.login(payload, userid)
 			.then(res => {
-				console.log(res);
 				if (res.rc_mess === '00') {
 					const { response_data1, response_data4, response_data5 } = res;
 					const x 	= response_data4.split('|');
@@ -81,17 +76,18 @@ const LoginView = props => {
 					props.setLoggedIn(session);
 					setLoading(false);
 					refPinView.current.clearAll();
-
 				}else{
-		            setOpenToast({ text: res.desk_mess, open: true })
 		            setLoading(false);
-		            refPinView.current.clearAll();
+					refPinView.current.clearAll();
+					props.addMessage(`(${res.rc_mess}) ${res.desk_mess}`, 'error');
+					
 				}
 			})
 			.catch(err => {
 				setLoading(false);
-	            setOpenToast({ text: err.global, open: true })
-	            refPinView.current.clearAll();
+	            // setOpenToast({ text: err.global, open: true })
+				refPinView.current.clearAll();
+				props.addMessage(`(500) ${err.global}`, 'error');
 			});
 	} 
 
@@ -157,12 +153,6 @@ const LoginView = props => {
 	        >
 	        	<Text style={styles.text}>Lupa PIN</Text>
 	        </TouchableOpacity>
-
-	        <CustomToast 
-	        	open={openToast.open}
-	        	message={openToast.text}
-	        	onClose={() => setOpenToast({message: '', open: false})}
-	        />
 		</ImageBackground>
 	);
 }
@@ -196,7 +186,8 @@ const styles = StyleSheet.create({
 })
 
 LoginView.propTypes = {
-	localUser: PropTypes.object.isRequired
+	localUser: PropTypes.object.isRequired,
+	addMessage: PropTypes.func.isRequired
 }
 
 function mapStateToProps(state) {
@@ -205,4 +196,7 @@ function mapStateToProps(state) {
 	}
 }
 
-export default connect(mapStateToProps, { setLoggedIn })(LoginView);
+export default connect(mapStateToProps, { 
+	setLoggedIn,
+	addMessage
+})(LoginView);
