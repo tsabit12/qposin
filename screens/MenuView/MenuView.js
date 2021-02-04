@@ -108,16 +108,16 @@ const MenuView = props => {
 		showToken: false,
 		tokenValue: ''
 	})
-	const [mount, setMount] = useState(false);
+	//const [mount, setMount] = useState(false);
 
-	const { user, order, local } = props;
+	const { order, local } = props;
 
 	useEffect(() => {
 		registerForPushNotificationsAsync()
 			.then(token => setExpoPushToken(token))
 			.catch(err => {
 				console.log(err);
-				setMount(true);
+				//setMount(true);
 			})
 	}, []);
 
@@ -129,31 +129,32 @@ const MenuView = props => {
     			email: local.email,
     			userid: local.userid,
     			phone: local.nohp
-    		};
-    		api.pushToken(payload)
-    			.then(res => {
-    				setMount(true);
-    			})
-    			.catch(err => {
-    				console.log(err);
-    				setMount(true);
-    			})
+			};
+			
+    		api.pushToken(payload);
+    			// .then(res => {
+    			// 	setMount(true);
+    			// })
+    			// .catch(err => {
+    			// 	console.log(err);
+    			// 	setMount(true);
+    			// })
 		}
 	}, [expoPushToken]);
 
-	useEffect(() => {
-		if (mount) {
-			(async () => {
-				const { norek } = user;
-				if (norek !== '-') {
-					const fuckingValue = await AsyncStorage.getItem('isCodBaru'); //define user was syncronize 
-					if (fuckingValue === null) { //web required to syncronize user when using cod
-						handleAsyncGiro(local, user);
-					}
-				}
-			})();
-		}
-	}, [mount])
+	// useEffect(() => {
+	// 	if (mount) {
+	// 		(async () => {
+	// 			const { norek } = user;
+	// 			if (norek !== '-') {
+	// 				const fuckingValue = await AsyncStorage.getItem('isCodBaru'); //define user was syncronize 
+	// 				if (fuckingValue === null) { //web required to syncronize user when using cod
+	// 					handleAsyncGiro(local, user);
+	// 				}
+	// 			}
+	// 		})();
+	// 	}
+	// }, [mount])
 
 	useEffect(() => {
 		if (state.tarifVisible) {
@@ -333,41 +334,41 @@ const MenuView = props => {
         })
 	}
 
-	const handleAsyncGiro = async (local, session) => {
-		api.generateToken(local.userid)
-			.then(pin => {
-				const payload = {
-					email: session.email,
-					pin: pin.response_data1
-				}
+	// const handleAsyncGiro = async (local, session) => {
+	// 	api.generateToken(local.userid)
+	// 		.then(pin => {
+	// 			const payload = {
+	// 				email: session.email,
+	// 				pin: pin.response_data1
+	// 			}
 
-				api.syncronizeUserPwd(payload)
-					.then(res => {
-						//keep send
-						if (res.respcode === '21' || res.respcode === '00') {
-							const payloadSyncGiro = {
-								email: session.email,
-								norek: session.norek
-							}
-							api.syncronizeCod(payloadSyncGiro)
-								.then(async lastResponse => {
-									try{
-										await AsyncStorage.setItem('isCodBaru', JSON.stringify(true));
-										Toast.show({
-									        text: 'Sinkronisasi giro sukses!',
-									        textStyle: { textAlign: 'center' },
-									        duration: 2000
-									    })	
-									}catch(lastFuckingError){
-										console.log(lastFuckingError);
-									}
-								})
-						}
-					})
-				// console.log(payload);
-			})
-		//console.log({ local, session });
-	}
+	// 			api.syncronizeUserPwd(payload)
+	// 				.then(res => {
+	// 					//keep send
+	// 					if (res.respcode === '21' || res.respcode === '00') {
+	// 						const payloadSyncGiro = {
+	// 							email: session.email,
+	// 							norek: session.norek
+	// 						}
+	// 						api.syncronizeCod(payloadSyncGiro)
+	// 							.then(async lastResponse => {
+	// 								try{
+	// 									await AsyncStorage.setItem('isCodBaru', JSON.stringify(true));
+	// 									Toast.show({
+	// 								        text: 'Sinkronisasi giro sukses!',
+	// 								        textStyle: { textAlign: 'center' },
+	// 								        duration: 2000
+	// 								    })	
+	// 								}catch(lastFuckingError){
+	// 									console.log(lastFuckingError);
+	// 								}
+	// 							})
+	// 					}
+	// 				})
+	// 			// console.log(payload);
+	// 		})
+	// 	//console.log({ local, session });
+	// }
 
 	const handleCallHaloPos = () => {
 		const url = `tel:161`;

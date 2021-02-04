@@ -15,8 +15,7 @@ import {
 } from 'react-native-responsive-screen';
 import {
 	ListQob,
-	ListQ9,
-	SearchForm
+	ListQ9
 } from './components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -27,11 +26,9 @@ import {
 	removeAllChoosed,
 	mutltipletPickuped
 } from '../../redux/actions/history';
+import { getSchedule } from '../../redux/actions/schedule';
+import { addMessage } from '../../redux/actions/message';
 import CustomToast from "../CustomToast";
-
-const daysInMonth = (iMonth, iYear) => {
-	return 32 - new Date(iYear, iMonth, 32).getDate();
-}
 
 const HistoryOrder = props => {
 	const scrollY = new Animated.Value(0);
@@ -163,7 +160,7 @@ const HistoryOrder = props => {
 					error={errors.qob}
 					list={props.qob}
 					navigation={props.navigation}
-					userid={props.user.userid}
+					user={props.user}
 					onPickup={handlePickup}
 					getNewData={handleGetNewDataQob}
 					handleRefresh={onRefreshQob}
@@ -171,6 +168,9 @@ const HistoryOrder = props => {
 					setChoosed={props.setChoosed}
 					onMultiplePickup={props.mutltipletPickuped}
 					showToast={(message) => setToastVisible({ message, open: true})}
+					schedules={props.schedules}
+					getSchedule={props.getSchedule}
+					addMessage={props.addMessage}
 				/> }
 
 			{ activePage === 2 && <ListQ9 /> }
@@ -235,13 +235,17 @@ HistoryOrder.propTypes = {
 	onPickuped: PropTypes.func.isRequired,
 	setChoosed: PropTypes.func.isRequired,
 	removeAllChoosed: PropTypes.func.isRequired,
-	mutltipletPickuped: PropTypes.func.isRequired
+	mutltipletPickuped: PropTypes.func.isRequired,
+	schedules: PropTypes.array.isRequired,
+	getSchedule: PropTypes.func.isRequired,
+	addMessage: PropTypes.func.isRequired
 }
 
 function mapStateToProps(state) {
 	return{
 		qob: state.history.qob,
-		user: state.auth.localUser
+		user: state.auth.localUser,
+		schedules: state.schedule
 	}
 }
 
@@ -250,5 +254,7 @@ export default connect(mapStateToProps, {
 	onPickuped,
 	setChoosed,
 	removeAllChoosed,
-	mutltipletPickuped
+	mutltipletPickuped,
+	getSchedule,
+	addMessage
 })(HistoryOrder);

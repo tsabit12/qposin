@@ -35,6 +35,7 @@ import {
 } from './components';
 import AnimatedLoader from "react-native-animated-loader";
 import api from '../../api';
+import { asyncGiro, setCod } from '../../helper';
 
 const handleConvertTarif = (res, type) => {
 	const response = res.split('#');
@@ -471,87 +472,42 @@ const OrderView = props => {
 			})
 	}
 
-	const onPressSyncCard = () => {
+	const onPressSyncCard = async () => {
 		setState(state => ({
 			...state,
 			loading: true
 		}))
 
-		api.generateToken(local.userid)
-			.then(pin => {
-				const payload = {
-					email: props.session.email,
-					pin: pin.response_data1
-				}
-				console.log('succes generate pin');
+		let type 	= '';
+		const value = await AsyncStorage.getItem('isSyncWeb');
+		if(value === null) type = 'FULL';
 
-				api.syncronizeUserPwd(payload)
-					.then(res => {
-						console.log("succes sync user");
-						if (res.respcode === '21' || res.respcode === '00') { //was sync and first time sync we keep send
-							const payloadSyncGiro = {
-								email: props.session.email,
-								norek: session.norek
-							}
-							api.syncronizeCod(payloadSyncGiro)
-								.then(async lastResponse => {
-									console.log("succes sync giro web");
-									setState(prevState => ({
-										...prevState,
-										loading: false
-									}));
-									setVisibleSync(false);
+		try {
+			const saveGiro = await asyncGiro(local.userid, session.email, session.norek, type);	
+			if(saveGiro.status == '00'){
+				props.addMessage(`(${saveGiro.status}) ${saveGiro.msg}`, 'success');
+				setCod(true);
+				setVisibleSync(false);
+				setTimeout(() => {
+					validateRekening();
+				}, 200);
+			}else{
+				props.addMessage(`(${saveGiro.status}) ${saveGiro.msg}`, 'error');
+			}
+		} catch (error) {
+			if(error.status){
+				const { msg, status } = error
+				props.addMessage(`(${status}) ${msg}`, 'error');
+			}else{
+				props.addMessage(`(400) Something wrong!`, 'error');
+			}
+		}
 
-									try{
-										await AsyncStorage.setItem('isCodBaru', JSON.stringify(true));
-										validateRekening();
-									}catch(err){
-										console.log(err);
-									}
-								})
-								//falied sync web giro
-								.catch(err2 => {
-									setState(prevState => ({
-										...prevState,
-										loading: false
-									})
-									)
-									if(err2.respcode){
-										props.addMessage(`(${err2.respcode}) Failed sync rekening`, 'error');
-									}else{
-										props.addMessage(`(500) Internal server error! Failed sync rekening`, 'error');
-									}
-								})
-						}
-					})
-					//failed sync user
-					.catch(err3 => {
-						setState(prevState => ({
-							...prevState,
-							loading: false
-						}))
-
-						if(err2.respcode){
-							props.addMessage(`(${err2.respcode}) User sync failed`, 'error');
-						}else{
-							props.addMessage(`(500) Internal server error! User sync failed`, 'error');
-						}
-					})
-			})
-			//get pin gagal
-			.catch(errPin => {
-			    setState(prevState => ({
-					...prevState,
-					loading: false
-				}))
-
-				if(errPin.global){
-					props.addMessage(`(${errPin.status}) ${errPin.global}`, 'error');
-				}else{
-					props.addMessage(`(500) Internal server error! generate PIN failed`, 'error');
-				}
-			})
-	} 
+		setState(state => ({
+			...state,
+			loading: false
+		}))
+	}
 
 	return(
 		<ImageBackground 
@@ -563,7 +519,7 @@ const OrderView = props => {
 		        overlayColor="rgba(0,0,0,0.6)"
 		        source={require("../../assets/images/loader/3098.json")}
 		        animationStyle={styles.lottie}
-		        speed={1}
+		        speed={2}
 		    />
 
 		    { shouldUpdateAddres && 

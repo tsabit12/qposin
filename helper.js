@@ -14,6 +14,19 @@ export const setIsSync = (boolValue) => {
     return result;
 }
 
+export const setCod = (boolValue) => {
+    let result = new Promise(async function(resolve, reject){
+        try {
+            await AsyncStorage.setItem('isCodBaru', JSON.stringify(boolValue));
+            resolve({ success: true });
+        } catch (error) {
+            reject('(101) Failed saving data to storage');
+        }
+    })
+
+    return result;
+}
+
 export const pushUserDataToWeb = (userid, email) => {
     let result = new Promise(function(resolve, reject){
         api.generateToken(userid)
@@ -91,3 +104,125 @@ export const pushUserDataToWeb = (userid, email) => {
 
     return result;
 } 
+
+
+export const asyncGiro = (userid, email, norek, type) => {
+    let result = new Promise(async function(resolve, reject){
+        try {
+            const getPin = await api.generateToken(userid);
+            if(getPin.rc_mess === '00'){
+                if(type === 'FULL'){ //sync user & giro
+                    api.syncronizeUserPwd({ email, pin: getPin.response_data1 })
+                        .then(response => {
+                            const { respcode, respmsg } = response;
+                            AsyncStorage.setItem('isSyncWeb', JSON.stringify(true));
+                            if(respcode === '00' || respcode === '21'){
+                                api.syncronizeCod({ email, account: norek })
+                                    .then(response => {
+                                        const { respcode, respmsg } = response;
+                                        if(respcode === '00' || respcode === '21'){//success / is exist
+                                            resolve({
+                                                status: '00',
+                                                msg: 'Syncronize sukses'
+                                            })
+                                        }else{
+                                            reject({
+                                                status: respcode,
+                                                msg: respmsg
+                                            })
+                                        }
+                                    })
+                                    .catch(error => {
+                                        if(error.response){
+                                            reject({
+                                                status: '302',
+                                                msg: 'Terdapat kesalahan, silahkan coba beberapa saat lagi'
+                                            })
+                                        }else if(error.request){
+                                            reject({
+                                                status: '303',
+                                                msg: 'Request error!'
+                                            })
+                                        }else{
+                                            reject({
+                                                status: '300',
+                                                msg: 'Internal server error'
+                                            })
+                                        }
+                                    })
+                            }else{
+                                reject({
+                                    status: respcode,
+                                    msg: respmsg
+                                })
+                            }
+                        })
+                        .catch(() => {
+                            reject({
+                                status: '203',
+                                msg: 'Sinkronisasi user gagal!'
+                            })
+                        })
+                }else{ //only giro
+                    api.syncronizeCod({ email, account: norek })
+                        .then(response => {
+                            const { respcode, respmsg } = response;
+                            if(respcode === '00' || respcode === '21'){//success / is exist
+                                resolve({
+                                    status: '00',
+                                    msg: 'Syncronize sukses'
+                                })
+                            }else{
+                                reject({
+                                    status: respcode,
+                                    msg: respmsg
+                                })
+                            }
+                        })
+                        .catch(error => {
+                            if(error.response){
+                                reject({
+                                    status: '302',
+                                    msg: 'Terdapat kesalahan, silahkan coba beberapa saat lagi'
+                                })
+                            }else if(error.request){
+                                reject({
+                                    status: '303',
+                                    msg: 'Request error!'
+                                })
+                            }else{
+                                reject({
+                                    status: '300',
+                                    msg: 'Internal server error'
+                                })
+                            }
+                        })
+                }
+            }else{
+                reject({
+                    status: getPin.rc_mess,
+                    msg: getPin.desk_mess
+                })
+            }
+        } catch (error) {
+            if(error.response){
+                reject({
+                    status: '102',
+                    msg: 'Terdapat kesalahan, silahkan coba beberapa saat lagi'
+                })
+            }else if(error.request){
+                reject({
+                    status: '103',
+                    msg: 'Request error!'
+                })
+            }else{
+                reject({
+                    status: '500',
+                    msg: 'Internal server error'
+                })
+            }
+        }
+    }) 
+
+    return result;
+}

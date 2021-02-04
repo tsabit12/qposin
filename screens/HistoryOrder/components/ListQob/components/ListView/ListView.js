@@ -4,14 +4,11 @@ import {
 	Text,
 	StyleSheet,
 	Image,
-	ScrollView,
 	FlatList,
-	SafeAreaView,
 	TouchableOpacity,
 	Clipboard,
 	ToastAndroid,
 	RefreshControl,
-	Alert,
 	Animated,
 	Platform
 } from 'react-native';
@@ -26,9 +23,7 @@ import {
   MenuOption,
   MenuTrigger,
 } from 'react-native-popup-menu';
-import { Ionicons } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
-import rgba from 'hex-to-rgba';
 
 const capitalize = (string) => {
 	if (string) {
@@ -105,7 +100,10 @@ const Item  = props => {
 						style={styles.status}
 						onPress={()=> handleCopy(props.id)}
 					>{col.extid}</Text>
-					<Icon name='ios-checkmark-circle' style={styles.icon} />
+					<Icon 
+						name={col.pickupnumber === null ? 'ios-cloud-circle' : 'ios-checkmark-circle'} 
+						style={[styles.icon, { color: col.pickupnumber === null ? '#0dbd04' : '#f59300' }]} 
+					/>
 					{ !col.choosed && <React.Fragment>
 						<Menu>
 							<MenuTrigger>
@@ -284,7 +282,8 @@ const ListView = props => {
 		}else if(type === '3'){
 			props.lacakKiriman(detail.extid);
 		}else if(type === '1'){
-			props.onPickup(detail);
+			const data = [{ extid: detail.extid }];
+			props.onPickup(data);
 		}
 	}
 
@@ -358,25 +357,6 @@ const ListView = props => {
 		/>
 	);
 
-	const onPressbtnpickup = () => {
-		Alert.alert(
-	      "Konfirmasi",
-	      `Apakah anda yakin untuk melakukan pickup?`,
-	      [
-	        {
-	          text: "Cancel",
-	          // onPress: () => console.log("Cancel Pressed"),
-	          style: "cancel"
-	        },
-	        { 
-	        	text: "OK", 
-	        	onPress: () => props.onMultiplePickup()
-	        }
-	      ],
-	      { cancelable: false }
-	    );
-	}
-
 	return(
 		<View style={itemPressed ? styles.choosedMode : null}>
 			<FlatList
@@ -398,7 +378,7 @@ const ListView = props => {
 			    <TouchableOpacity 
 			    	style={styles.btn_pickup} 
 			    	activeOpacity={0.7}
-			    	onPress={onPressbtnpickup}
+			    	onPress={props.onMultiplePickup}
 			    >
 			    	<Text style={{color: 'white', textAlign: 'center'}}>
 			    		Pickup{'\n'}{DATA.filter(row => row.choosed === true).length} item
@@ -436,8 +416,7 @@ const styles = StyleSheet.create({
 	},
 	icon: {
 		fontSize: 20, 
-		flex: 1,
-		color: '#f59300'
+		flex: 1
 	},
 	box: {
 		flexDirection: 'row',

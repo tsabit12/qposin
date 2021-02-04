@@ -16,7 +16,7 @@ export const styles = (props) => StyleSheet.create({
 		left: 5,
 		right: 5,
 		minHeight: hp('7%'),
-		borderRadius: 3,
+		borderRadius: 10,
 		padding: 10,
 		flexDirection: 'row',
 		justifyContent: 'space-between',
@@ -30,11 +30,11 @@ export const styles = (props) => StyleSheet.create({
 		color: 'white'
     },
     button: {
-        height: hp('5%'),
-        width: hp('5%'),
+        height: hp('4%'),
+        width: hp('4%'),
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: hp('5%') / 2,
+        borderRadius: hp('4%') / 2,
         borderWidth: 1,
         borderColor: 'white'
     }
@@ -64,14 +64,14 @@ const Notification = props => {
     if(props.open){
         return(
             <Animated.View style={[styles(props.variant).content, {opacity: fadeAnim}]}>
-                <View style={{flex: 1}}>
+                <View style={{width: wp('80%')}}>
                     <Text style={styles(props).text}>{props.message}</Text>
                 </View>
                 <TouchableOpacity 
                     activeOpacity={0.7} style={styles().button}
                     onPress={props.onClose}
                 >
-                    <EvilIcons name="close" size={30} color="#FFFF" />
+                    <EvilIcons name="close" size={20} color="#FFFF" />
                 </TouchableOpacity>
             </Animated.View>
         );

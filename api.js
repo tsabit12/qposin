@@ -410,14 +410,14 @@ export default {
 	}),
 	syncronizeCod: (payload) => axios.post(`${iposUrl}/syncronizeaccount`, {
 		...payload
-	}, qobConfig).then(res => {
-		const { result } = res.data;
-		if (result.respcode === '00' || result.respcode === '21') {
-			return result;
-		}else{
-			return Promise.reject(result);
-		}
-	}),
+	}, qobConfig).then(res => res.data.response),
+	// const { result } = res.data;
+	// 	if (result.respcode === '00' || result.respcode === '21') {
+	// 		return result;
+	// 	}else{
+	// 		return Promise.reject(result);
+	// 	}
+	// }
 	testApi: () => axios.post(`${url1}/test`).then(res => res.data),
 	updateStatusPickup: (payload) => axios.post(`${iposUrl}/setpickup`, {
 		...payload

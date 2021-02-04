@@ -53,6 +53,7 @@ const ChoosePickup = props => {
         const payload = {
             pickupstatus: '1',
             pickupdate: scheduleId,
+            email: props.user.email,
             data: [{ extid: props.route.params.extid }]
         }
 
@@ -142,7 +143,8 @@ ChoosePickup.propTypes = {
 
 function mapStateToProps(state){
     return {
-        schedules: state.schedule
+        schedules: state.schedule,
+        user: state.auth.localUser
     }
 }
 
