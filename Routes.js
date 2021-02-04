@@ -85,7 +85,7 @@ const Routes = props => {
 			<Notification 
 				variant={flashMessage.variant}
 				message={flashMessage.msg}
-				open={true}
+				open={flashMessage.open}
 				onClose={props.closeMessage}
 			/>
 	    </React.Fragment>
