@@ -48,13 +48,13 @@ Notifications.setNotificationHandler({
   }),
 });
 
-const capitalize = (string) => {
-	if (string) {
-		return string.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
-	}else{
-		return '-';
-	}
-}
+// const capitalize = (string) => {
+// 	if (string) {
+// 		return string.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
+// 	}else{
+// 		return '-';
+// 	}
+// }
 
 async function registerForPushNotificationsAsync() {
   	let token;
@@ -132,29 +132,8 @@ const MenuView = props => {
 			};
 			
     		api.pushToken(payload);
-    			// .then(res => {
-    			// 	setMount(true);
-    			// })
-    			// .catch(err => {
-    			// 	console.log(err);
-    			// 	setMount(true);
-    			// })
 		}
 	}, [expoPushToken]);
-
-	// useEffect(() => {
-	// 	if (mount) {
-	// 		(async () => {
-	// 			const { norek } = user;
-	// 			if (norek !== '-') {
-	// 				const fuckingValue = await AsyncStorage.getItem('isCodBaru'); //define user was syncronize 
-	// 				if (fuckingValue === null) { //web required to syncronize user when using cod
-	// 					handleAsyncGiro(local, user);
-	// 				}
-	// 			}
-	// 		})();
-	// 	}
-	// }, [mount])
 
 	useEffect(() => {
 		if (state.tarifVisible) {
@@ -290,85 +269,7 @@ const MenuView = props => {
 				props.addMessage(`Error ${error.message}`, 'error');
 			}
 		}
-		
-
-		// api.generateToken(userid)
-		// 	.then(res => {
-		// 		const payload = {
-		// 			email: email,
-		// 			pin: res.response_data1
-		// 		};
-
-		// 		api.syncronizeUserPwd(payload)
-		// 			.then(res2 => {
-		// 				setState(state => ({
-		// 					...state,
-		// 					loading: false,
-		// 					showToken: true,
-		// 					tokenValue: res.response_data1
-		// 				}))
-		// 			})
-		// 			.catch(err => {
-						
-		// 				setError(`(${err.respcode ? err.respcode : '500'})\nTidak dapat memproses permintaan anda, mohon coba beberapa saat lagi`);
-		// 			})
-		// 	})
-		// 	.catch(err => {
-		// 		if (err.global) {
-		// 			setError(err.global)
-		// 		}else{
-		// 			setError('Tidak dapat memproses permintaan anda, mohon coba beberapa saat lagi');
-		// 		}
-		// 	})
 	}
-
-	const setError = (msg) => {
-		setState(state => ({
-			...state,
-			loading: false
-		}));
-		Toast.show({
-            text: msg,
-            textStyle: { textAlign: 'center' },
-            duration: 3000
-        })
-	}
-
-	// const handleAsyncGiro = async (local, session) => {
-	// 	api.generateToken(local.userid)
-	// 		.then(pin => {
-	// 			const payload = {
-	// 				email: session.email,
-	// 				pin: pin.response_data1
-	// 			}
-
-	// 			api.syncronizeUserPwd(payload)
-	// 				.then(res => {
-	// 					//keep send
-	// 					if (res.respcode === '21' || res.respcode === '00') {
-	// 						const payloadSyncGiro = {
-	// 							email: session.email,
-	// 							norek: session.norek
-	// 						}
-	// 						api.syncronizeCod(payloadSyncGiro)
-	// 							.then(async lastResponse => {
-	// 								try{
-	// 									await AsyncStorage.setItem('isCodBaru', JSON.stringify(true));
-	// 									Toast.show({
-	// 								        text: 'Sinkronisasi giro sukses!',
-	// 								        textStyle: { textAlign: 'center' },
-	// 								        duration: 2000
-	// 								    })	
-	// 								}catch(lastFuckingError){
-	// 									console.log(lastFuckingError);
-	// 								}
-	// 							})
-	// 					}
-	// 				})
-	// 			// console.log(payload);
-	// 		})
-	// 	//console.log({ local, session });
-	// }
 
 	const handleCallHaloPos = () => {
 		const url = `tel:161`;
