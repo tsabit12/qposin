@@ -6,17 +6,22 @@ import { Feather } from '@expo/vector-icons';
 import { Menu, MenuOption, MenuOptions, MenuTrigger } from 'react-native-popup-menu';
 import { Icon } from 'native-base';
 
-const isPickup = (lastStatus) => {
-    switch (lastStatus) {
-        case '1':
+const isPickup = (pickupnumber) => {
+    switch (pickupnumber) {
+        case null:
             return {
                 color: '#0eab38',
-                status: true
+                status: false
+            }
+        case '':
+            return {
+                color: '#0eab38',
+                status: false
             }
         default:
             return {
                 color: '#f59300',
-                status: false
+                status: true
             }
     }
 }
@@ -50,7 +55,7 @@ const Items = props => {
                     </Text>
                     <View style={{flex: 1}}>
                         <TouchableOpacity 
-                            style={[styles.icon, { backgroundColor: isPickup(order.lasthistorystatusid).color}]}
+                            style={[styles.icon, { backgroundColor: isPickup(order.pickupnumber).color}]}
                             disabled
                         >
                             <Feather name="box" size={13} color="white" />
@@ -61,11 +66,11 @@ const Items = props => {
                             <Icon name="ios-more" style={{fontSize: 20, marginRight: 5}}/>
                         </MenuTrigger>
                         <MenuOptions>
-                            <MenuOption>
+                            { !isPickup(order.pickupnumber).status && <MenuOption onSelect={() => props.onPressMenu(order, 'pickup')}>
                                 <View style={styles.textMenu}>
                                     <Text>Pickup</Text>
                                 </View>
-                            </MenuOption>
+                            </MenuOption> }
                             <MenuOption onSelect={() => props.onPressMenu(order, 'lacak')}>
                                 <View style={styles.textMenu}>
                                     <Text>Lacak Kiriman</Text>

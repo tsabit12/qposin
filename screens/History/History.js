@@ -8,8 +8,9 @@ import {
 import { getDateFormat } from '../../helper';
 import { connect } from 'react-redux';
 import { getQob, resetHistory } from '../../redux/actions/history';
+import { getSchedule } from '../../redux/actions/schedule';
 import { addMessage } from '../../redux/actions/message';
-import { EmptyMessage, ListLacak, ListOrder } from './components';
+import { EmptyMessage, ListLacak, ListOrder, ListSchedule } from './components';
 import api from '../../api';
 
 const PER_PAGE = 5;
@@ -32,6 +33,7 @@ const History = props => {
     //handle onEndReached end cause we dont have total data
     const [isFinish, setFinish] = useState(false);
     const [refreshLoading, setRefresh] = useState(false);
+    const [showJadwal, setShowJadwal] = useState([]);
 
     useEffect(() => {
         getData();
@@ -41,6 +43,12 @@ const History = props => {
     useEffect(() => {
         return () => props.resetHistory();
     }, []);
+
+    useEffect(() => {
+        if(showJadwal.length > 0){
+            props.getSchedule({ id: ''});
+        }
+    }, [showJadwal]);
 
     const handleClickLacak = async (extid) => {
         setLoading(true);
@@ -82,7 +90,7 @@ const History = props => {
         setLoading(true);
 
         try {
-            defaultPayload.email = "abdul@gmail.com";
+            defaultPayload.email = user.email;
             defaultPayload.limitawal = type === 'refresh' ? 1 : limit.awal;
             defaultPayload.limitakhir = type === 'refresh' ? 5 : limit.akhir;
             const getOrder = await props.getQob(defaultPayload);
@@ -101,6 +109,39 @@ const History = props => {
         }
 
         setLoading(false);
+    }
+
+    const onChooseJadwal = async (jadwalId, value) => {
+        setShowJadwal([]);
+        setLoading(true);
+
+        const payload = {
+            pickupstatus: '1',
+            pickupdate: jadwalId,
+            email: user.email,
+            data: value
+        }
+        
+        try {
+            const pickup = await api.qob.requestPickup(payload);
+            if(pickup.respcode === '000'){
+				props.addMessage(`(000) ${pickup.respmsg}`, 'success');
+			}else{
+				props.addMessage(`(${pickup.respcode}) ${pickup.respmsg}`, 'error');
+			}
+        } catch (error) {
+            console.log(error);
+            if(error.response){
+                props.addMessage(`(410) Terdapat kesalahan`, 'error');
+            }else if(error.request){
+                props.addMessage(`(400) Request error`, 'error');
+            }else{
+                props.addMessage(`(500) Internal server error`, 'error');
+            }
+        }
+
+        setLoading(false);
+
     }
 
     return(
@@ -124,6 +165,7 @@ const History = props => {
                     getNewData={handleGetNewData}
                     refreshLoading={refreshLoading}
                     handeleRefresh={onRefresh}
+                    onPickup={(arrId) => setShowJadwal(arrId)}
                 /> }
 
             { tracks.data.length > 0 && <ListLacak 
@@ -131,6 +173,14 @@ const History = props => {
                 extid={tracks.id}
                 onClose={() => setTracks({ data: [] })} 
             /> }
+
+            <ListSchedule 
+                open={showJadwal.length > 0 ? true : false }
+                list={props.schedules}
+                extid={showJadwal}
+                handleClose={() => setShowJadwal([])}
+                handleChoose={onChooseJadwal}
+            />
         </View>
     )
 }
@@ -140,18 +190,22 @@ History.propTypes = {
     getQob: PropTypes.func.isRequired,
     addMessage: PropTypes.func.isRequired,
     list: PropTypes.array.isRequired,
-    resetHistory: PropTypes.func.isRequired
+    resetHistory: PropTypes.func.isRequired,
+    schedules: PropTypes.array.isRequired,
+    getSchedule: PropTypes.func.isRequired
 }
 
 function mapStateToProps(state){
     return{
         user: state.auth.localUser,
-        list: state.history.qob
+        list: state.history.qob,
+        schedules: state.schedule
     }
 }
 
 export default connect(mapStateToProps, { 
     getQob,
     addMessage,
-    resetHistory
+    resetHistory,
+    getSchedule
 })(History);

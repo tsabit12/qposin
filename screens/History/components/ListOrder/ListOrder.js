@@ -10,6 +10,9 @@ const ListOrder = props => {
             props.onClickDetail(value);
         }else if(type === 'lacak'){
             props.onClickLacak(value.extid);
+        }else{
+            const payload = [{ extid: value.extid }];
+            props.onPickup(payload);
         }
     }
 
@@ -43,7 +46,8 @@ ListOrder.propTypes = {
     onClickLacak: PropTypes.func.isRequired,
     getNewData: PropTypes.func.isRequired,
     refreshLoading: PropTypes.bool.isRequired,
-    handeleRefresh: PropTypes.func.isRequired
+    handeleRefresh: PropTypes.func.isRequired,
+    onPickup: PropTypes.func.isRequired
 }
 
 export default ListOrder;
