@@ -16,7 +16,7 @@ export const styles = (props) => StyleSheet.create({
 		left: 5,
 		right: 5,
 		minHeight: hp('7%'),
-		borderRadius: 10,
+		borderRadius: 5,
 		padding: 10,
 		flexDirection: 'row',
 		justifyContent: 'space-between',
