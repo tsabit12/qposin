@@ -110,11 +110,9 @@ const History = props => {
                 title='History Kiriman'
             />
             
-            <LoadingComponent 
-                loading={loading} 
-            />
+            { !refreshLoading && <LoadingComponent loading={loading} />}
 
-            { list.length <= 0 ? <EmptyMessage 
+            { list.length <= 0 && !loading ? <EmptyMessage 
                     onClickOrder={() => props.navigation.replace('Order', { type: 2 })}
                 /> : 
                 <ListOrder 
