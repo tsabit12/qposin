@@ -22,6 +22,32 @@ const styles = StyleSheet.create({
     backButton: {
         marginRight: 13,
         marginTop: 5
+    },
+    loading: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: '#f7f7f7',
+        margin: 10,
+        height: hp('8%'),
+        borderRadius: 5,
+        justifyContent: 'center',
+        padding: 10,
+        elevation: 3
+    },
+    loadingContent: {
+        flexDirection: 'row',
+        //backgroundColor: 'red',
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginRight: 8
+    },
+    loadingText: {
+        fontFamily: 'Nunito-semi',
+        flex: 1,
+        marginRight: 8
     }
 })
 

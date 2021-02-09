@@ -1,13 +1,13 @@
 import api from '../../api';
+import { GET_ORDER_QOB } from '../types';
 
 export const getQob = (payload) => dispatch => 
 	api.getDetailOrder(payload)
-		.then(result => {
-			dispatch({
-				type: payload.offset === 0 ? 'GET_ORDER_QOB' : 'GET_NEW_QOB',
+		.then(result => dispatch({
+				type: GET_ORDER_QOB,
 				orders: result
 			})
-		})
+		)
 
 export const onPickuped = (noPickup, extid) => dispatch => dispatch({
 	type: 'PICKUP_ITEM',

@@ -1,20 +1,27 @@
+import { 
+	GET_ORDER_QOB, 
+	GET_NEW_QOB,
+	PICKUP_ITEM,
+	SET_CHOOSED
+} from '../types';
+
 const intialState = {
 	qob: []
 }
 
 export default function history(state=intialState, action={}) {
 	switch(action.type){
-		case 'GET_ORDER_QOB':
+		case GET_ORDER_QOB:
 			return {
 				...state,
 				qob: action.orders
 			}
-		case 'GET_NEW_QOB':
+		case GET_NEW_QOB:
 			return {
 				...state,
 				qob: [...state.qob, ...action.orders ]
 			}
-		case 'PICKUP_ITEM':
+		case PICKUP_ITEM:
 			return {
 				...state,
 				qob: state.qob.map(row => {
@@ -28,7 +35,7 @@ export default function history(state=intialState, action={}) {
 					return row;
 				})
 			} 
-		case 'SET_CHOOSED':
+		case SET_CHOOSED:
 			return {
 				...state,
 				qob: state.qob.map(row => {
