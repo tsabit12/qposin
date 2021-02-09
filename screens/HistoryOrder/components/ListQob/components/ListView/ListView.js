@@ -66,7 +66,7 @@ const PickupIntro = () => {
 const Item  = props => {
 	const { col } = props;
 	const handleCopy = (extid) => {
-		Clipboard.setString(props.id);
+		Clipboard.setString(extid);
 		if(Platform.OS === 'android'){
 			ToastAndroid.showWithGravity(
 				"Extid copied to clipboard",
@@ -77,6 +77,7 @@ const Item  = props => {
 			alert('Extid copied to clipboard')
 		}
 	}
+	// console.log(col.pickupnumber);
 
 	return(
 		<View style={styles.shadow}>
@@ -98,11 +99,11 @@ const Item  = props => {
 				<View style={styles.header}>
 					<Text 
 						style={styles.status}
-						onPress={()=> handleCopy(props.id)}
+						onPress={()=> handleCopy(col.extid)}
 					>{col.extid}</Text>
 					<Icon 
-						name={col.pickupnumber === null ? 'ios-cloud-circle' : 'ios-checkmark-circle'} 
-						style={[styles.icon, { color: col.pickupnumber === null ? '#0dbd04' : '#f59300' }]} 
+						name={col.pickupnumber === '' || col.pickupnumber === null ? 'ios-cloud-circle' : 'ios-checkmark-circle'} 
+						style={[styles.icon, { color: col.pickupnumber === '' || col.pickupnumber === null ? '#0dbd04' : '#f59300' }]} 
 					/>
 					{ !col.choosed && <React.Fragment>
 						<Menu>
@@ -110,13 +111,13 @@ const Item  = props => {
 								<Icon name="ios-more" style={{fontSize: 20, marginRight: 5}}/>
 							</MenuTrigger>
 							<MenuOptions>
-								{ col.pickupnumber === null && <MenuOption 
+								{ col.pickupnumber === '' || col.pickupnumber === null ? <MenuOption 
 										onSelect={() => props.onPressMenu(col.extid, '1')}
 									>
 						          	<View style={styles.textMenu}>
 						          		<Text>Pickup</Text>
 						          	</View>
-						        </MenuOption> }
+						        </MenuOption> : <React.Fragment />}
 						        
 						        {/* <MenuOption>
 						          	<View style={styles.textMenu}>
@@ -322,7 +323,7 @@ const ListView = props => {
 
 	const validate = (choosedItem) => {
 		const isValid = {};
-		if (choosedItem.pickupnumber === null) {
+		if (choosedItem.pickupnumber === null || choosedItem.pickupnumber === '') {
 			const firstChoosedItem = DATA.find(row => row.choosed === true);
 			if (firstChoosedItem) {
 				const { shippersubdistrict } = firstChoosedItem;
