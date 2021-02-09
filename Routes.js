@@ -20,12 +20,13 @@ import {
   CityCourier as CityCourierView,
   ScanBarcode as ScanBarcodeView,
   ConnectGiroView,
-  HitoryOrderView,
+//   HitoryOrderView,
   EditAlamatView,
   UpdatePlaystoreView,
   FindDriverView,
   DetailOrder as DetailOrderView,
-  ChoosePickup
+  ChoosePickup,
+  History as HistoryOrderScreen
 } from './screens';
 import Notification from './Notification';
 import { closeMessage } from './redux/actions/message';
@@ -57,7 +58,7 @@ const Routes = props => {
 			        		<Stack.Screen name="CityCourier" component={CityCourierView} />
 			        		<Stack.Screen name="ScanBarcode" component={ScanBarcodeView} />
 			        		<Stack.Screen name="ConnectGiro" component={ConnectGiroView} />
-			        		<Stack.Screen name="History" component={HitoryOrderView} />
+			        		<Stack.Screen name="History" component={HistoryOrderScreen} />
 			        		<Stack.Screen name="UpdateAlamat" component={EditAlamatView} />
 			        		<Stack.Screen name="Bidding" component={FindDriverView} />
 			        		<Stack.Screen name="DetailOrder" component={DetailOrderView} />

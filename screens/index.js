@@ -20,3 +20,4 @@ export { default as UpdatePlaystoreView } from './UpdatePlaystoreView';
 export { default as FindDriverView } from './FindDriverView';
 export { default as DetailOrder } from './DetailOrder';
 export { default as ChoosePickup } from './ChoosePickup';
+export { default as History } from './History';

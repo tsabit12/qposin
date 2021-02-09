@@ -238,26 +238,24 @@ const ListQob = props => {
 
 	return(
 		<View style={{flex: 1}}>
-			{ error ? <EmptyMessage 
+			{ props.list.length > 0 ? 
+				<ListView 
+					data={props.list} 
+					onViewDetail={(order) => props.navigation.navigate('DetailOrder', {
+						order
+					})}
+					lacakKiriman={handleLacak}
+					onPickup={handleOpenJadwal}
+					onMultiplePickup={getChoosedItem}
+					getNewData={props.getNewData}
+					onScroll={props.onScroll}
+					onRefresh={props.handleRefresh}
+					setChoosed={props.setChoosed}
+				/> : <View style={styles.err}>
+				<EmptyMessage 
 					onOrder={() => props.navigation.navigate('Order', { type: 2 })} 
-				/> : <React.Fragment>
-					{ props.list.length > 0 ? 
-						<ListView 
-							data={props.list} 
-							onViewDetail={(order) => props.navigation.navigate('DetailOrder', {
-								order
-							})}
-							lacakKiriman={handleLacak}
-							onPickup={handleOpenJadwal}
-							onMultiplePickup={getChoosedItem}
-							getNewData={props.getNewData}
-							onScroll={props.onScroll}
-							onRefresh={props.handleRefresh}
-							setChoosed={props.setChoosed}
-						/> : <View style={styles.err}>
-						<Text style={styles.textErr}>Loading...</Text>
-					</View> }
-				</React.Fragment> }			
+				/>
+			</View> }	
 
 			<Loader 
 				loading={pickupLoading.loading} 
