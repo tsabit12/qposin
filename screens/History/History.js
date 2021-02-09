@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Text, View } from 'react-native';
-import styles from './styles';
+import { View } from 'react-native';
 import {
     HeaderComponent,
     LoadingComponent
@@ -10,7 +9,8 @@ import { getDateFormat } from '../../helper';
 import { connect } from 'react-redux';
 import { getQob } from '../../redux/actions/history';
 import { addMessage } from '../../redux/actions/message';
-import { EmptyMessage } from './components';
+import { EmptyMessage, ListLacak, ListOrder } from './components';
+import api from '../../api';
 
 const defaultPayload = {
     startdate: '2019-07-01',
@@ -24,11 +24,13 @@ const defaultPayload = {
 const History = props => {
     const { user, list } = props;
     const [loading, setLoading] = useState(true);
+    const [tracks, setTracks] = useState({ data: [], id: '' });
 
     useEffect(() => {
         (async () => {
             try {
-                defaultPayload.email = user.email;
+                //defaultPayload.email = user.email;
+                defaultPayload.email = "abdul@gmail.com";
                 await props.getQob(defaultPayload);
             } catch (error) {
                 props.addMessage('Internal server error', 'error');
@@ -39,7 +41,25 @@ const History = props => {
         
     }, []);
 
-    console.log(props.list);
+    const handleClickLacak = async (extid) => {
+        setLoading(true);
+
+        try {
+            const tracks = await api.lacakKiriman(extid)
+            setTracks({ data: tracks, id: extid });
+        } catch (error) {
+            if(error.response){
+                const { data, status } = error.response;
+                props.addMessage(`(${status}) ${data.errors.global}`, 'error');
+            }else if(error.request){
+                props.addMessage(`(080) Request error!`, 'error');
+            }else{
+                props.addMessage(`(500) Internal server error`, 'error');
+            }
+        }
+        
+        setLoading(false);
+    }
 
     return(
         <View style={{flex: 1}}>
@@ -51,10 +71,23 @@ const History = props => {
             <LoadingComponent 
                 loading={loading} 
             />
-            { list.length <= 0 ? 
-                <EmptyMessage 
+
+            { list.length <= 0 ? <EmptyMessage 
                     onClickOrder={() => props.navigation.replace('Order', { type: 2 })}
-                /> : <View><Text>ok</Text></View>}
+                /> : 
+                <ListOrder 
+                    orderList={list}
+                    onClickDetail={(value) => props.navigation.navigate('DetailOrder', {
+						order: value
+                    })}
+                    onClickLacak={handleClickLacak}
+                /> }
+
+            { tracks.data.length > 0 && <ListLacak 
+                data={tracks.data}
+                extid={tracks.id}
+                onClose={() => setTracks({ data: [] })} 
+            /> }
         </View>
     )
 }

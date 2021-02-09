@@ -357,7 +357,7 @@ export default {
 			return Promise.reject(errors);
 		}
 	}),
-	getDetailOrder: (payload) => axios.post(`${iposUrl}/getorder`, {
+	getDetailOrder: (payload) => axios.post(`${iposUrl}/getorderwithlimit`, {
 		...payload
 	}, qobConfig).then(res => res.data.response.data),
 	addPickup: (payload) => axios.post('https://fasterv2.fastkurir.com/api/customer/bidding_v2', {
