@@ -9,6 +9,11 @@ export const getQob = (payload) => dispatch =>
 			})
 		)
 
+export const resetHistory = () =>  dispatch =>
+	dispatch({
+		type: 'RESET_HISTORY'
+	})
+
 export const onPickuped = (noPickup, extid) => dispatch => dispatch({
 	type: 'PICKUP_ITEM',
 	noPickup,

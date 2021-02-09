@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, RefreshControl } from 'react-native';
 import PropTypes from 'prop-types';
 import { Items } from './components';
 
@@ -26,6 +26,13 @@ const ListOrder = props => {
             data={props.orderList}
             renderItem={renderItem}
             keyExtractor={item => item.id.toString()}
+            onEndReached={props.getNewData}
+            onEndReachedThreshold={0.3}
+            refreshControl={<RefreshControl 
+                refreshing={props.refreshLoading}
+                progressViewOffset={90}
+                onRefresh={props.handeleRefresh}
+            />}
         />
     )
 }
@@ -33,7 +40,10 @@ const ListOrder = props => {
 ListOrder.propTypes = {
     orderList: PropTypes.array.isRequired,
     onClickDetail: PropTypes.func.isRequired,
-    onClickLacak: PropTypes.func.isRequired
+    onClickLacak: PropTypes.func.isRequired,
+    getNewData: PropTypes.func.isRequired,
+    refreshLoading: PropTypes.bool.isRequired,
+    handeleRefresh: PropTypes.func.isRequired
 }
 
 export default ListOrder;

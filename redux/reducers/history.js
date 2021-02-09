@@ -1,7 +1,7 @@
 import { 
 	GET_ORDER_QOB, 
-	GET_NEW_QOB,
 	PICKUP_ITEM,
+	RESET_HISTORY,
 	SET_CHOOSED
 } from '../types';
 
@@ -14,12 +14,12 @@ export default function history(state=intialState, action={}) {
 		case GET_ORDER_QOB:
 			return {
 				...state,
-				qob: action.orders
+				qob: [...state.qob, ...action.orders ]
 			}
-		case GET_NEW_QOB:
+		case RESET_HISTORY:
 			return {
 				...state,
-				qob: [...state.qob, ...action.orders ]
+				qob: []
 			}
 		case PICKUP_ITEM:
 			return {
