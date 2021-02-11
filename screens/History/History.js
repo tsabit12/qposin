@@ -89,8 +89,13 @@ const History = props => {
     const getData = async (type) => {
         setLoading(true);
 
+        if(type === 'refresh' && isFinish){
+            setFinish(false);
+        }
+
         try {
             defaultPayload.email = user.email;
+            // defaultPayload.email = 'abdul@gmail.com';
             defaultPayload.limitawal = type === 'refresh' ? 1 : limit.awal;
             defaultPayload.limitakhir = type === 'refresh' ? 5 : limit.akhir;
             const getOrder = await props.getQob(defaultPayload);
@@ -98,8 +103,8 @@ const History = props => {
             if(getOrder.orders.length >= PER_PAGE){
                 setLimit(limit => ({
                     ...limit,
-                    awal: type === 'refresh' ?  1 : limit.awal + PER_PAGE,
-                    akhir: type === 'refresh' ? 5 : limit.akhir + PER_PAGE
+                    awal: defaultPayload.limitawal + PER_PAGE,
+                    akhir: defaultPayload.limitakhir + PER_PAGE
                 }))
             }else{
                 setFinish(true);
@@ -130,7 +135,6 @@ const History = props => {
 				props.addMessage(`(${pickup.respcode}) ${pickup.respmsg}`, 'error');
 			}
         } catch (error) {
-            console.log(error);
             if(error.response){
                 props.addMessage(`(410) Terdapat kesalahan`, 'error');
             }else if(error.request){
@@ -155,11 +159,10 @@ const History = props => {
 
             { list.length <= 0 && !loading ? <EmptyMessage 
                     onClickOrder={() => props.navigation.replace('Order', { type: 2 })}
-                /> : 
-                <ListOrder 
+                /> : <ListOrder 
                     orderList={list}
                     onClickDetail={(value) => props.navigation.navigate('DetailOrder', {
-						order: value
+                        order: value
                     })}
                     onClickLacak={handleClickLacak}
                     getNewData={handleGetNewData}
