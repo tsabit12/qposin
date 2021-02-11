@@ -44,8 +44,12 @@ const Items = props => {
     }
     
     return(
-        <View style={styles.root}>
-            <TouchableOpacity activeOpacity={0.8}>
+        <View style={[styles.root, { backgroundColor: order.choosed ? '#6f706f' : '#FFF'}]}>
+			<TouchableOpacity 
+				activeOpacity={0.8} 
+				onLongPress={() => props.onLongPress(order)}
+				onPress={() => props.onPress(order)}
+			>
                 <View style={styles.header}>
                     <Text 
 						style={styles.status}
@@ -199,7 +203,9 @@ const Items = props => {
 Items.propsTypes = {
     order: PropTypes.object.isRequired,
     index: PropTypes.number,
-    onPressMenu: PropTypes.func.isRequired
+	onPressMenu: PropTypes.func.isRequired,
+	onLongPress: PropTypes.func.isRequired,
+	onPress: PropTypes.func.isRequired
 }
 
 export default Items;

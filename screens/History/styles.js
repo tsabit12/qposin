@@ -25,11 +25,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: hp('6%'),
         borderRadius: 30,
-        justifyContent: 'center'
+        justifyContent: 'center',
+        elevation: 2
     },
     btnText: {
         color: '#FFF',
         fontFamily: 'Nunito-Bold'
+    },
+    contentBtnPickup: {
+        alignItems: 'center',
+        padding: 10,
+        position: 'absolute',
+        bottom: 8,
+        left: 0,
+        right: 0
     }
 })
 

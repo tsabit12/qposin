@@ -1,10 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlatList, RefreshControl } from 'react-native';
 import PropTypes from 'prop-types';
 import { Items } from './components';
 
 const ListOrder = props => {
     // console.log(props.orderList)
+    const [chooseMode, setChooseMode] = useState(false);
+
+    useEffect(() => {
+        if(props.orderList.length > 0){
+            const findChoosed = props.orderList.filter(row => row.choosed === true);
+			if (findChoosed.length === 0 && chooseMode) {
+				setChooseMode(false);
+			}
+        }
+    }, [props.orderList, chooseMode])
+
     const handlePressOption = (value, type) => {
         if(type === 'detail'){
             props.onClickDetail(value);
@@ -16,11 +27,61 @@ const ListOrder = props => {
         }
     }
 
+    const handleChooseItemByLongPress = (orderItem) => {
+        if(!chooseMode){
+            const isValid = validate(orderItem);
+            if(isValid.success){
+                props.onChooseItem(orderItem.extid);
+                setChooseMode(true);
+            }else{
+                alert(isValid.message);
+            }
+        }        
+    }
+
+    const validate = (choosedItem) => {
+        const isValid = {};
+		if (choosedItem.pickupnumber === null || choosedItem.pickupnumber === '') {
+			const firstChoosedItem = props.orderList.find(row => row.choosed === true);
+			if (firstChoosedItem) {
+				const { shippersubdistrict } = firstChoosedItem;
+				if (shippersubdistrict.toLowerCase() !== choosedItem.shippersubdistrict.toLowerCase()) {
+					isValid.success = false;
+					isValid.message = "Harap pilih alamat pengirim yang sama";
+				}else{
+					isValid.success = true;
+					isValid.message = null;
+				}
+			}else{
+				isValid.success = true;
+				isValid.message = null;
+			}
+		}else{
+			isValid.success = false;
+			isValid.message = `ID ORDER ${choosedItem.extid} sebelumnya sudah dipickup, silahkan pilih ID ORDER lain`;
+		}
+
+		return isValid;
+    }
+
+    const handleChooseItem = (orderItem) => {
+        if(chooseMode){//working only
+            const isValid = validate(orderItem);
+            if(isValid.success){
+                props.onChooseItem(orderItem.extid);
+            }else{ 
+                alert(isValid.message);
+            }
+        }
+    }
+
     const renderItem = ({ item, index }) => (
         <Items 
             order={item}
             index={index}
             onPressMenu={handlePressOption}
+            onLongPress={handleChooseItemByLongPress}
+            onPress={handleChooseItem}
         />
     )
 
@@ -47,7 +108,8 @@ ListOrder.propTypes = {
     getNewData: PropTypes.func.isRequired,
     refreshLoading: PropTypes.bool.isRequired,
     handeleRefresh: PropTypes.func.isRequired,
-    onPickup: PropTypes.func.isRequired
+    onPickup: PropTypes.func.isRequired,
+    onChooseItem: PropTypes.func.isRequired
 }
 
 export default ListOrder;

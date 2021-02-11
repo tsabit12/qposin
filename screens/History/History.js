@@ -7,10 +7,10 @@ import {
 } from '../components';
 import { getDateFormat } from '../../helper';
 import { connect } from 'react-redux';
-import { getQob, resetHistory } from '../../redux/actions/history';
+import { getQob, resetHistory, setChoosed, removeAllChoosed } from '../../redux/actions/history';
 import { getSchedule } from '../../redux/actions/schedule';
 import { addMessage } from '../../redux/actions/message';
-import { EmptyMessage, ListLacak, ListOrder, ListSchedule } from './components';
+import { ButtonPickup, EmptyMessage, ListLacak, ListOrder, ListSchedule } from './components';
 import api from '../../api';
 
 const PER_PAGE = 5;
@@ -130,7 +130,8 @@ const History = props => {
         try {
             const pickup = await api.qob.requestPickup(payload);
             if(pickup.respcode === '000'){
-				props.addMessage(`(000) ${pickup.respmsg}`, 'success');
+                props.addMessage(`(000) ${pickup.respmsg}`, 'success');
+                props.removeAllChoosed();
 			}else{
 				props.addMessage(`(${pickup.respcode}) ${pickup.respmsg}`, 'error');
 			}
@@ -169,6 +170,7 @@ const History = props => {
                     refreshLoading={refreshLoading}
                     handeleRefresh={onRefresh}
                     onPickup={(arrId) => setShowJadwal(arrId)}
+                    onChooseItem={props.setChoosed}
                 /> }
 
             { tracks.data.length > 0 && <ListLacak 
@@ -184,6 +186,21 @@ const History = props => {
                 handleClose={() => setShowJadwal([])}
                 handleChoose={onChooseJadwal}
             />
+
+            { list.filter(row => row.choosed === true).length > 0 && 
+                <ButtonPickup 
+                    total={list.filter(row => row.choosed === true).length}
+                    onClose={props.removeAllChoosed}
+                    onClick={() => {
+                        const getChoosed = list.filter(row => row.choosed === true);
+                        const arrExtid  = [];
+                        getChoosed.forEach(element => {
+                            arrExtid.push({ extid: element.extid });
+                        });
+
+                        setShowJadwal(arrExtid);
+                    }}
+                /> }
         </View>
     )
 }
@@ -195,7 +212,9 @@ History.propTypes = {
     list: PropTypes.array.isRequired,
     resetHistory: PropTypes.func.isRequired,
     schedules: PropTypes.array.isRequired,
-    getSchedule: PropTypes.func.isRequired
+    getSchedule: PropTypes.func.isRequired,
+    setChoosed: PropTypes.func.isRequired,
+    removeAllChoosed: PropTypes.func.isRequired
 }
 
 function mapStateToProps(state){
@@ -210,5 +229,7 @@ export default connect(mapStateToProps, {
     getQob,
     addMessage,
     resetHistory,
-    getSchedule
+    getSchedule,
+    setChoosed,
+    removeAllChoosed
 })(History);

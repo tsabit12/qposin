@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
         shadowRadius: 1,
         margin: 5,
         elevation: 2,
-        backgroundColor: '#FFF',
+        //backgroundColor: '#FFF',
         borderRadius: 3
     },
     header: {
