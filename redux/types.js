@@ -6,3 +6,4 @@ export const PICKUP_ITEM = 'PICKUP_ITEM';
 export const SET_CHOOSED = 'SET_CHOOSED';
 export const REMOVE_ALL_CHOOSED = 'REMOVE_ALL_CHOOSED';
 export const RESET_HISTORY = 'RESET_HISTORY';
+export const REMOVE_ORDER = 'REMOVE_ORDER';

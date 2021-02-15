@@ -7,7 +7,13 @@ import {
 } from '../components';
 import { getDateFormat } from '../../helper';
 import { connect } from 'react-redux';
-import { getQob, resetHistory, setChoosed, removeAllChoosed } from '../../redux/actions/history';
+import { 
+    getQob, 
+    resetHistory, 
+    setChoosed, 
+    removeAllChoosed,
+    removeItem
+} from '../../redux/actions/history';
 import { getSchedule } from '../../redux/actions/schedule';
 import { addMessage } from '../../redux/actions/message';
 import { ButtonPickup, EmptyMessage, ListLacak, ListOrder, ListSchedule } from './components';
@@ -149,6 +155,38 @@ const History = props => {
 
     }
 
+    const handleRemoveItem = async (extid, status) => {
+        setLoading(true);
+        const payload = {
+            email: user.email,
+            extid,
+            status
+        }
+
+        console.log(payload);
+
+        try {
+            const cancel = await api.removeOrder(payload);
+            console.log(cancel);
+            if(cancel.respcode === "00"){
+                props.removeItem(extid, status);
+                props.addMessage(`${extid} berhasil dibatalkan`, 'success');
+            }else{
+                props.addMessage(`(${cancel.respcode}) ${cancel.respmsg}`, 'error');
+            }
+        } catch (error) {
+            if(error.response){
+                props.addMessage(`(410) Terdapat kesalahan`, 'error');
+            }else if(error.request){
+                props.addMessage(`(400) Request error`, 'error');
+            }else{
+                props.addMessage(`(500) Internal server error`, 'error');
+            }
+        }
+        
+        setLoading(false);
+    }
+
     return(
         <View style={{flex: 1}}>
             <HeaderComponent 
@@ -171,6 +209,7 @@ const History = props => {
                     handeleRefresh={onRefresh}
                     onPickup={(arrId) => setShowJadwal(arrId)}
                     onChooseItem={props.setChoosed}
+                    removeItem={handleRemoveItem}
                 /> }
 
             { tracks.data.length > 0 && <ListLacak 
@@ -214,7 +253,8 @@ History.propTypes = {
     schedules: PropTypes.array.isRequired,
     getSchedule: PropTypes.func.isRequired,
     setChoosed: PropTypes.func.isRequired,
-    removeAllChoosed: PropTypes.func.isRequired
+    removeAllChoosed: PropTypes.func.isRequired,
+    removeItem: PropTypes.func.isRequired
 }
 
 function mapStateToProps(state){
@@ -231,5 +271,6 @@ export default connect(mapStateToProps, {
     resetHistory,
     getSchedule,
     setChoosed,
-    removeAllChoosed
+    removeAllChoosed,
+    removeItem
 })(History);

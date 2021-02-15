@@ -411,13 +411,6 @@ export default {
 	syncronizeCod: (payload) => axios.post(`${iposUrl}/syncronizeaccount`, {
 		...payload
 	}, qobConfig).then(res => res.data.response),
-	// const { result } = res.data;
-	// 	if (result.respcode === '00' || result.respcode === '21') {
-	// 		return result;
-	// 	}else{
-	// 		return Promise.reject(result);
-	// 	}
-	// }
 	testApi: () => axios.post(`${url1}/test`).then(res => res.data),
 	updateStatusPickup: (payload) => axios.post(`${iposUrl}/setpickup`, {
 		...payload
@@ -428,4 +421,7 @@ export default {
 			return res.data;
 		}
 	}),
+	removeOrder: (payload) => axios.post(`${iposUrl}/cancelorder`, {
+		...payload
+	}).then(res => res.data)
 }

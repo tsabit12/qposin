@@ -70,11 +70,16 @@ const Items = props => {
                             <Icon name="ios-more" style={{fontSize: 20, marginRight: 5}}/>
                         </MenuTrigger>
                         <MenuOptions>
-                            { !isPickup(order.pickupnumber).status && <MenuOption onSelect={() => props.onPressMenu(order, 'pickup')}>
+                            { !isPickup(order.pickupnumber).status ? <MenuOption onSelect={() => props.onPressMenu(order, 'pickup')}>
                                 <View style={styles.textMenu}>
                                     <Text>Pickup</Text>
                                 </View>
+                            </MenuOption> : order.laststatusid === "1" &&  <MenuOption onSelect={() => props.onPressMenu(order, 'cancel', '20')}>
+                                <View style={styles.textMenu}>
+                                    <Text>Batalkan Pickup</Text>
+                                </View>
                             </MenuOption> }
+
                             <MenuOption onSelect={() => props.onPressMenu(order, 'lacak')}>
                                 <View style={styles.textMenu}>
                                     <Text>Lacak Kiriman</Text>
@@ -83,6 +88,11 @@ const Items = props => {
                             <MenuOption onSelect={() => props.onPressMenu(order, 'detail')}>
                                 <View style={styles.textMenu}>
                                     <Text>Lihat Detail</Text>
+                                </View>
+                            </MenuOption>
+							<MenuOption onSelect={() => props.onPressMenu(order, 'cancel', '6')}>
+                                <View style={styles.textMenu}>
+                                    <Text>Batalkan Order</Text>
                                 </View>
                             </MenuOption>
                         </MenuOptions>

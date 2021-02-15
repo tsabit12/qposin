@@ -1,6 +1,7 @@
 import { 
 	GET_ORDER_QOB, 
 	PICKUP_ITEM,
+	REMOVE_ORDER,
 	RESET_HISTORY,
 	SET_CHOOSED
 } from '../types';
@@ -79,6 +80,20 @@ export default function history(state=intialState, action={}) {
 
 					return row;
 				})
+			}
+		case REMOVE_ORDER:
+			return {
+				...state,
+				qob: action.status === '20' ? state.qob.map(row => {
+					if(row.extid === action.extid){
+						return {
+							...row,
+							pickupnumber: null
+						}
+					}
+
+					return row;
+				}) : state.qob.filter(row => row.extid !== action.extid)
 			}
 		default:
 			return state;

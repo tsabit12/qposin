@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, RefreshControl } from 'react-native';
+import { Alert, FlatList, RefreshControl } from 'react-native';
 import PropTypes from 'prop-types';
 import { Items } from './components';
 
@@ -16,11 +16,26 @@ const ListOrder = props => {
         }
     }, [props.orderList, chooseMode])
 
-    const handlePressOption = (value, type) => {
+    //status only for cancel option
+    const handlePressOption = (value, type, status) => {
         if(type === 'detail'){
             props.onClickDetail(value);
         }else if(type === 'lacak'){
             props.onClickLacak(value.extid);
+        }else if(type === 'cancel'){
+            Alert.alert(
+                `BATALKAN ${status === '20' ? 'PICKUP' : 'ORDER'}`,
+                `Apakah kamu yakin untuk membatalkan ${status === '20' ? 'pickup' : 'order'} dengan extid ${value.extid}?`,
+                [
+                    {
+                    text: "Batal",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                    },
+                    { text: "Ya", onPress: () => props.removeItem(value.extid, status) }
+                ],
+                { cancelable: false }
+            );
         }else{
             const payload = [{ extid: value.extid }];
             props.onPickup(payload);
@@ -109,7 +124,8 @@ ListOrder.propTypes = {
     refreshLoading: PropTypes.bool.isRequired,
     handeleRefresh: PropTypes.func.isRequired,
     onPickup: PropTypes.func.isRequired,
-    onChooseItem: PropTypes.func.isRequired
+    onChooseItem: PropTypes.func.isRequired,
+    removeItem: PropTypes.func.isRequired
 }
 
 export default ListOrder;

@@ -1,5 +1,5 @@
 import api from '../../api';
-import { GET_ORDER_QOB } from '../types';
+import { GET_ORDER_QOB, REMOVE_ORDER } from '../types';
 
 export const getQob = (payload) => dispatch => 
 	api.getDetailOrder(payload)
@@ -34,3 +34,10 @@ export const mutltipletPickuped = (noPickup, groupExtid) => dispatch => dispatch
 	noPickup,
 	groupExtid
 })
+
+export const removeItem = (extid, status) => dispatch =>
+	dispatch({
+		type: REMOVE_ORDER,
+		extid,
+		status
+	}) 
