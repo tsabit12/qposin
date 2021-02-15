@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#C51C16',
         //justifyContent: 'center',
         padding: 10,
-        paddingTop: 25,
+        paddingTop: 28,
         flexDirection: 'row',
         alignItems: 'center'
     },
@@ -48,6 +48,11 @@ const styles = StyleSheet.create({
         fontFamily: 'Nunito-semi',
         flex: 1,
         marginRight: 8
+    },
+    subtitle: {
+        color: '#FFF',
+        fontFamily: 'Nunito-semi',
+        fontSize: 12
     }
 })
 

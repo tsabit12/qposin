@@ -15,14 +15,18 @@ const HeaderComponent = props => {
             >
                 <Icon name='ios-arrow-back' style={{color: '#FFF', fontSize: 25}} />
             </TouchableOpacity>
-            <Text style={styles.text}>{title}</Text>
+            <View>
+                <Text style={styles.text}>{title}</Text>
+                { props.subtitle && <Text style={styles.subtitle}>{props.subtitle}</Text>}
+            </View>
         </View>
     )
 }
 
 HeaderComponent.propTypes = {
     onClickBack: PropTypes.func.isRequired,
-    title: PropTypes.string.isRequired
+    title: PropTypes.string.isRequired,
+    subtitle: PropTypes.string
 }
 
 export default HeaderComponent;

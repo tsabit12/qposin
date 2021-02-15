@@ -13,10 +13,11 @@ import {
 } from 'react-native-responsive-screen';
 import { Icon } from 'native-base';
 import rgba from 'hex-to-rgba';
+import { HeaderComponent } from '../components';
 
 const capitalize = (string) => {
 	if (string) {
-		return string.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
+		return string.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ').replace(/\s*$/,'');
 	}else{
 		return '-';
 	}
@@ -28,29 +29,14 @@ const numberWithCommas = (number) => {
 
 const DetailOrder = props => {
 	const { order } = props.route.params;
-	// console.log(order);
+
 	return(
 		<View style={{flex: 1}}>
-			<ImageBackground 
-				source={require('../../assets/images/backgroundHeader.png')} 
-				style={{
-					height: hp('10%'),
-					flexDirection: 'row',
-					alignItems: 'center',
-					paddingLeft: 20
-				}}
-			>
-				<TouchableOpacity 
-					style={{width: wp('7%')}} 
-					onPress={() => props.navigation.goBack()}
-				>
-					<Icon name='ios-arrow-back' style={{color: '#FFF', fontSize: 25, marginTop: 20}} />
-				</TouchableOpacity>
-				<View>
-					<Text style={[styles.text, {marginTop: 20, fontSize: 17}]}>Detail Order</Text>
-					<Text style={styles.subtext}>{order.extid}</Text>
-				</View>
-			</ImageBackground>
+			<HeaderComponent 
+				onClickBack={() => props.navigation.goBack()}
+				title='Detail Order'
+				subtitle={order.extid}
+			/>
 			<ScrollView>
 				<View style={{flex: 1, backgroundColor: '#FFF'}}>
 					<View style={styles.list}>
@@ -66,7 +52,7 @@ const DetailOrder = props => {
 						</Text>
 					</View>
 					<View style={styles.list}>
-						<Text style={styles.title}>Kiriman {order.codvalue === 0 ? '' : 'COD'}</Text>
+						<Text style={styles.title}>Kiriman {order.codstatus.toLowerCase() === 'bukan' ? '' : 'COD'}</Text>
 						<Text style={styles.subtitle}>
 							{order.itemtypeid === '1' ? 'Paket' : 'Surat'} ({capitalize(order.desctrans)})
 						</Text>
@@ -80,7 +66,7 @@ const DetailOrder = props => {
 					<View style={styles.list}>
 						<Text style={styles.title}>Ongkir</Text>
 						<Text style={styles.subtitle}>
-							Rp {numberWithCommas(order.totalamount)}
+							Rp {numberWithCommas(Math.round(order.totalamount).toString())}
 						</Text>
 					</View>
 					<View style={styles.list}>
