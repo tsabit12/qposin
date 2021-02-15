@@ -53,6 +53,14 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontFamily: 'Nunito-semi',
         fontSize: 12
+    },
+    titleContent: {
+        //backgroundColor: 'yellow',
+        width: wp('80%')
+    },
+    lottie: {
+        width: 100,
+	    height: 100
     }
 })
 

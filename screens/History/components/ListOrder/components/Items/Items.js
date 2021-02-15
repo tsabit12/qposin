@@ -5,33 +5,7 @@ import styles from '../styles';
 import { Feather } from '@expo/vector-icons'; 
 import { Menu, MenuOption, MenuOptions, MenuTrigger } from 'react-native-popup-menu';
 import { Icon } from 'native-base';
-
-const isPickup = (pickupnumber, status) => {
-	if(status === '20'){
-		return {
-			color: '#0eab38',
-			status: false
-		}
-	}else{
-		switch (pickupnumber) {
-			case null:
-				return {
-					color: '#0eab38',
-					status: false
-				}
-			case '':
-				return {
-					color: '#0eab38',
-					status: false
-				}
-			default:
-				return {
-					color: '#f59300',
-					status: true
-				}
-		}
-	}
-}
+import { isPickup } from '../../../../../../helper';
 
 const Items = props => {
     const { order } = props;

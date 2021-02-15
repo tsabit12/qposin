@@ -20,7 +20,7 @@ import {
   CityCourier as CityCourierView,
   ScanBarcode as ScanBarcodeView,
   ConnectGiroView,
-//   HitoryOrderView,
+  ChooseLocation,
   EditAlamatView,
   UpdatePlaystoreView,
   FindDriverView,
@@ -63,6 +63,7 @@ const Routes = props => {
 			        		<Stack.Screen name="Bidding" component={FindDriverView} />
 			        		<Stack.Screen name="DetailOrder" component={DetailOrderView} />
 			        		<Stack.Screen name="ChoosePickup" component={ChoosePickup} />
+			        		<Stack.Screen name="ChooseLocation" component={ChooseLocation} />
 			        	</React.Fragment> : <React.Fragment>
 							<Stack.Screen name="Home" component={HomeScreen} />
 							<Stack.Screen name="FormRegister" component={FormRegisterScreen} />

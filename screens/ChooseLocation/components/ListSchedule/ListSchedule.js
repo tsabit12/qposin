@@ -30,9 +30,9 @@ const styles = StyleSheet.create({
         color: 'white'
     },
     header: {
-        backgroundColor: '#C51C16',
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
+        backgroundColor: 'red',
+        borderTopLeftRadius: 15,
+        borderTopRightRadius: 15,
         height: hp('5%'),
         justifyContent: 'center'
     },
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     btn: {
-        backgroundColor: '#C51C16',
+        backgroundColor: 'red',
         width: wp('6%'),
         height: wp('6%'),
         alignItems: 'center',
@@ -85,8 +85,8 @@ const ListSchedule = props => {
                                         `Tahap ${row.tahap} (${row.available_pickup_request}) dipickup (${row.schedule_pickup})`
                                     }
                                 </Text>
-                                <TouchableOpacity style={styles.btn} onPress={() => props.handleChoose(row.id, props.extid)}>
-                                    <AntDesign name="arrowright" size={17} color="white" />
+                                <TouchableOpacity style={styles.btn} onPress={() => props.handleChoose(row.id)}>
+                                    <AntDesign name="arrowright" size={20} color="white" />
                                 </TouchableOpacity>
                             </View>) : <Text>Sedang memuat jadwal pickup..</Text>}
                         </View>
@@ -100,8 +100,8 @@ ListSchedule.propTypes = {
     list: PropTypes.array.isRequired,
     open: PropTypes.bool.isRequired,
     handleClose: PropTypes.func.isRequired,
-    handleChoose: PropTypes.func.isRequired,
-    extid: PropTypes.array.isRequired //adding this cause its in array
+    handleChoose: PropTypes.func.isRequired
+
 }
 
 export default ListSchedule;

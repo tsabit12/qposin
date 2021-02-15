@@ -21,3 +21,4 @@ export { default as FindDriverView } from './FindDriverView';
 export { default as DetailOrder } from './DetailOrder';
 export { default as ChoosePickup } from './ChoosePickup';
 export { default as History } from './History';
+export { default as ChooseLocation } from './ChooseLocation';

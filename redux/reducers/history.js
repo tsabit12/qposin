@@ -62,7 +62,8 @@ export default function history(state=intialState, action={}) {
 							...row,
 							choosed: false,
 							pickupnumber: action.noPickup,
-							lasthistorystatus: 'Pickup'
+							lasthistorystatus: 'Pickup',
+							lasthistorystatusid: 26
 						}
 					}
 
@@ -78,7 +79,7 @@ export default function history(state=intialState, action={}) {
 							...row,
 							pickupnumber: null,
 							lasthistorystatus: 'Batal Pickup',
-							laststatusid: 1
+							lasthistorystatusid: 20
 						}
 					}
 

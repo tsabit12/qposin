@@ -12,12 +12,10 @@ import {
     resetHistory, 
     setChoosed, 
     removeAllChoosed,
-    removeItem,
-    updateNomorPickup
+    removeItem
 } from '../../redux/actions/history';
-import { getSchedule } from '../../redux/actions/schedule';
 import { addMessage } from '../../redux/actions/message';
-import { ButtonPickup, EmptyMessage, ListLacak, ListOrder, ListSchedule } from './components';
+import { ButtonPickup, EmptyMessage, ListLacak, ListOrder } from './components';
 import api from '../../api';
 
 const PER_PAGE = 7;
@@ -40,7 +38,6 @@ const History = props => {
     //handle onEndReached end cause we dont have total data
     const [isFinish, setFinish] = useState(false);
     const [refreshLoading, setRefresh] = useState(false);
-    const [showJadwal, setShowJadwal] = useState([]);
 
     useEffect(() => {
         getData();
@@ -50,12 +47,6 @@ const History = props => {
     useEffect(() => {
         return () => props.resetHistory();
     }, []);
-
-    useEffect(() => {
-        if(showJadwal.length > 0){
-            props.getSchedule({ id: ''});
-        }
-    }, [showJadwal]);
 
     const handleClickLacak = async (extid) => {
         setLoading(true);
@@ -123,44 +114,6 @@ const History = props => {
         setLoading(false);
     }
 
-    const onChooseJadwal = async (jadwalId, value) => {
-        setShowJadwal([]);
-        setLoading(true);
-
-        const payload = {
-            pickupstatus: '1',
-            pickupdate: jadwalId,
-            email: user.email,
-            data: value
-        }
-        
-        try {
-            const pickup = await api.qob.requestPickup(payload);
-            if(pickup.respcode === '000'){
-                props.addMessage(`(000) ${pickup.respmsg}`, 'success');
-                //remove key object in array
-                const groupExtid = [];
-                value.forEach(row => {
-                    groupExtid.push(row.extid);
-                });
-                props.updateNomorPickup(pickup.transref, groupExtid);
-			}else{
-				props.addMessage(`(${pickup.respcode}) ${pickup.respmsg}`, 'error');
-			}
-        } catch (error) {
-            if(error.response){
-                props.addMessage(`(410) Terdapat kesalahan`, 'error');
-            }else if(error.request){
-                props.addMessage(`(400) Request error`, 'error');
-            }else{
-                props.addMessage(`(500) Internal server error`, 'error');
-            }
-        }
-
-        setLoading(false);
-
-    }
-
     const handleRemoveItem = async (extid, status) => {
         setLoading(true);
         const payload = {
@@ -211,7 +164,7 @@ const History = props => {
                     getNewData={handleGetNewData}
                     refreshLoading={refreshLoading}
                     handeleRefresh={onRefresh}
-                    onPickup={(arrId) => setShowJadwal(arrId)}
+                    onPickup={(arrId) => props.navigation.push('ChooseLocation', {extid: arrId})}
                     onChooseItem={props.setChoosed}
                     removeItem={handleRemoveItem}
                 /> }
@@ -221,14 +174,6 @@ const History = props => {
                 extid={tracks.id}
                 onClose={() => setTracks({ data: [] })} 
             /> }
-
-            <ListSchedule 
-                open={showJadwal.length > 0 ? true : false }
-                list={props.schedules}
-                extid={showJadwal}
-                handleClose={() => setShowJadwal([])}
-                handleChoose={onChooseJadwal}
-            />
 
             { list.filter(row => row.choosed === true).length > 0 && 
                 <ButtonPickup 
@@ -241,7 +186,7 @@ const History = props => {
                             arrExtid.push({ extid: element.extid });
                         });
 
-                        setShowJadwal(arrExtid);
+                        props.navigation.push('ChooseLocation', {extid: arrExtid})
                     }}
                 /> }
         </View>
@@ -254,12 +199,9 @@ History.propTypes = {
     addMessage: PropTypes.func.isRequired,
     list: PropTypes.array.isRequired,
     resetHistory: PropTypes.func.isRequired,
-    schedules: PropTypes.array.isRequired,
-    getSchedule: PropTypes.func.isRequired,
     setChoosed: PropTypes.func.isRequired,
     removeAllChoosed: PropTypes.func.isRequired,
-    removeItem: PropTypes.func.isRequired,
-    updateNomorPickup: PropTypes.func.isRequired
+    removeItem: PropTypes.func.isRequired
 }
 
 function mapStateToProps(state){
@@ -274,9 +216,7 @@ export default connect(mapStateToProps, {
     getQob,
     addMessage,
     resetHistory,
-    getSchedule,
     setChoosed,
     removeAllChoosed,
-    removeItem,
-    updateNomorPickup
+    removeItem
 })(History);

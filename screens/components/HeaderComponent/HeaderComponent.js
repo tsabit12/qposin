@@ -15,9 +15,9 @@ const HeaderComponent = props => {
             >
                 <Icon name='ios-arrow-back' style={{color: '#FFF', fontSize: 25}} />
             </TouchableOpacity>
-            <View>
+            <View style={styles.titleContent}>
                 <Text style={styles.text}>{title}</Text>
-                { props.subtitle && <Text style={styles.subtitle}>{props.subtitle}</Text>}
+                { props.subtitle && <Text style={styles.subtitle} numberOfLines={1}>{props.subtitle}</Text>}
             </View>
         </View>
     )

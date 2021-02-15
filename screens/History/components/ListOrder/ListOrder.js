@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Alert, FlatList, RefreshControl } from 'react-native';
 import PropTypes from 'prop-types';
 import { Items } from './components';
+import { isPickup } from '../../../../helper';
 
 const ListOrder = props => {
     // console.log(props.orderList)
@@ -56,8 +57,8 @@ const ListOrder = props => {
 
     const validate = (choosedItem) => {
         const isValid = {};
-		if (choosedItem.pickupnumber === null || choosedItem.pickupnumber === '') {
-			const firstChoosedItem = props.orderList.find(row => row.choosed === true);
+        if(!isPickup(choosedItem.pickupnumber, choosedItem.lasthistorystatusid).status){
+            const firstChoosedItem = props.orderList.find(row => row.choosed === true);
 			if (firstChoosedItem) {
 				const { shippersubdistrict } = firstChoosedItem;
 				if (shippersubdistrict.toLowerCase() !== choosedItem.shippersubdistrict.toLowerCase()) {
@@ -71,10 +72,10 @@ const ListOrder = props => {
 				isValid.success = true;
 				isValid.message = null;
 			}
-		}else{
-			isValid.success = false;
+        }else{
+            isValid.success = false;
 			isValid.message = `ID ORDER ${choosedItem.extid} sebelumnya sudah dipickup, silahkan pilih ID ORDER lain`;
-		}
+        }
 
 		return isValid;
     }
