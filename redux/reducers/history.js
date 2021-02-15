@@ -1,9 +1,10 @@
 import { 
-	GET_ORDER_QOB, 
-	PICKUP_ITEM,
+	GET_ORDER_QOB,
 	REMOVE_ORDER,
 	RESET_HISTORY,
-	SET_CHOOSED
+	SET_CHOOSED,
+	UPDATE_NOPICKUP,
+	REMOVE_ALL_CHOOSED
 } from '../types';
 
 const intialState = {
@@ -22,20 +23,6 @@ export default function history(state=intialState, action={}) {
 				...state,
 				qob: []
 			}
-		case PICKUP_ITEM:
-			return {
-				...state,
-				qob: state.qob.map(row => {
-					if(row.extid === action.extid) {
-						return{ 
-							...row,
-							pickupnumber: action.noPickup
-						}	
-					}
-
-					return row;
-				})
-			} 
 		case SET_CHOOSED:
 			return {
 				...state,
@@ -58,7 +45,7 @@ export default function history(state=intialState, action={}) {
 					return row;
 				})
 			} 
-		case 'REMOVE_ALL_CHOOSED':
+		case REMOVE_ALL_CHOOSED:
 			return {
 				...state,
 				qob: state.qob.map(row => {
@@ -66,7 +53,7 @@ export default function history(state=intialState, action={}) {
 					return row;
 				})
 			}
-		case 'MULTIPLE_ORDER_WAS_PICKUP':
+		case UPDATE_NOPICKUP:
 			return {
 				...state,
 				qob: state.qob.map(row => {
@@ -74,7 +61,8 @@ export default function history(state=intialState, action={}) {
 						return {
 							...row,
 							choosed: false,
-							pickupnumber: action.noPickup
+							pickupnumber: action.noPickup,
+							lasthistorystatus: 'Pickup'
 						}
 					}
 
@@ -88,7 +76,9 @@ export default function history(state=intialState, action={}) {
 					if(row.extid === action.extid){
 						return {
 							...row,
-							pickupnumber: null
+							pickupnumber: null,
+							lasthistorystatus: 'Batal Pickup',
+							laststatusid: 1
 						}
 					}
 

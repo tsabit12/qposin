@@ -102,7 +102,7 @@ const ListOrder = props => {
 
     return(
         <FlatList 
-            data={props.orderList}
+            data={props.orderList.filter(row => row.lasthistorystatusid !== '6')}
             renderItem={renderItem}
             keyExtractor={item => item.id.toString()}
             onEndReached={props.getNewData}

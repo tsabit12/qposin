@@ -12,14 +12,15 @@ import {
     resetHistory, 
     setChoosed, 
     removeAllChoosed,
-    removeItem
+    removeItem,
+    updateNomorPickup
 } from '../../redux/actions/history';
 import { getSchedule } from '../../redux/actions/schedule';
 import { addMessage } from '../../redux/actions/message';
 import { ButtonPickup, EmptyMessage, ListLacak, ListOrder, ListSchedule } from './components';
 import api from '../../api';
 
-const PER_PAGE = 5;
+const PER_PAGE = 7;
 
 const defaultPayload = {
     startdate: '2019-07-01',
@@ -34,7 +35,7 @@ const History = props => {
     const [tracks, setTracks] = useState({ data: [], id: '' });
     const [limit, setLimit] = useState({
         awal: 1,
-        akhir: 5
+        akhir: 7
     })
     //handle onEndReached end cause we dont have total data
     const [isFinish, setFinish] = useState(false);
@@ -101,9 +102,9 @@ const History = props => {
 
         try {
             defaultPayload.email = user.email;
-            // defaultPayload.email = 'abdul@gmail.com';
+            //defaultPayload.email = 'abdul@gmail.com';
             defaultPayload.limitawal = type === 'refresh' ? 1 : limit.awal;
-            defaultPayload.limitakhir = type === 'refresh' ? 5 : limit.akhir;
+            defaultPayload.limitakhir = type === 'refresh' ? 7 : limit.akhir;
             const getOrder = await props.getQob(defaultPayload);
 
             if(getOrder.orders.length >= PER_PAGE){
@@ -137,7 +138,12 @@ const History = props => {
             const pickup = await api.qob.requestPickup(payload);
             if(pickup.respcode === '000'){
                 props.addMessage(`(000) ${pickup.respmsg}`, 'success');
-                props.removeAllChoosed();
+                //remove key object in array
+                const groupExtid = [];
+                value.forEach(row => {
+                    groupExtid.push(row.extid);
+                });
+                props.updateNomorPickup(pickup.transref, groupExtid);
 			}else{
 				props.addMessage(`(${pickup.respcode}) ${pickup.respmsg}`, 'error');
 			}
@@ -162,8 +168,6 @@ const History = props => {
             extid,
             status
         }
-
-        console.log(payload);
 
         try {
             const cancel = await api.removeOrder(payload);
@@ -254,7 +258,8 @@ History.propTypes = {
     getSchedule: PropTypes.func.isRequired,
     setChoosed: PropTypes.func.isRequired,
     removeAllChoosed: PropTypes.func.isRequired,
-    removeItem: PropTypes.func.isRequired
+    removeItem: PropTypes.func.isRequired,
+    updateNomorPickup: PropTypes.func.isRequired
 }
 
 function mapStateToProps(state){
@@ -272,5 +277,6 @@ export default connect(mapStateToProps, {
     getSchedule,
     setChoosed,
     removeAllChoosed,
-    removeItem
+    removeItem,
+    updateNomorPickup
 })(History);
