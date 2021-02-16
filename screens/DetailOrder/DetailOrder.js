@@ -90,7 +90,7 @@ const DetailOrder = props => {
 					<View style={styles.list}>
 						<Text style={styles.title}>Status Terakhir</Text>
 						<Text style={styles.subtitle}>
-							{order.laststatus}
+							{order.lasthistorystatus}
 						</Text>
 					</View>
 				</View>

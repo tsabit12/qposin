@@ -57,7 +57,7 @@ const ListOrder = props => {
 
     const validate = (choosedItem) => {
         const isValid = {};
-        if(!isPickup(choosedItem.pickupnumber, choosedItem.lasthistorystatusid).status){
+        if(!isPickup(choosedItem.lasthistorystatusid).status){
             const firstChoosedItem = props.orderList.find(row => row.choosed === true);
 			if (firstChoosedItem) {
 				const { shippersubdistrict } = firstChoosedItem;

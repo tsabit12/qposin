@@ -40,7 +40,7 @@ const Items = props => {
                     </Text>
                     <View style={{flex: 1}}>
                         <TouchableOpacity 
-                            style={[styles.icon, { backgroundColor: isPickup(order.pickupnumber, order.lasthistorystatusid).color}]}
+                            style={[styles.icon, { backgroundColor: isPickup(order.lasthistorystatusid).color}]}
                             disabled
                         >
                             <Feather name="box" size={13} color="white" />
@@ -51,7 +51,7 @@ const Items = props => {
                             <Icon name="ios-more" style={{fontSize: 20, marginRight: 5}}/>
                         </MenuTrigger>
                         <MenuOptions>
-                            { !isPickup(order.pickupnumber, order.lasthistorystatusid).status && <MenuOption onSelect={() => props.onPressMenu(order, 'pickup')}>
+                            { !isPickup(order.lasthistorystatusid).status && <MenuOption onSelect={() => props.onPressMenu(order, 'pickup')}>
                                 <View style={styles.textMenu}>
                                     <Text>Pickup</Text>
                                 </View>
@@ -72,7 +72,7 @@ const Items = props => {
                                     <Text>Batalkan Order</Text>
                                 </View>
                             </MenuOption>
-							{ isPickup(order.pickupnumber, order.lasthistorystatusid).status && <MenuOption onSelect={() => props.onPressMenu(order, 'cancel', '20')}>
+							{ isPickup(order.lasthistorystatusid).status && <MenuOption onSelect={() => props.onPressMenu(order, 'cancel', '20')}>
                                 <View style={styles.textMenu}>
                                     <Text>Batalkan Pickup</Text>
                                 </View>

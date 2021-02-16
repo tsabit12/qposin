@@ -261,29 +261,22 @@ export const getDateFormat = (date, type) => {
     }
 }
 
-export const isPickup = (pickupnumber, status) => {
-	if(status === '20'){
-		return {
-			color: '#0eab38',
-			status: false
-		}
-	}else{
-		switch (pickupnumber) {
-			case null:
-				return {
-					color: '#0eab38',
-					status: false
-				}
-			case '':
-				return {
-					color: '#0eab38',
-					status: false
-				}
-			default:
-				return {
-					color: '#f59300',
-					status: true
-				}
-		}
-	}
+export const isPickup = (status) => {
+    switch(status){
+        case '20':
+            return {
+                color: '#0eab38',
+			    status: false
+            }
+        case '1':
+            return {
+                color: '#0eab38',
+			    status: false
+            }
+        default:
+            return {
+                color: '#f59300',
+				status: true
+            }
+    }
 }

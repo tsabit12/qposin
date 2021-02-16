@@ -19,6 +19,14 @@ const HeaderComponent = props => {
                 <Text style={styles.text}>{title}</Text>
                 { props.subtitle && <Text style={styles.subtitle} numberOfLines={1}>{props.subtitle}</Text>}
             </View>
+            { props.searching && 
+                <TouchableOpacity 
+                    style={styles.searchIcon}
+                    activeOpacity={0.8}
+                    onPress={props.onSearch}
+                >
+                    <Icon name='ios-search' style={{color: '#FFF', fontSize: 28}} />
+                </TouchableOpacity> }
         </View>
     )
 }
@@ -26,7 +34,9 @@ const HeaderComponent = props => {
 HeaderComponent.propTypes = {
     onClickBack: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
-    subtitle: PropTypes.string
+    subtitle: PropTypes.string,
+    searching: PropTypes.bool,
+    onSearch: PropTypes.func
 }
 
 export default HeaderComponent;

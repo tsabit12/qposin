@@ -92,8 +92,8 @@ const History = props => {
         }
 
         try {
-            defaultPayload.email = user.email;
-            //defaultPayload.email = 'abdul@gmail.com';
+            //defaultPayload.email = user.email;
+            defaultPayload.email = 'abdul@gmail.com';
             defaultPayload.limitawal = type === 'refresh' ? 1 : limit.awal;
             defaultPayload.limitakhir = type === 'refresh' ? 7 : limit.akhir;
             const getOrder = await props.getQob(defaultPayload);

@@ -38,7 +38,6 @@ const styles = StyleSheet.create({
     },
     loadingContent: {
         flexDirection: 'row',
-        //backgroundColor: 'red',
         flex: 1,
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -55,12 +54,20 @@ const styles = StyleSheet.create({
         fontSize: 12
     },
     titleContent: {
-        //backgroundColor: 'yellow',
-        width: wp('80%')
+        width: wp('75%')
     },
     lottie: {
         width: 100,
 	    height: 100
+    },
+    searchIcon: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: hp('5%'),
+        marginTop: 7,
+        marginLeft: 10,
+        //backgroundColor: 'black'
     }
 })
 

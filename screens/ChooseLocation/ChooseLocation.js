@@ -107,7 +107,7 @@ const ChooseLocation = props => {
                     groupExtid.push(row.extid);
                 });
                 props.updateNomorPickup(pickup.transref, groupExtid);
-                
+
                 setTimeout(() => {
                     props.navigation.goBack();
                 }, 100);
@@ -133,6 +133,8 @@ const ChooseLocation = props => {
                 title='Pilih lokasi pickup'
                 subtitle={subtitle}
                 onClickBack={() => props.navigation.goBack()}
+                searching={true}
+                onSearch={() => props.navigation.push("SearchAddress")}
             />
             <MapView
                 region={region}

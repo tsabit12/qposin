@@ -26,7 +26,8 @@ import {
   FindDriverView,
   DetailOrder as DetailOrderView,
   ChoosePickup,
-  History as HistoryOrderScreen
+  History as HistoryOrderScreen,
+  SearchAddress
 } from './screens';
 import Notification from './Notification';
 import { closeMessage } from './redux/actions/message';
@@ -64,6 +65,7 @@ const Routes = props => {
 			        		<Stack.Screen name="DetailOrder" component={DetailOrderView} />
 			        		<Stack.Screen name="ChoosePickup" component={ChoosePickup} />
 			        		<Stack.Screen name="ChooseLocation" component={ChooseLocation} />
+							<Stack.Screen name="SearchAddress" component={SearchAddress}/>
 			        	</React.Fragment> : <React.Fragment>
 							<Stack.Screen name="Home" component={HomeScreen} />
 							<Stack.Screen name="FormRegister" component={FormRegisterScreen} />
