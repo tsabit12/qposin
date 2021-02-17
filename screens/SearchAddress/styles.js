@@ -31,5 +31,26 @@ export default StyleSheet.create({
         justifyContent: 'center',
         width: wp('8%'),
         alignItems: 'center'
+    },
+    list: {
+        padding: 10,
+        borderBottomWidth: 0.4,
+        borderColor: '#ababab',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+    },
+    text: {
+        fontFamily: 'Nunito-semi',
+        width: wp('87%'),
+        fontSize: 13
+    },
+    iconList: {
+        fontSize: 20
+    },
+    iconContent: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 })

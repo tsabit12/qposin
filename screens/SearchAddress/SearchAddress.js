@@ -1,34 +1,56 @@
 import { Icon } from 'native-base';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import api from '../../api';
 import styles from './styles';
+import { ListComponent } from './components';
+import { CommonActions } from '@react-navigation/native';
 
 const SearchAddress = props => {
     const [param, setParam] = useState('');
     const [label, setLabel] = useState('Cari nama jalan atau kecamatan atau kota diatas');
+    const [list, setList] = useState([]);
 
     useEffect(() => {
         if(param){
             const timeId = setTimeout(() => {
-                getAddress();
+                setLabel('Loading...');
+                setList([]);
+                api.google.findLatlongbyAddres(param)
+                    .then(addres => setList(addres))
+                    .catch(() => setLabel(`Tidak ditemukan hasil untuk ${param}`)); 
             }, 1000);
 
             return () => clearTimeout(timeId);
         }
     }, [param]);
 
-    const getAddress = async () => {
-        setLabel('Loading...');
+    const handleChoose = (value) => {
+        props.navigation.dispatch(state => {
+            //remove current route
+            const routes    = state.routes.filter(r => r.name !== 'SearchAddress');
+            const newRoutes = [];
+            
+            routes.forEach(route => {
+                if(route.name === 'ChooseLocation'){ //add lat long
+                    newRoutes.push({
+                        ...route,
+                        params: {
+                            ...route.params,
+                            coordinate: value.location
+                        }
+                    })
+                }else{
+                    newRoutes.push(route);
+                }
+            });
 
-        try {
-            const address = await api.google.findLatlongbyAddres(param);
-            console.log(address);
-        } catch (error) {
-            console.log(error);
-        }
-
-        setLabel('Something wrong');
+            return CommonActions.reset({
+                ...state,
+                routes: newRoutes,
+			    index: routes.length - 1,
+            })
+        })
     }
 
     return(
@@ -39,6 +61,7 @@ const SearchAddress = props => {
                         placeholder='Cari jalan/kecamatan/kota...'    
                         autoFocus={true}
                         value={param}
+                        style={{flex: 1}}
                         onChangeText={(text) => setParam(text)}
                     />
                     <TouchableOpacity 
@@ -49,9 +72,12 @@ const SearchAddress = props => {
                     </TouchableOpacity>
                 </View>
             </View>
-            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}> 
+            { list.length > 0 ? <ListComponent 
+                data={list}
+                onChooseAddres={handleChoose}
+            /> : <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}> 
                 <Text>{label}</Text>
-            </View> 
+            </View> }
         </View>
     )
 }

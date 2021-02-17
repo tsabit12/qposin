@@ -192,12 +192,11 @@ export default {
 		findLatlongbyAddres: (value) => axios.get(`https://maps.googleapis.com/maps/api/place/textsearch/json`, {
 			params: {
 				query: value,
-				// components: 'country:indonesia',
+				components: 'country:indonesia',
 				key: GOOGLE_API_KEY
 			}
 		}).then(res => {
 			const { results } = res.data;
-			console.log(results);
 			if (results.length > 0) {
 				const response = [];
 				results.forEach(places => {

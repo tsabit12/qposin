@@ -19,7 +19,7 @@ const LATITUDE_DELTA    = 0.02;
 const LONGITUDE_DELTA   = LATITUDE_DELTA * (width / height);
 
 const ChooseLocation = props => {
-    const { user } = props;
+    const { user, route } = props;
     const [coordinates] = useState(new AnimatedRegion({
         latitude: LATITUDE,
         longitude: LOGITUDE,
@@ -50,6 +50,24 @@ const ChooseLocation = props => {
             props.getSchedule({ id: ''});
         }
     }, [open]);
+
+    useEffect(() => {
+        if(route.params.coordinate){
+            const { lat, lng } = route.params.coordinate;
+            coordinates.timing({
+                latitude: lat,
+                longitude: lng,
+                latitudeDelta: LATITUDE_DELTA,
+                longitudeDelta: LONGITUDE_DELTA
+            }).start();
+
+            setRegion(region => ({
+                ...region,
+                latitude: lat,
+                longitude: lng
+            }))
+        }
+    }, [route]);
 
     const getCurrentPosition = async () => {
         try {
@@ -174,7 +192,8 @@ const ChooseLocation = props => {
 ChooseLocation.propTypes = {
     route: PropTypes.shape({
         params: PropTypes.shape({
-            extid: PropTypes.array.isRequired
+            extid: PropTypes.array.isRequired,
+            coordinate: PropTypes.object
         }).isRequired
     }).isRequired,
     schedules: PropTypes.array.isRequired,
