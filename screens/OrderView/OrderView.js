@@ -54,15 +54,15 @@ const handleConvertTarif = (res, type) => {
 	});
 
 	//let filterVal 	= [];
-	if (type === 2) {
-		const filterVal = ['210','240','EC2','EC1','1Q9','2Q9','447','401','417'];
-		const filters 	= toWhatIwant.filter(x => filterVal.includes(x.id));
-		return filters;
-	}else{
-		const filterVal = ['EC2'];
-		const filters 	= toWhatIwant.filter(x => filterVal.includes(x.id));
-		return filters;
-	}
+	//if (type === 2) {
+	const filterVal = ['210','240','EC2','EC1','1Q9','2Q9','447','401','417'];
+	const filters 	= toWhatIwant.filter(x => filterVal.includes(x.id));
+	return filters;
+	// }else{
+	// 	const filterVal = ['EC2'];
+	// 	const filters 	= toWhatIwant.filter(x => filterVal.includes(x.id));
+	// 	return filters;
+	// }
 }
 
 const OrderView = props => {
@@ -414,7 +414,8 @@ const OrderView = props => {
 		}
 
 		props.navigation.navigate('DataPenerima', {
-			data: payload
+			data: payload,
+			type: params.type
 		})
 	}
 
@@ -538,7 +539,7 @@ const OrderView = props => {
 						<Icon name='ios-arrow-back' style={{color: '#FFF', fontSize: 25, marginTop: 20}} />
 					</TouchableOpacity>
 					<Text style={[styles.text, {marginTop: 20, fontSize: 17, color: '#FFF'}]}>
-						{ params.type === 1 ? 'Kiriman E-Commerce' : 'Online Booking' }
+						{ params.type === 1 ? 'Pickup' : 'Online Booking' }
 					</Text>
 				</View>
 				{ state.disabled && <TouchableOpacity 

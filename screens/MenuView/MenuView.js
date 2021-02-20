@@ -425,11 +425,11 @@ const MenuView = props => {
 										<View style={[styles.image, styles.elevationImage]}>
 											<Image 
 												style={styles.image}
-												source={require('../../assets/images/icon/qcom.png')} 
+												source={require('../../assets/images/icon/pickup.png')} 
 												resizeMode='contain'
 											/>
 										</View>
-										<Text style={styles.textLabel}>Kiriman{'\n'}E-Commerce</Text>
+										<Text style={styles.textLabel}>Pickup</Text>
 									</TouchableOpacity>
 
 									<TouchableOpacity 

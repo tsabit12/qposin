@@ -43,7 +43,7 @@ const DataPenerima = props => {
 	})
 	const [loadingSync, setLoadingSync] = useState(true);
 
-	const { data: dataProps } = props.route.params;
+	const { data: dataProps, type: typeMenu } = props.route.params;
 	const { data, errors } = state;
 
 	useEffect(() => {
@@ -155,9 +155,14 @@ const DataPenerima = props => {
 			const saveOrder = await api.qob.booking(payload);
 			const { respcode, transref, respmsg } = saveOrder;
 			if(respcode === '000'){
-				props.navigation.replace('ChoosePickup', {
-					...transref
-				})
+				if(typeMenu === 1){
+					props.navigation.replace('ChoosePickup', {
+						...transref
+					})
+				}else{
+					props.addMessage(`(${respcode}) ${respmsg}`, 'success');
+					backHome();
+				}
 			}else{
 				props.addMessage(`(${respcode}) ${respmsg}`, 'error');
 			}
