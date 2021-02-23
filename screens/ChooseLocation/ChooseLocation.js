@@ -35,6 +35,8 @@ const ChooseLocation = props => {
     const [subtitle, setSubtitle] = useState('Loading...');
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [kodepos, setKodepos] = useState('');
+    const [scheduleLoading, setScheduleLoading] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -47,7 +49,19 @@ const ChooseLocation = props => {
 
     useEffect(() => {
         if(open){
-            props.getSchedule({ id: ''});
+            (async () => {
+                try {
+                    await props.getSchedule({ 
+                        id: '',
+                        kodepos: kodepos
+                    });   
+                } catch (error) {
+                    setOpen(false); //to show notif
+                    props.addMessage('Terdapat kesalahan', 'error');
+                }
+
+                setScheduleLoading(false);
+            })();
         }
     }, [open]);
 
@@ -95,7 +109,8 @@ const ChooseLocation = props => {
         setRegion(location); 
         try {
             const addres = await api.google.getAddres({ latitude: location.latitude, longitude: location.longitude });
-            setSubtitle(`${addres.kota} ${addres.kecamatan} (${addres.street})`);
+            setSubtitle(`(${addres.kodepos}) ${addres.kota} ${addres.kecamatan} (${addres.street})`);
+            setKodepos(addres.kodepos);
         } catch (error) {
             setSubtitle('Error');
         }
@@ -174,13 +189,17 @@ const ChooseLocation = props => {
                 list={props.schedules}
                 handleChoose={handlePickup}
                 handleClose={() => setOpen(false)}
+                loading={scheduleLoading}
             />
             
             {!open && !loading && <View style={styles.btnContainer}>
                 <TouchableOpacity 
                     style={styles.btn}
                     activeOpacity={0.7}
-                    onPress={() => setOpen(true)}
+                    onPress={() => {
+                        setOpen(true);
+                        setScheduleLoading(true);
+                    }}
                 >
                     <Text style={styles.title}>SELANJUTNYA</Text>
                 </TouchableOpacity>

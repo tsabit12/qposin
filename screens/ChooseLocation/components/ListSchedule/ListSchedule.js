@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
         color: 'white'
     },
     header: {
-        backgroundColor: 'red',
+        backgroundColor: '#C51C16',
         borderTopLeftRadius: 15,
         borderTopRightRadius: 15,
         height: hp('5%'),
@@ -47,10 +47,11 @@ const styles = StyleSheet.create({
         flex: 1,
         width: wp('90%'),
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        margin: 5
     },
     btn: {
-        backgroundColor: 'red',
+        backgroundColor: '#C51C16',
         width: wp('6%'),
         height: wp('6%'),
         alignItems: 'center',
@@ -88,7 +89,13 @@ const ListSchedule = props => {
                                 <TouchableOpacity style={styles.btn} onPress={() => props.handleChoose(row.id)}>
                                     <AntDesign name="arrowright" size={20} color="white" />
                                 </TouchableOpacity>
-                            </View>) : <Text>Sedang memuat jadwal pickup..</Text>}
+                            </View>) : <React.Fragment>
+                                {props.loading ? <Text>Sedang memuat jadwal pickup..</Text> : 
+                                <Text>
+                                    Jadwal pickup tidak ditemukan pada lokasi yang anda pilih. 
+                                    Silahkan geser lokasi atau cari lokasi lainnya yang terdapat kodeposnya    
+                                </Text>}
+                            </React.Fragment>}
                         </View>
                     </View>
             </Modal>  
@@ -100,8 +107,8 @@ ListSchedule.propTypes = {
     list: PropTypes.array.isRequired,
     open: PropTypes.bool.isRequired,
     handleClose: PropTypes.func.isRequired,
-    handleChoose: PropTypes.func.isRequired
-
+    handleChoose: PropTypes.func.isRequired,
+    loading: PropTypes.bool.isRequired
 }
 
 export default ListSchedule;
