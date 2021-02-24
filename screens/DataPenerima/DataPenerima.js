@@ -18,7 +18,8 @@ import {
 } from 'react-native-responsive-screen';
 import rgba from 'hex-to-rgba';
 import {
-	ResultView
+	ResultView,
+	SyncComponent
 } from './components';
 import { connect } from 'react-redux';
 import AnimatedLoader from "react-native-animated-loader";
@@ -28,6 +29,7 @@ import { resetOrder } from '../../redux/actions/order';
 import { addMessage } from '../../redux/actions/message';
 import * as Location from 'expo-location';
 import { pushUserDataToWeb, setIsSync } from '../../helper';
+import { set } from 'react-native-reanimated';
 
 const DataPenerima = props => {
 	const [ state, setState ] = useState({
@@ -41,7 +43,7 @@ const DataPenerima = props => {
 		errors: {},
 		loading: false
 	})
-	const [loadingSync, setLoadingSync] = useState(true);
+	const [isSyncWeb, setIsSyncWeb] = useState(true);
 
 	const { data: dataProps, type: typeMenu } = props.route.params;
 	const { data, errors } = state;
@@ -51,24 +53,35 @@ const DataPenerima = props => {
 			try {
 				const isSyncWeb = await AsyncStorage.getItem('isSyncWeb');
 				if(isSyncWeb === null){
+					setState(state => ({
+						...state,
+						loading: true
+					}))
+
 					const { email, userid } = props.user.localUser;
 					
 					pushUserDataToWeb(userid, email)
 						.then(() => {
 							setIsSync(true);
-							setLoadingSync(false);
+
+							setState(state => ({
+								...state,
+								loading: false
+							}))
 						})
 						.catch(err => {
 							const { code, errorMsg } = err;
 							props.addMessage(`(${code}) ${errorMsg}`, 'error');
-							setLoadingSync(false);
+							setIsSyncWeb(false);
+
+							setState(state => ({
+								...state,
+								loading: false
+							}))
 						})
-				}else{
-					setLoadingSync(false);
-					//AsyncStorage.removeItem('isSyncWeb');
 				}
+
 			} catch (error) {
-				setLoadingSync(false);
 				props.addMessage('(112) Error fetching storage', 'error');
 			}
 		})();
@@ -197,7 +210,30 @@ const DataPenerima = props => {
 			);
 		}, 10);
 	}
- 
+
+	const handleSyncWeb = async () => {
+		setState(state => ({
+			...state,
+			loading: true
+		}))
+
+		const { userid, email } = props.user.localUser;
+
+		try {
+			await pushUserDataToWeb(userid, email);	
+			setIsSync(true); //save to storage
+			setIsSyncWeb(true); //live reload state
+		} catch (error) {
+			const { code, errorMsg } = error;
+			props.addMessage(`(${code}) ${errorMsg}`, 'error');
+		}
+
+		setState(state => ({
+			...state,
+			loading: false
+		}))
+	}
+	
 	return(
 		<ImageBackground 
 			source={require('../../assets/images/background.png')} 
@@ -233,66 +269,67 @@ const DataPenerima = props => {
 					Kirim {dataProps.jenis === '1' ? 'paket' : 'surat'} ke siapa?
 				</Text>
 			</View>
-			<ScrollView style={{flex: 1, backgroundColor: '#FFF'}}>
-				<View style={{flex: 1, backgroundColor: '#FFF', alignItems: 'center'}}>
-					<View style={styles.form}>
-						<View style={styles.field}>
-							<Text style={styles.label}>Nama</Text>
-							<TextInput 
-								style={styles.input}
-								value={data.nama}
-								placeholder='Masukkan nama penerima'
-								onChangeText={(text) => handleChange(text, 'nama')}
-								autoCapitalize='words'
-							/>
-							{ errors.nama && <Text style={styles.labelErr}>{errors.nama}</Text> }
-						</View>
+			{ !isSyncWeb ? <SyncComponent onSubmit={handleSyncWeb} /> : 
+				<ScrollView style={{flex: 1, backgroundColor: '#FFF'}}>
+					<View style={{flex: 1, backgroundColor: '#FFF', alignItems: 'center'}}>
+						<View style={styles.form}>
+							<View style={styles.field}>
+								<Text style={styles.label}>Nama</Text>
+								<TextInput 
+									style={styles.input}
+									value={data.nama}
+									placeholder='Masukkan nama penerima'
+									onChangeText={(text) => handleChange(text, 'nama')}
+									autoCapitalize='words'
+								/>
+								{ errors.nama && <Text style={styles.labelErr}>{errors.nama}</Text> }
+							</View>
 
-						<View style={styles.field}>
-							<Text style={styles.label}>Alamat utama</Text>
-							<TextInput 
-								style={styles.input}
-								value={data.street}
-								placeholder='Contoh: jln xxx no 12'
-								onChangeText={(text) => handleChange(text, 'street')}
-								autoCapitalize='none'
-							/>
-							{ errors.street && <Text style={styles.labelErr}>{errors.street}</Text> }
-						</View>
+							<View style={styles.field}>
+								<Text style={styles.label}>Alamat utama</Text>
+								<TextInput 
+									style={styles.input}
+									value={data.street}
+									placeholder='Contoh: jln xxx no 12'
+									onChangeText={(text) => handleChange(text, 'street')}
+									autoCapitalize='none'
+								/>
+								{ errors.street && <Text style={styles.labelErr}>{errors.street}</Text> }
+							</View>
 
-						<View style={styles.field}>
-							<Text style={styles.label}>Email <Text style={{color: rgba('#4d4d4d', 0.6)}}>(optional)</Text></Text>
-							<TextInput 
-								style={styles.input}
-								placeholder='Masukkan email penerima'
-								keyboardType='email-address'
-								autoCapitalize='none'
-								value={data.email}
-								onChangeText={(text) => handleChange(text, 'email')}
-							/>
-						</View>
+							<View style={styles.field}>
+								<Text style={styles.label}>Email <Text style={{color: rgba('#4d4d4d', 0.6)}}>(optional)</Text></Text>
+								<TextInput 
+									style={styles.input}
+									placeholder='Masukkan email penerima'
+									keyboardType='email-address'
+									autoCapitalize='none'
+									value={data.email}
+									onChangeText={(text) => handleChange(text, 'email')}
+								/>
+							</View>
 
-						<View style={styles.field}>
-							<Text style={styles.label}>Nomor handphone</Text>
-							<TextInput 
-								style={styles.input}
-								placeholder='Masukkan nomor handphone penerima'
-								value={data.phone}
-								keyboardType='phone-pad'
-								onChangeText={(text) => handleChange(text, 'phone')}
-							/>
-							{ errors.phone && <Text style={styles.labelErr}>{errors.phone}</Text> }
+							<View style={styles.field}>
+								<Text style={styles.label}>Nomor handphone</Text>
+								<TextInput 
+									style={styles.input}
+									placeholder='Masukkan nomor handphone penerima'
+									value={data.phone}
+									keyboardType='phone-pad'
+									onChangeText={(text) => handleChange(text, 'phone')}
+								/>
+								{ errors.phone && <Text style={styles.labelErr}>{errors.phone}</Text> }
+							</View>
+							<TouchableOpacity 
+								style={styles.button}
+								activeOpacity={0.7}
+								onPress={handleSubmitPenerima}
+							>
+								<Text style={styles.text}>Selanjutnya</Text>
+							</TouchableOpacity>
 						</View>
-						<TouchableOpacity 
-							style={styles.button}
-							activeOpacity={0.7}
-							onPress={handleSubmitPenerima}
-						>
-							<Text style={styles.text}>{loadingSync ? 'Synchronizing...' : 'Selanjutnya'}</Text>
-						</TouchableOpacity>
 					</View>
-				</View>
-			</ScrollView>
+				</ScrollView> }
 		</ImageBackground>
 	);
 }
